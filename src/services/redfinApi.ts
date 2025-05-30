@@ -24,41 +24,41 @@ interface AutoCompleteResponse {
 }
 
 interface PropertyDetailsResponse {
-  data: {
-    avm: {
-      lastSoldDate: number;
-      lastSoldPrice: number;
-      numBeds: number;
-      sqFt: {
-        value: number;
-      };
+  avm: {
+    lastSoldDate: number;
+    lastSoldPrice: number;
+    numBeds: number;
+    sqFt: {
+      value: number;
     };
-    belowTheFold: {
-      propertyHistoryInfo: {
-        events: Array<{
-          mlsDescription: string;
-          price: number;
-          eventDate: number;
-        }>;
-      };
+  };
+  belowTheFold: {
+    propertyHistoryInfo: {
+      events: Array<{
+        mlsDescription: string;
+        price: number;
+        eventDate: number;
+      }>;
     };
-    primaryRegionInfo: {
-      regionType: number;
-      tableId: number;
-    };
-    marketInsightsInfo?: {
+  };
+  primaryRegionInfo: {
+    regionType: number;
+    tableId: number;
+  };
+  marketInsightsInfo?: {
+    competeScoreInfo?: {
       aggs?: {
         dom?: number;
         saleToList?: number;
       };
     };
-    nearbyhomes?: {
-      nearbyHomeDataList?: Array<{
-        sqFt?: {
-          value?: number;
-        };
-      }>;
-    };
+  };
+  nearbyhomes?: {
+    nearbyHomeDataList?: Array<{
+      sqFt?: {
+        value?: number;
+      };
+    }>;
   };
 }
 
@@ -111,20 +111,24 @@ export const getPropertyDetails = async (redfinUrl: string): Promise<RedfinPrope
       throw new Error(`Property details API error: ${response.status}`);
     }
 
-    const data: PropertyDetailsResponse = await response.json();
+    const response_data = await response.json();
+    console.log('Full API Response:', JSON.stringify(response_data, null, 2));
+    
+    const data: PropertyDetailsResponse = response_data.data;
+    console.log('Extracted data object:', JSON.stringify(data, null, 2));
     
     // Extract sold date and price
-    const soldDate = data.data?.avm?.lastSoldDate 
-      ? new Date(data.data.avm.lastSoldDate).toLocaleDateString()
+    const soldDate = data?.avm?.lastSoldDate 
+      ? new Date(data.avm.lastSoldDate).toLocaleDateString()
       : null;
-    const soldPrice = data.data?.avm?.lastSoldPrice || null;
+    const soldPrice = data?.avm?.lastSoldPrice || null;
 
     // Extract listed date and price from events array
     let listedDate: string | null = null;
     let listedPrice: number | null = null;
     
-    if (data.data?.belowTheFold?.propertyHistoryInfo?.events) {
-      const activeEvent = data.data.belowTheFold.propertyHistoryInfo.events.find(
+    if (data?.belowTheFold?.propertyHistoryInfo?.events) {
+      const activeEvent = data.belowTheFold.propertyHistoryInfo.events.find(
         event => event.mlsDescription === 'Active'
       );
       
@@ -135,24 +139,32 @@ export const getPropertyDetails = async (redfinUrl: string): Promise<RedfinPrope
     }
 
     // Extract bedrooms and square feet
-    const bedrooms = data.data?.avm?.numBeds || null;
-    const squareFeet = data.data?.avm?.sqFt?.value || null;
+    const bedrooms = data?.avm?.numBeds || null;
+    const squareFeet = data?.avm?.sqFt?.value || null;
 
     // Extract region code (regionType_tableId)
-    const regionCode = data.data?.primaryRegionInfo 
-      ? `${data.data.primaryRegionInfo.regionType}_${data.data.primaryRegionInfo.tableId}`
+    const regionCode = data?.primaryRegionInfo 
+      ? `${data.primaryRegionInfo.regionType}_${data.primaryRegionInfo.tableId}`
       : null;
 
-    // Extract neighborhood market insights
-    const neighborhoodAvgDaysOnMarket = data.data?.marketInsightsInfo?.aggs?.dom || null;
-    const neighborhoodAvgSaleToListRatio = data.data?.marketInsightsInfo?.aggs?.saleToList || null;
+    // Extract neighborhood market insights with corrected path
+    console.log('Market insights info:', JSON.stringify(data?.marketInsightsInfo, null, 2));
+    const neighborhoodAvgDaysOnMarket = data?.marketInsightsInfo?.competeScoreInfo?.aggs?.dom || null;
+    const neighborhoodAvgSaleToListRatio = data?.marketInsightsInfo?.competeScoreInfo?.aggs?.saleToList || null;
+    
+    console.log('Extracted neighborhood avg days on market:', neighborhoodAvgDaysOnMarket);
+    console.log('Extracted neighborhood avg sale-to-list ratio:', neighborhoodAvgSaleToListRatio);
 
-    // Calculate nearby homes average square feet
+    // Calculate nearby homes average square feet with corrected path
     let nearbyHomesAvgSquareFeet: number | null = null;
-    if (data.data?.nearbyhomes?.nearbyHomeDataList) {
-      const squareFeetValues = data.data.nearbyhomes.nearbyHomeDataList
+    console.log('Nearby homes data:', JSON.stringify(data?.nearbyhomes?.nearbyHomeDataList, null, 2));
+    
+    if (data?.nearbyhomes?.nearbyHomeDataList) {
+      const squareFeetValues = data.nearbyhomes.nearbyHomeDataList
         .map(home => home.sqFt?.value)
         .filter((value): value is number => value !== undefined && value !== null);
+      
+      console.log('Square feet values from nearby homes:', squareFeetValues);
       
       if (squareFeetValues.length > 0) {
         nearbyHomesAvgSquareFeet = Math.round(
@@ -174,7 +186,7 @@ export const getPropertyDetails = async (redfinUrl: string): Promise<RedfinPrope
       nearbyHomesAvgSquareFeet
     };
 
-    console.log('Extracted property data:', propertyData);
+    console.log('Final extracted property data:', propertyData);
     return propertyData;
   } catch (error) {
     console.error('Error fetching property details:', error);
