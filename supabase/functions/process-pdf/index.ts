@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -108,6 +107,7 @@ Your analysis should be:
 - Focused on safety and financial impact
 - Helpful for prioritizing repairs
 - Based on realistic cost estimates for typical markets
+- Comprehensive and thorough - typical inspection reports contain 15-25 findings. Include both major issues and routine maintenance items to provide comprehensive value.
 
 Return your response as valid JSON matching this exact structure (no markdown, no code blocks, just pure JSON):
 
@@ -134,7 +134,7 @@ Return your response as valid JSON matching this exact structure (no markdown, n
     {
       "description": "specific issue description",
       "location": "where in the house",
-      "priority": "high or medium",
+      "priority": "immediate, high, medium, or low",
       "estimatedCost": {
         "min": number,
         "max": number
@@ -146,13 +146,15 @@ Return your response as valid JSON matching this exact structure (no markdown, n
     "list of specific safety concerns that need immediate attention"
   ],
   "costSummary": {
+    "immediatePriorityTotal": {"min": number, "max": number},
     "highPriorityTotal": {"min": number, "max": number},
-    "mediumPriorityTotal": {"min": number, "max": number}, 
+    "mediumPriorityTotal": {"min": number, "max": number},
+    "lowPriorityTotal": {"min": number, "max": number},
     "grandTotal": {"min": number, "max": number}
   }
 }`;
 
-  const userPrompt = `Please analyze this home inspection report and extract the structured information requested. Focus on being specific about issues, their locations, realistic cost estimates, and actionable priorities.
+  const userPrompt = `Please analyze this home inspection report thoroughly and extract the structured information requested. Include significant findings across all priority levels, from safety concerns to maintenance recommendations. Focus on being specific about issues, their locations, realistic cost estimates, and actionable priorities.
 
 Here is the inspection report text:
 
