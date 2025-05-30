@@ -1,3 +1,4 @@
+
 const RAPIDAPI_KEY = '368fcd3424mshc9624dccf030eaep1ada4ajsn5c0135eebcf7';
 const BASE_URL = 'https://redfin-com-data.p.rapidapi.com';
 
@@ -15,7 +16,9 @@ export interface RedfinPropertyData {
 }
 
 interface AutoCompleteResponse {
-  didYouMean: Array<{
+  status: boolean;
+  message?: string;
+  data: Array<{
     rows: Array<{
       url: string;
     }>;
@@ -84,9 +87,15 @@ export const searchPropertyByAddress = async (address: string): Promise<string |
     const data: AutoCompleteResponse = await response.json();
     console.log('Auto-complete response:', JSON.stringify(data, null, 2));
     
-    // Extract URL from didYouMean>0>rows>0>url
-    if (data.didYouMean && data.didYouMean[0] && data.didYouMean[0].rows && data.didYouMean[0].rows[0]) {
-      const url = data.didYouMean[0].rows[0].url;
+    // Check if response is successful
+    if (!data.status) {
+      console.log('API returned unsuccessful status:', data.message);
+      return null;
+    }
+    
+    // Extract URL from data[0].rows[0].url
+    if (data.data && data.data[0] && data.data[0].rows && data.data[0].rows[0]) {
+      const url = data.data[0].rows[0].url;
       console.log('Found Redfin URL:', url);
       return url;
     }
@@ -109,9 +118,10 @@ export const searchPropertyByAddress = async (address: string): Promise<string |
 
       if (fallbackResponse.ok) {
         const fallbackData: AutoCompleteResponse = await fallbackResponse.json();
+        console.log('Fallback response:', JSON.stringify(fallbackData, null, 2));
         
-        if (fallbackData.didYouMean && fallbackData.didYouMean[0] && fallbackData.didYouMean[0].rows && fallbackData.didYouMean[0].rows[0]) {
-          const url = fallbackData.didYouMean[0].rows[0].url;
+        if (fallbackData.status && fallbackData.data && fallbackData.data[0] && fallbackData.data[0].rows && fallbackData.data[0].rows[0]) {
+          const url = fallbackData.data[0].rows[0].url;
           console.log('Found Redfin URL with fallback:', url);
           return url;
         }
