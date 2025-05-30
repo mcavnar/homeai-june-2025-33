@@ -53,85 +53,6 @@ async function extractTextFromPDF(arrayBuffer: ArrayBuffer): Promise<string> {
   }
 }
 
-// Function to truncate text to fit OpenAI token limits
-function truncateTextForOpenAI(text: string, maxTokens: number = 8000): string {
-  // Rough estimate: 1 token ≈ 4 characters
-  const maxChars = maxTokens * 3; // Conservative estimate
-  
-  if (text.length <= maxChars) {
-    return text;
-  }
-  
-  // Try to truncate at sentence boundaries first
-  const truncated = text.substring(0, maxChars);
-  const lastSentenceEnd = Math.max(
-    truncated.lastIndexOf('.'),
-    truncated.lastIndexOf('!'),
-    truncated.lastIndexOf('?')
-  );
-  
-  if (lastSentenceEnd > maxChars * 0.7) {
-    return truncated.substring(0, lastSentenceEnd + 1);
-  }
-  
-  // Fall back to word boundary
-  const lastSpace = truncated.lastIndexOf(' ');
-  return lastSpace > 0 ? truncated.substring(0, lastSpace) + '...' : truncated + '...';
-}
-
-function createHomeInspectionPrompt(extractedText: string): string {
-  return `You are an expert home inspection report analyzer. Analyze the following home inspection report text and create a structured summary.
-
-PRIORITIZATION RULES:
-🔴 HIGH PRIORITY (Always include):
-- Structural problems (foundation cracks, roof damage)
-- Electrical hazards (exposed wires, outdated panels)
-- Major plumbing leaks or sewer issues
-- HVAC system malfunction
-- Water damage or mold
-- Pest infestations (especially termites)
-- Fire safety risks (missing smoke detectors, chimney issues)
-
-🟡 MEDIUM PRIORITY (Include if significant):
-- Poor insulation or ventilation
-- Drainage/grading problems
-- Minor plumbing/electrical issues
-- Window and door damage
-- Appliance defects
-
-🟢 LOW PRIORITY (Only if noteworthy):
-- Cosmetic issues
-- Normal wear and tear
-
-SEVERITY DETECTION - Look for these context phrases:
-High severity: "needs immediate repair", "safety hazard", "significant damage", "not up to code", "beyond expected lifespan"
-Low severity: "typical for age", "cosmetic only", "minor issue", "no action required", "maintenance recommended"
-
-FORMAT YOUR RESPONSE as a JSON object with this structure:
-{
-  "majorSystems": {
-    "roof": "summary of roof findings with priority level",
-    "foundation": "summary of foundation findings",
-    "electrical": "summary of electrical findings",
-    "plumbing": "summary of plumbing findings",
-    "hvac": "summary of HVAC findings"
-  },
-  "safetyIssues": [
-    "list of safety-related findings"
-  ],
-  "highPriorityIssues": [
-    "list of issues requiring immediate attention"
-  ],
-  "mediumPriorityIssues": [
-    "list of issues to address soon"
-  ],
-  "summary": "overall assessment in 2-3 sentences"
-}
-
-Report text to analyze:
-${extractedText}`;
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -158,65 +79,18 @@ serve(async (req) => {
       throw new Error('Could not extract sufficient text from PDF. The file may be image-based or corrupted.');
     }
 
-    // Truncate text to fit OpenAI limits
-    const truncatedText = truncateTextForOpenAI(extractedText, 15000);
-    console.log('Truncated text length:', truncatedText.length);
-
-    // Use OpenAI to analyze the extracted text
-    const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'user',
-            content: createHomeInspectionPrompt(truncatedText)
-          }
-        ],
-        temperature: 0.3,
-        max_tokens: 2000
-      }),
-    });
-
-    if (!openAIResponse.ok) {
-      const errorData = await openAIResponse.json().catch(() => ({}));
-      console.error('OpenAI API error:', openAIResponse.status, errorData);
-      
-      if (openAIResponse.status === 429) {
-        throw new Error('OpenAI rate limit exceeded. Please try again in a few minutes.');
-      }
-      
-      throw new Error(`OpenAI API error: ${openAIResponse.status}. Please check your API key and try again.`);
-    }
-
-    const openAIData = await openAIResponse.json();
-    const analysisText = openAIData.choices[0].message.content;
-    
-    console.log('OpenAI analysis received');
-
-    // Try to parse the JSON response from OpenAI
-    let analysis;
-    try {
-      analysis = JSON.parse(analysisText);
-    } catch (parseError) {
-      console.error('Failed to parse OpenAI response as JSON:', parseError);
-      // Fallback to simple text analysis
-      analysis = {
-        summary: analysisText,
-        extractedTextLength: truncatedText.length,
-        note: "Analysis returned as text due to parsing issues"
-      };
-    }
+    // Return just the extracted text without OpenAI analysis
+    const analysis = {
+      summary: extractedText,
+      extractedTextLength: extractedText.length,
+      note: "Raw extracted text (OpenAI analysis disabled for testing)"
+    };
 
     return new Response(
       JSON.stringify({
         success: true,
         analysis,
-        extractedTextLength: truncatedText.length,
+        extractedTextLength: extractedText.length,
         originalTextLength: extractedText.length
       }),
       {
