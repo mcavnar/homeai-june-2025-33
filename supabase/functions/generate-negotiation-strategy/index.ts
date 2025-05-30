@@ -9,6 +9,27 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Helper function to clean and extract JSON from OpenAI response
+function cleanJsonResponse(content: string): string {
+  // Remove markdown code block wrappers if present
+  let cleaned = content.trim();
+  
+  // Remove ```json at the beginning
+  if (cleaned.startsWith('```json')) {
+    cleaned = cleaned.substring(7);
+  } else if (cleaned.startsWith('```')) {
+    cleaned = cleaned.substring(3);
+  }
+  
+  // Remove ``` at the end
+  if (cleaned.endsWith('```')) {
+    cleaned = cleaned.substring(0, cleaned.length - 3);
+  }
+  
+  // Trim any remaining whitespace
+  return cleaned.trim();
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -97,13 +118,24 @@ Return ONLY the JSON object, no additional text.`;
 
     console.log('Raw OpenAI response:', content);
 
+    // Clean the response to remove markdown wrappers
+    const cleanedContent = cleanJsonResponse(content);
+    console.log('Cleaned response:', cleanedContent);
+
     // Parse the JSON response
     let negotiationStrategy;
     try {
-      negotiationStrategy = JSON.parse(content);
+      negotiationStrategy = JSON.parse(cleanedContent);
     } catch (parseError) {
-      console.error('Failed to parse OpenAI response as JSON:', parseError);
+      console.error('Failed to parse cleaned response as JSON:', parseError);
+      console.error('Cleaned content was:', cleanedContent);
       throw new Error('Failed to parse negotiation strategy response');
+    }
+
+    // Validate the response structure
+    if (!negotiationStrategy.quickReference || !negotiationStrategy.phaseGuide) {
+      console.error('Invalid negotiation strategy structure:', negotiationStrategy);
+      throw new Error('Invalid negotiation strategy structure received');
     }
 
     console.log('Successfully generated negotiation strategy');
