@@ -8,6 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { extractTextFromPDF } from '@/utils/pdfTextExtractor';
+import { fetchPropertyData, RedfinPropertyData } from '@/services/redfinApi';
+import PropertyDetails from './PropertyDetails';
 
 interface InspectionIssue {
   description: string;
@@ -58,6 +60,9 @@ const PDFSummarizer = () => {
   const [analysis, setAnalysis] = useState<HomeInspectionAnalysis | null>(null);
   const [cleanedText, setCleanedText] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [propertyData, setPropertyData] = useState<RedfinPropertyData | null>(null);
+  const [isLoadingProperty, setIsLoadingProperty] = useState(false);
+  const [propertyError, setPropertyError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -65,6 +70,8 @@ const PDFSummarizer = () => {
     // Reset previous state
     setAnalysis(null);
     setError('');
+    setPropertyData(null);
+    setPropertyError('');
 
     // Validate file type
     if (selectedFile.type !== 'application/pdf') {
@@ -106,6 +113,8 @@ const PDFSummarizer = () => {
     setIsProcessing(true);
     setError('');
     setExtractionProgress(0);
+    setPropertyData(null);
+    setPropertyError('');
 
     try {
       // Extract text from PDF in the frontend
@@ -145,12 +154,18 @@ const PDFSummarizer = () => {
       }
 
       setAnalysis(data.analysis);
-      setCleanedText(data.cleanedText || ''); // Store the cleaned text
+      setCleanedText(data.cleanedText || '');
 
       toast({
         title: "Analysis complete!",
         description: `Processed ${extractionResult.pageCount} pages and generated comprehensive insights.`,
       });
+
+      // Fetch property data if address is available
+      if (data.analysis?.propertyInfo?.address) {
+        await fetchPropertyDetails(data.analysis.propertyInfo.address);
+      }
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to process PDF';
       setError(errorMessage);
@@ -165,11 +180,41 @@ const PDFSummarizer = () => {
     }
   };
 
+  const fetchPropertyDetails = async (address: string) => {
+    setIsLoadingProperty(true);
+    setPropertyError('');
+
+    try {
+      console.log('Fetching property details for address:', address);
+      
+      toast({
+        title: "Fetching property details...",
+        description: "Looking up market information for this property.",
+      });
+
+      const data = await fetchPropertyData(address);
+      setPropertyData(data);
+
+      toast({
+        title: "Property details loaded!",
+        description: "Market information and property stats have been added.",
+      });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch property details';
+      setPropertyError(errorMessage);
+      console.error('Property fetch error:', err);
+    } finally {
+      setIsLoadingProperty(false);
+    }
+  };
+
   const resetTool = () => {
     setFile(null);
     setAnalysis(null);
     setCleanedText('');
     setError('');
+    setPropertyData(null);
+    setPropertyError('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -451,6 +496,36 @@ const PDFSummarizer = () => {
             </Card>
           )}
         </div>
+      )}
+
+      {/* Property Details Section */}
+      {propertyData && (
+        <PropertyDetails propertyData={propertyData} />
+      )}
+
+      {/* Property Loading State */}
+      {isLoadingProperty && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-center gap-3 py-4">
+              <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+              <div className="text-center">
+                <p className="font-medium text-gray-900">Fetching property details...</p>
+                <p className="text-sm text-gray-600">Looking up market information</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Property Error */}
+      {propertyError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Property details unavailable: {propertyError}
+          </AlertDescription>
+        </Alert>
       )}
 
       {/* Cleaned PDF Text Display */}
