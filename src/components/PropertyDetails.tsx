@@ -2,7 +2,7 @@
 import React from 'react';
 import { Home, DollarSign, Calendar, Bed, Square } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { RedfinPropertyData } from '@/services/redfinApi';
+import { RedfinPropertyData } from '@/types/redfin';
 import { formatCurrency, formatNumber, formatPercentage, calculateDaysOnMarket, calculateSaleToListRatio } from '@/utils/formatters';
 import MarketCompData from './MarketCompData';
 

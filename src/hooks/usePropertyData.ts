@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
-import { fetchPropertyData, RedfinPropertyData } from '@/services/redfinApi';
+import { fetchPropertyData } from '@/services/redfinApi';
+import { RedfinPropertyData } from '@/types/redfin';
 import { useToast } from '@/hooks/use-toast';
 
 export const usePropertyData = () => {
