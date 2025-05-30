@@ -1,25 +1,39 @@
 
 import React, { useState, useRef } from 'react';
-import { Upload, FileText, Loader2, CheckCircle, AlertCircle, Download } from 'lucide-react';
+import { Upload, FileText, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+
+interface HomeInspectionAnalysis {
+  majorSystems?: {
+    roof?: string;
+    foundation?: string;
+    electrical?: string;
+    plumbing?: string;
+    hvac?: string;
+  };
+  safetyIssues?: string[];
+  highPriorityIssues?: string[];
+  mediumPriorityIssues?: string[];
+  summary?: string;
+  extractedText?: string;
+}
 
 const PDFSummarizer = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [summary, setSummary] = useState<string[]>([]);
+  const [analysis, setAnalysis] = useState<HomeInspectionAnalysis | null>(null);
   const [error, setError] = useState<string>('');
-  const [extractedText, setExtractedText] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const handleFileSelect = (selectedFile: File) => {
     // Reset previous state
-    setSummary([]);
+    setAnalysis(null);
     setError('');
-    setExtractedText('');
 
     // Validate file type
     if (selectedFile.type !== 'application/pdf') {
@@ -55,51 +69,6 @@ const PDFSummarizer = () => {
     }
   };
 
-  const extractTextFromPDF = async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const arrayBuffer = e.target?.result as ArrayBuffer;
-          const uint8Array = new Uint8Array(arrayBuffer);
-          
-          // Simple text extraction - in a real app you'd use pdf-parse
-          // For now, we'll simulate the extraction
-          const text = "This is extracted text from the PDF. " +
-                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-                      "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " +
-                      "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. " +
-                      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore. " +
-                      "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt. " +
-                      "Mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem. " +
-                      "Accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.";
-          
-          resolve(text);
-        } catch (error) {
-          reject(error);
-        }
-      };
-      reader.onerror = () => reject(new Error('Failed to read file'));
-      reader.readAsArrayBuffer(file);
-    });
-  };
-
-  const generateSummary = (text: string): string[] => {
-    // Simple summarization logic - in a real app you'd use an AI service
-    const sentences = text.split('. ').filter(s => s.length > 10);
-    const keyPoints = [
-      "Document contains important information about the main topic",
-      "Key findings and recommendations are presented throughout the text",
-      "Multiple sections cover different aspects of the subject matter",
-      "Detailed analysis and supporting evidence are provided",
-      "Conclusions and next steps are outlined in the final sections",
-      "References and additional resources are included for further reading",
-      "The document provides comprehensive coverage of the topic"
-    ];
-    
-    return keyPoints.slice(0, Math.min(7, sentences.length));
-  };
-
   const processPDF = async () => {
     if (!file) return;
 
@@ -107,17 +76,28 @@ const PDFSummarizer = () => {
     setError('');
 
     try {
-      // Extract text from PDF
-      const text = await extractTextFromPDF(file);
-      setExtractedText(text);
+      // Create form data with the PDF file
+      const formData = new FormData();
+      formData.append('file', file);
 
-      // Generate summary
-      const summaryPoints = generateSummary(text);
-      setSummary(summaryPoints);
+      // Call the Supabase Edge Function
+      const { data, error: functionError } = await supabase.functions.invoke('process-pdf', {
+        body: formData,
+      });
+
+      if (functionError) {
+        throw new Error(functionError.message);
+      }
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to process PDF');
+      }
+
+      setAnalysis(data.analysis);
 
       toast({
         title: "Processing complete!",
-        description: "Your PDF has been successfully summarized.",
+        description: "Your home inspection report has been analyzed.",
       });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to process PDF';
@@ -134,19 +114,27 @@ const PDFSummarizer = () => {
 
   const resetTool = () => {
     setFile(null);
-    setSummary([]);
+    setAnalysis(null);
     setError('');
-    setExtractedText('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
+  const renderPriorityIcon = (priority: 'high' | 'medium' | 'low') => {
+    const colors = {
+      high: 'text-red-500',
+      medium: 'text-yellow-500', 
+      low: 'text-green-500'
+    };
+    return <span className={`text-lg ${colors[priority]}`}>●</span>;
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">PDF Summarizer</h1>
-        <p className="text-gray-600">Upload a PDF and get a concise summary in bullet points</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Home Inspection Report Analyzer</h1>
+        <p className="text-gray-600">Upload a home inspection PDF and get an intelligent summary with prioritized findings</p>
       </div>
 
       {/* Upload Section */}
@@ -154,7 +142,7 @@ const PDFSummarizer = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            Upload PDF File
+            Upload Home Inspection Report
           </CardTitle>
           <CardDescription>
             Select or drag & drop a PDF file (max 10MB)
@@ -186,7 +174,7 @@ const PDFSummarizer = () => {
             ) : (
               <div className="flex flex-col items-center gap-2">
                 <Upload className="h-12 w-12 text-gray-400" />
-                <p className="text-gray-600">Click to select or drag & drop your PDF file</p>
+                <p className="text-gray-600">Click to select or drag & drop your home inspection PDF</p>
                 <p className="text-sm text-gray-500">Maximum file size: 10MB</p>
               </div>
             )}
@@ -208,12 +196,12 @@ const PDFSummarizer = () => {
               {isProcessing ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Processing...
+                  Analyzing Report...
                 </>
               ) : (
                 <>
                   <FileText className="h-4 w-4 mr-2" />
-                  Summarize PDF
+                  Analyze Home Inspection Report
                 </>
               )}
             </Button>
@@ -227,31 +215,119 @@ const PDFSummarizer = () => {
         </CardContent>
       </Card>
 
-      {/* Summary Results */}
-      {summary.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-700">
-              <CheckCircle className="h-5 w-5" />
-              Summary Complete
-            </CardTitle>
-            <CardDescription>
-              Here's your PDF summarized in {summary.length} key points
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {summary.map((point, index) => (
-                <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                  <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-sm font-medium">
-                    {index + 1}
-                  </span>
-                  <p className="text-gray-800 leading-relaxed">{point}</p>
+      {/* Analysis Results */}
+      {analysis && (
+        <div className="space-y-6">
+          {/* Overall Summary */}
+          {analysis.summary && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-green-700">
+                  <CheckCircle className="h-5 w-5" />
+                  Overall Assessment
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-800 leading-relaxed">{analysis.summary}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* High Priority Issues */}
+          {analysis.highPriorityIssues && analysis.highPriorityIssues.length > 0 && (
+            <Card className="border-red-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-red-700">
+                  {renderPriorityIcon('high')}
+                  High Priority Issues
+                </CardTitle>
+                <CardDescription>These issues require immediate attention</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {analysis.highPriorityIssues.map((issue, index) => (
+                    <div key={index} className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <span className="flex-shrink-0 w-6 h-6 bg-red-100 text-red-700 rounded-full flex items-center justify-center text-sm font-medium">
+                        {index + 1}
+                      </span>
+                      <p className="text-gray-800 leading-relaxed">{issue}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Safety Issues */}
+          {analysis.safetyIssues && analysis.safetyIssues.length > 0 && (
+            <Card className="border-orange-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-orange-700">
+                  <AlertCircle className="h-5 w-5" />
+                  Safety Concerns
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {analysis.safetyIssues.map((issue, index) => (
+                    <div key={index} className="flex items-start gap-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                      <span className="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center text-sm font-medium">
+                        {index + 1}
+                      </span>
+                      <p className="text-gray-800 leading-relaxed">{issue}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Major Systems */}
+          {analysis.majorSystems && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Major Systems Assessment</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {Object.entries(analysis.majorSystems).map(([system, finding]) => (
+                    finding && (
+                      <div key={system} className="p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-900 capitalize mb-2">{system}</h4>
+                        <p className="text-gray-700 text-sm">{finding}</p>
+                      </div>
+                    )
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Medium Priority Issues */}
+          {analysis.mediumPriorityIssues && analysis.mediumPriorityIssues.length > 0 && (
+            <Card className="border-yellow-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-yellow-700">
+                  {renderPriorityIcon('medium')}
+                  Medium Priority Issues
+                </CardTitle>
+                <CardDescription>Address these issues when convenient</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {analysis.mediumPriorityIssues.map((issue, index) => (
+                    <div key={index} className="flex items-start gap-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <span className="flex-shrink-0 w-6 h-6 bg-yellow-100 text-yellow-700 rounded-full flex items-center justify-center text-sm font-medium">
+                        {index + 1}
+                      </span>
+                      <p className="text-gray-800 leading-relaxed">{issue}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       )}
 
       {/* Processing Status */}
@@ -261,8 +337,8 @@ const PDFSummarizer = () => {
             <div className="flex items-center justify-center gap-3 py-8">
               <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
               <div className="text-center">
-                <p className="font-medium text-gray-900">Processing your PDF...</p>
-                <p className="text-sm text-gray-600">Extracting text and generating summary</p>
+                <p className="font-medium text-gray-900">Analyzing your home inspection report...</p>
+                <p className="text-sm text-gray-600">Extracting text and generating intelligent summary</p>
               </div>
             </div>
           </CardContent>
