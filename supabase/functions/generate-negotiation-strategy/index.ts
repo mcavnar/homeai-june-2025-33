@@ -87,7 +87,7 @@ IMPORTANT GUIDELINES:
 3. Factor in safety issues and high-priority repairs for leverage
 4. Make property-specific recommendations
 5. Be realistic about market conditions and seller motivation
-6. Include specific dollar amounts based on estimated repairs as well as actionable advice
+6. Include specific dollar amounts based on estimated repairs as well as actionable advice. The dollar amounts requested cannot exceed the total repair estimate.
 7. Consider listing price, sold comparables, and time on market
 
 Return ONLY the JSON object, no additional text.`;
