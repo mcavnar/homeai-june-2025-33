@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+
+import React, { useState, useRef, useEffect } from 'react';
 import { Loader2, AlertCircle, FileText, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -8,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { extractTextFromPDF } from '@/utils/pdfTextExtractor';
 import { usePropertyData } from '@/hooks/usePropertyData';
-import { HomeInspectionAnalysis } from '@/types/inspection';
+import { HomeInspectionAnalysis, NegotiationStrategy as NegotiationStrategyType } from '@/types/inspection';
 import PropertyDetails from './PropertyDetails';
 import PropertyInfo from './PropertyInfo';
 import ExecutiveSummary from './ExecutiveSummary';
@@ -18,6 +19,7 @@ import DetailedFindings from './DetailedFindings';
 import MajorSystems from './MajorSystems';
 import FileUploadSection from './FileUploadSection';
 import ConditionScore from './ConditionScore';
+import NegotiationStrategy from './NegotiationStrategy';
 
 const PDFSummarizer = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -26,6 +28,9 @@ const PDFSummarizer = () => {
   const [analysis, setAnalysis] = useState<HomeInspectionAnalysis | null>(null);
   const [cleanedText, setCleanedText] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [negotiationStrategy, setNegotiationStrategy] = useState<NegotiationStrategyType | null>(null);
+  const [isGeneratingStrategy, setIsGeneratingStrategy] = useState(false);
+  const [strategyError, setStrategyError] = useState<string>('');
   const { toast } = useToast();
 
   const {
@@ -36,10 +41,67 @@ const PDFSummarizer = () => {
     resetPropertyData,
   } = usePropertyData();
 
+  // Generate negotiation strategy when both analysis and property data are available
+  useEffect(() => {
+    const generateNegotiationStrategy = async () => {
+      if (!analysis || !propertyData || negotiationStrategy || isGeneratingStrategy) {
+        return;
+      }
+
+      setIsGeneratingStrategy(true);
+      setStrategyError('');
+
+      try {
+        toast({
+          title: "Generating negotiation strategy...",
+          description: "Analyzing inspection findings and market data to create your negotiation plan.",
+        });
+
+        const { data, error: functionError } = await supabase.functions.invoke('generate-negotiation-strategy', {
+          body: { 
+            inspectionAnalysis: analysis,
+            propertyData: propertyData 
+          },
+        });
+
+        if (functionError) {
+          throw new Error(functionError.message);
+        }
+
+        if (!data.success) {
+          throw new Error(data.error || 'Failed to generate negotiation strategy');
+        }
+
+        setNegotiationStrategy(data.negotiationStrategy);
+
+        toast({
+          title: "Negotiation strategy ready!",
+          description: "Your comprehensive negotiation plan has been generated based on inspection and market data.",
+        });
+
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to generate negotiation strategy';
+        setStrategyError(errorMessage);
+        console.error('Negotiation strategy error:', err);
+        toast({
+          title: "Strategy generation failed",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      } finally {
+        setIsGeneratingStrategy(false);
+      }
+    };
+
+    generateNegotiationStrategy();
+  }, [analysis, propertyData, negotiationStrategy, isGeneratingStrategy, toast]);
+
   const handleFileSelect = (selectedFile: File) => {
     // Reset previous state
     setAnalysis(null);
     setError('');
+    setNegotiationStrategy(null);
+    setStrategyError('');
     resetPropertyData();
 
     // Validate file type
@@ -67,6 +129,8 @@ const PDFSummarizer = () => {
     setIsProcessing(true);
     setError('');
     setExtractionProgress(0);
+    setNegotiationStrategy(null);
+    setStrategyError('');
     resetPropertyData();
 
     try {
@@ -138,6 +202,8 @@ const PDFSummarizer = () => {
     setAnalysis(null);
     setCleanedText('');
     setError('');
+    setNegotiationStrategy(null);
+    setStrategyError('');
     resetPropertyData();
   };
 
@@ -183,6 +249,36 @@ const PDFSummarizer = () => {
           {/* Cost Summary */}
           {analysis.costSummary && (
             <CostSummary costSummary={analysis.costSummary} />
+          )}
+
+          {/* Negotiation Strategy */}
+          {negotiationStrategy && (
+            <NegotiationStrategy strategy={negotiationStrategy} />
+          )}
+
+          {/* Negotiation Strategy Loading */}
+          {isGeneratingStrategy && (
+            <Card className="border-purple-200">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-center gap-3 py-4">
+                  <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
+                  <div className="text-center">
+                    <p className="font-medium text-gray-900">Generating negotiation strategy...</p>
+                    <p className="text-sm text-gray-600">Analyzing inspection and market data</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Negotiation Strategy Error */}
+          {strategyError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Negotiation strategy unavailable: {strategyError}
+              </AlertDescription>
+            </Alert>
           )}
 
           {/* Safety Issues */}

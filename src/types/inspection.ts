@@ -10,6 +10,21 @@ export interface InspectionIssue {
   category: string;
 }
 
+export interface NegotiationStrategy {
+  quickReference: {
+    recommendedAsk: {
+      min: number;
+      max: number;
+    };
+    strongPoints: string[];
+  };
+  phaseGuide: {
+    initialResponse: string[];
+    counterNegotiation: string[];
+    finalStrategy: string[];
+  };
+}
+
 export interface HomeInspectionAnalysis {
   propertyInfo?: {
     address?: string;
