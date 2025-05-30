@@ -21,13 +21,10 @@ serve(async (req) => {
 
     console.log('Processing extracted text. Length:', extractedText.length);
 
-    // For now, return the text as a summary for verification
-    // This is where you would add AI analysis later
+    // Return the full extracted text for verification
     const analysis = {
-      summary: `Processed ${extractedText.length} characters of text from the PDF. This is the raw extracted content for verification.`,
-      extractedText: extractedText.substring(0, 2000) + (extractedText.length > 2000 ? '...' : ''), // Show first 2000 chars
+      summary: extractedText, // Show the full extracted text
       fullTextLength: extractedText.length,
-      note: "PDF text successfully extracted in frontend and processed by Edge Function"
     };
 
     return new Response(
