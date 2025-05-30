@@ -40,7 +40,7 @@ serve(async (req) => {
 
     console.log('Generating negotiation strategy with inspection and market data...');
 
-    const prompt = `You are a real estate negotiation expert. Based on the home inspection analysis and market data provided, generate a comprehensive negotiation strategy for a home buyer.
+    const prompt = `You are a real estate negotiation expert. Your client has already had an offer accepted on this home and received the inspection report. Based on the home inspection analysis and market data provided, generate a comprehensive negotiation strategy for a home buyer before closing, now that they know how much repairs will cost them.
 
 INSPECTION DATA:
 ${JSON.stringify(inspectionAnalysis, null, 2)}
@@ -82,13 +82,13 @@ Generate a negotiation strategy with this EXACT JSON structure:
 }
 
 IMPORTANT GUIDELINES:
-1. Base the recommendedAsk range on repair costs, market conditions, and property value
+1. Base recommendations on repair costs, market conditions, and property value
 2. Consider days on market, sale-to-list ratio, and neighborhood data
-3. Factor in safety issues and high-priority repairs for stronger leverage
-4. Make recommendations specific to this property's situation
+3. Factor in safety issues and high-priority repairs for leverage
+4. Make property-specific recommendations
 5. Be realistic about market conditions and seller motivation
-6. Include specific dollar amounts and actionable advice
-7. Consider the property's listing price, sold comparables, and time on market
+6. Include specific dollar amounts based on estimated repairs as well as actionable advice
+7. Consider listing price, sold comparables, and time on market
 
 Return ONLY the JSON object, no additional text.`;
 
