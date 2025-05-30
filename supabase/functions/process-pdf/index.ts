@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -85,7 +84,7 @@ const cleanExtractedText = (rawText: string): string => {
   return cleanedText;
 };
 
-// Enhanced OpenAI analysis function
+// Simplified OpenAI analysis function
 const analyzeWithOpenAI = async (cleanedText: string) => {
   if (!openAIApiKey) {
     throw new Error('OpenAI API key not configured');
@@ -93,33 +92,30 @@ const analyzeWithOpenAI = async (cleanedText: string) => {
 
   console.log('Starting OpenAI analysis. Text length:', cleanedText.length);
 
-  const systemPrompt = `You are an expert home inspector with 25+ years of experience. Your goal is to find EVERY SINGLE issue mentioned in the inspection report - no matter how small - and provide accurate 2024 cost estimates.
+  const systemPrompt = `You are an experienced home inspector. Please analyze this home inspection report and provide a helpful summary.
 
-CRITICAL REQUIREMENTS:
-1. Find ALL issues including:
-   - Major structural/safety problems
-   - Minor cosmetic issues (scratches, scuffs, worn paint)
-   - Preventive maintenance items (filter changes, caulking)
-   - Items mentioned as "should be monitored" or "keep an eye on"
-   - Anything that deviates from perfect condition
-   - Code violations or outdated systems
+Please look for both major and minor issues mentioned in the report. Include realistic 2024 cost estimates where possible.
 
-2. Use realistic 2024 cost estimates that include:
-   - Current material costs (post-inflation)
-   - Labor at $75-150/hour for skilled trades
-   - Contractor markup of 20-30%
-   - Permit costs where required
-   - Small repairs: $100-800, Medium: $500-3,000, Large: $2,500-15,000+
+Return a JSON response with this structure:
+{
+  "issues": [
+    {
+      "description": "Brief description of the issue",
+      "location": "Where the issue is located (optional)",
+      "priority": "critical, high, medium, or low",
+      "estimatedCost": {
+        "min": 100,
+        "max": 500
+      },
+      "category": "electrical, plumbing, structural, etc (optional)"
+    }
+  ],
+  "summary": "Brief overall assessment of the property condition"
+}
 
-3. Priority levels:
-   - critical: Immediate safety hazards, code violations
-   - high: Major systems needing repair/replacement soon
-   - medium: Issues to address within 6-12 months
-   - low: Minor issues, cosmetic, preventive maintenance
+Keep the response focused and practical. Don't worry if some fields are missing.`;
 
-Return ONLY valid JSON without markdown formatting:`;
-
-  const userPrompt = `Analyze this home inspection report and find EVERY issue mentioned, including minor ones. Use 2024 cost estimates that reflect current market rates with proper contractor markup.
+  const userPrompt = `Please analyze this home inspection report:
 
 ${cleanedText}`;
 
@@ -136,29 +132,29 @@ ${cleanedText}`;
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 0.2,
-        max_tokens: 3500,
+        temperature: 0.3,
+        max_tokens: 2000,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error('OpenAI API error:', response.status, errorText);
-      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+      throw new Error(`OpenAI API error: ${response.status}`);
     }
 
     const data = await response.json();
     console.log('OpenAI response received successfully');
     
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.error('Invalid OpenAI response structure:', JSON.stringify(data, null, 2));
+      console.error('Invalid OpenAI response structure');
       throw new Error('Invalid response format from OpenAI');
     }
 
     const content = data.choices[0].message.content;
-    console.log('Parsing OpenAI response content length:', content.length);
+    console.log('Response content length:', content.length);
     
-    // Simple JSON parsing with basic cleanup
+    // Clean up the response
     let cleanedContent = content.trim();
     
     // Remove markdown code blocks if present
@@ -173,11 +169,23 @@ ${cleanedText}`;
     try {
       const analysis = JSON.parse(cleanedContent);
       console.log('Successfully parsed analysis with', analysis.issues?.length || 0, 'issues');
+      
+      // Ensure we have the basic structure
+      if (!analysis.issues) {
+        analysis.issues = [];
+      }
+      
       return analysis;
     } catch (parseError) {
       console.error('JSON parse error:', parseError.message);
-      console.error('Content that failed to parse (first 500 chars):', cleanedContent.substring(0, 500));
-      throw new Error(`Failed to parse AI response as JSON: ${parseError.message}`);
+      console.error('Content that failed to parse:', cleanedContent.substring(0, 200));
+      
+      // Return a basic structure if parsing fails
+      return {
+        issues: [],
+        summary: "Unable to parse detailed analysis. Please try again.",
+        error: "Parsing failed"
+      };
     }
 
   } catch (error) {
