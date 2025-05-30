@@ -85,6 +85,36 @@ const cleanExtractedText = (rawText: string): string => {
   return cleanedText;
 };
 
+// Function to clean OpenAI response and extract JSON
+const cleanAndParseJSON = (content: string) => {
+  console.log('Raw OpenAI content length:', content.length);
+  
+  // Remove markdown code block markers if present
+  let cleanedContent = content.trim();
+  
+  // Remove ```json at the beginning
+  cleanedContent = cleanedContent.replace(/^```json\s*/i, '');
+  
+  // Remove ``` at the end
+  cleanedContent = cleanedContent.replace(/\s*```$/, '');
+  
+  // Trim any remaining whitespace
+  cleanedContent = cleanedContent.trim();
+  
+  console.log('Cleaned content length:', cleanedContent.length);
+  console.log('First 200 chars:', cleanedContent.substring(0, 200));
+  
+  try {
+    const parsed = JSON.parse(cleanedContent);
+    console.log('Successfully parsed JSON');
+    return parsed;
+  } catch (parseError) {
+    console.error('JSON parse error:', parseError.message);
+    console.error('Content that failed to parse:', cleanedContent.substring(0, 500));
+    throw new Error(`Failed to parse AI response as JSON: ${parseError.message}`);
+  }
+};
+
 // Enhanced OpenAI analysis function
 const analyzeWithOpenAI = async (cleanedText: string) => {
   if (!openAIApiKey) {
@@ -132,6 +162,8 @@ ANALYSIS REQUIREMENTS:
    - Insulation/Energy efficiency
    - Exterior (siding, windows, doors, walkways)
    - Interior (flooring, walls, ceilings, doors)
+
+IMPORTANT: Return ONLY valid JSON without any markdown formatting, code blocks, or extra text. Do not wrap your response in \`\`\`json blocks.
 
 Return your response as valid JSON matching this exact structure:
 
@@ -208,28 +240,46 @@ ${cleanedText}`;
     if (!response.ok) {
       const errorText = await response.text();
       console.error('OpenAI API error:', response.status, errorText);
-      throw new Error(`OpenAI API error: ${response.status}`);
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('OpenAI response received');
+    console.log('OpenAI response received successfully');
     
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Invalid OpenAI response structure:', JSON.stringify(data, null, 2));
       throw new Error('Invalid response format from OpenAI');
     }
 
     const content = data.choices[0].message.content;
-    console.log('Parsing OpenAI response...');
+    console.log('Processing OpenAI response content...');
     
-    try {
-      const analysis = JSON.parse(content);
-      console.log('Successfully parsed OpenAI analysis');
-      return analysis;
-    } catch (parseError) {
-      console.error('Failed to parse OpenAI response as JSON:', parseError);
-      console.error('Raw content:', content);
-      throw new Error('Failed to parse AI analysis response');
+    // Use the new cleaning and parsing function
+    const analysis = cleanAndParseJSON(content);
+    
+    // Validate the parsed response has required fields
+    if (!analysis || typeof analysis !== 'object') {
+      throw new Error('Parsed response is not a valid object');
     }
+    
+    if (!analysis.issues || !Array.isArray(analysis.issues)) {
+      console.warn('No issues array found in response, creating empty array');
+      analysis.issues = [];
+    }
+    
+    if (!analysis.costSummary || typeof analysis.costSummary !== 'object') {
+      console.warn('No cost summary found in response, creating default');
+      analysis.costSummary = {
+        criticalTotal: { min: 0, max: 0 },
+        highPriorityTotal: { min: 0, max: 0 },
+        mediumPriorityTotal: { min: 0, max: 0 },
+        lowPriorityTotal: { min: 0, max: 0 },
+        grandTotal: { min: 0, max: 0 }
+      };
+    }
+    
+    console.log('Analysis validation completed successfully');
+    return analysis;
 
   } catch (error) {
     console.error('OpenAI analysis error:', error);
