@@ -7,6 +7,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+
 // Text cleaning and filtering function
 const cleanExtractedText = (rawText: string): string => {
   console.log('Starting text cleaning. Original length:', rawText.length);
@@ -87,6 +89,121 @@ const cleanExtractedText = (rawText: string): string => {
   return cleanedText;
 };
 
+// OpenAI analysis function
+const analyzeWithOpenAI = async (cleanedText: string) => {
+  if (!openAIApiKey) {
+    throw new Error('OpenAI API key not configured');
+  }
+
+  console.log('Starting OpenAI analysis. Text length:', cleanedText.length);
+
+  const systemPrompt = `You are an expert home inspector and real estate professional. Analyze home inspection reports and provide structured, actionable insights that help homeowners understand what needs attention and how much it might cost.
+
+Your analysis should be:
+- Practical and specific
+- Focused on safety and financial impact
+- Helpful for prioritizing repairs
+- Based on realistic cost estimates for typical markets
+
+Return your response as valid JSON matching this exact structure (no markdown, no code blocks, just pure JSON):
+
+{
+  "propertyInfo": {
+    "address": "extracted property address if found",
+    "inspectionDate": "extracted inspection date if found"
+  },
+  "executiveSummary": [
+    "exactly 5 clear, actionable bullet points summarizing the overall condition",
+    "focus on the most important findings",
+    "include cost implications where relevant",
+    "keep each point concise but informative",
+    "prioritize safety and major expenses"
+  ],
+  "majorSystems": {
+    "roof": "brief assessment",
+    "foundation": "brief assessment", 
+    "electrical": "brief assessment",
+    "plumbing": "brief assessment",
+    "hvac": "brief assessment"
+  },
+  "issues": [
+    {
+      "description": "specific issue description",
+      "location": "where in the house",
+      "priority": "high or medium",
+      "estimatedCost": {
+        "min": number,
+        "max": number
+      },
+      "category": "system category (e.g., Electrical, Plumbing, Structural)"
+    }
+  ],
+  "safetyIssues": [
+    "list of specific safety concerns that need immediate attention"
+  ],
+  "costSummary": {
+    "highPriorityTotal": {"min": number, "max": number},
+    "mediumPriorityTotal": {"min": number, "max": number}, 
+    "grandTotal": {"min": number, "max": number}
+  }
+}`;
+
+  const userPrompt = `Please analyze this home inspection report and extract the structured information requested. Focus on being specific about issues, their locations, realistic cost estimates, and actionable priorities.
+
+Here is the inspection report text:
+
+${cleanedText}`;
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.3,
+        max_tokens: 4000,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenAI API error:', response.status, errorText);
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('OpenAI response received');
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Invalid response format from OpenAI');
+    }
+
+    const content = data.choices[0].message.content;
+    console.log('Parsing OpenAI response...');
+    
+    try {
+      const analysis = JSON.parse(content);
+      console.log('Successfully parsed OpenAI analysis');
+      return analysis;
+    } catch (parseError) {
+      console.error('Failed to parse OpenAI response as JSON:', parseError);
+      console.error('Raw content:', content);
+      throw new Error('Failed to parse AI analysis response');
+    }
+
+  } catch (error) {
+    console.error('OpenAI analysis error:', error);
+    throw new Error(`AI analysis failed: ${error.message}`);
+  }
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -104,12 +221,12 @@ serve(async (req) => {
     // Clean and filter the extracted text
     const cleanedText = cleanExtractedText(extractedText);
 
-    // Return the cleaned text for verification
-    const analysis = {
-      summary: cleanedText, // Show the cleaned text
-      fullTextLength: extractedText.length,
-      cleanedTextLength: cleanedText.length,
-    };
+    if (cleanedText.length < 100) {
+      throw new Error('Insufficient text content after cleaning for meaningful analysis');
+    }
+
+    // Analyze with OpenAI
+    const analysis = await analyzeWithOpenAI(cleanedText);
 
     return new Response(
       JSON.stringify({

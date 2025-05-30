@@ -1,5 +1,6 @@
+
 import React, { useState, useRef } from 'react';
-import { Upload, FileText, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, FileText, Loader2, CheckCircle, AlertCircle, DollarSign, Calendar, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -7,7 +8,23 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { extractTextFromPDF } from '@/utils/pdfTextExtractor';
 
+interface InspectionIssue {
+  description: string;
+  location: string;
+  priority: 'high' | 'medium';
+  estimatedCost: {
+    min: number;
+    max: number;
+  };
+  category: string;
+}
+
 interface HomeInspectionAnalysis {
+  propertyInfo?: {
+    address?: string;
+    inspectionDate?: string;
+  };
+  executiveSummary?: string[];
   majorSystems?: {
     roof?: string;
     foundation?: string;
@@ -15,11 +32,22 @@ interface HomeInspectionAnalysis {
     plumbing?: string;
     hvac?: string;
   };
+  issues?: InspectionIssue[];
   safetyIssues?: string[];
-  highPriorityIssues?: string[];
-  mediumPriorityIssues?: string[];
-  summary?: string;
-  extractedText?: string;
+  costSummary?: {
+    highPriorityTotal: {
+      min: number;
+      max: number;
+    };
+    mediumPriorityTotal: {
+      min: number;
+      max: number;
+    };
+    grandTotal: {
+      min: number;
+      max: number;
+    };
+  };
 }
 
 const PDFSummarizer = () => {
@@ -98,8 +126,8 @@ const PDFSummarizer = () => {
 
       // Send extracted text to Edge Function for analysis
       toast({
-        title: "Analyzing extracted text...",
-        description: "Processing the content for insights.",
+        title: "Analyzing with AI...",
+        description: "Processing the content with OpenAI for detailed insights.",
       });
 
       const { data, error: functionError } = await supabase.functions.invoke('process-pdf', {
@@ -117,8 +145,8 @@ const PDFSummarizer = () => {
       setAnalysis(data.analysis);
 
       toast({
-        title: "Processing complete!",
-        description: `Extracted text from ${extractionResult.pageCount} pages and analyzed successfully.`,
+        title: "Analysis complete!",
+        description: `Processed ${extractionResult.pageCount} pages and generated comprehensive insights.`,
       });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to process PDF';
@@ -143,20 +171,32 @@ const PDFSummarizer = () => {
     }
   };
 
-  const renderPriorityIcon = (priority: 'high' | 'medium' | 'low') => {
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const renderPriorityBadge = (priority: 'high' | 'medium') => {
     const colors = {
-      high: 'text-red-500',
-      medium: 'text-yellow-500', 
-      low: 'text-green-500'
+      high: 'bg-red-100 text-red-800 border-red-200',
+      medium: 'bg-yellow-100 text-yellow-800 border-yellow-200'
     };
-    return <span className={`text-lg ${colors[priority]}`}>●</span>;
+    return (
+      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${colors[priority]}`}>
+        {priority.charAt(0).toUpperCase() + priority.slice(1)} Priority
+      </span>
+    );
   };
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Home Inspection Report Analyzer</h1>
-        <p className="text-gray-600">Upload a home inspection PDF and get an intelligent summary with prioritized findings</p>
+        <p className="text-gray-600">Upload a home inspection PDF and get an intelligent summary with prioritized findings and cost estimates</p>
       </div>
 
       {/* Upload Section */}
@@ -218,7 +258,7 @@ const PDFSummarizer = () => {
               {isProcessing ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {extractionProgress > 0 ? `Extracting... ${Math.round(extractionProgress)}%` : 'Analyzing Report...'}
+                  {extractionProgress > 0 ? `Extracting... ${Math.round(extractionProgress)}%` : 'Analyzing with AI...'}
                 </>
               ) : (
                 <>
@@ -240,41 +280,88 @@ const PDFSummarizer = () => {
       {/* Analysis Results */}
       {analysis && (
         <div className="space-y-6">
-          {/* Overall Summary */}
-          {analysis.summary && (
+          {/* Property Information */}
+          {analysis.propertyInfo && (
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-green-700">
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  Property Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {analysis.propertyInfo.address && (
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-1">Address</h4>
+                      <p className="text-gray-700">{analysis.propertyInfo.address}</p>
+                    </div>
+                  )}
+                  {analysis.propertyInfo.inspectionDate && (
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-1 flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        Inspection Date
+                      </h4>
+                      <p className="text-gray-700">{analysis.propertyInfo.inspectionDate}</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Executive Summary */}
+          {analysis.executiveSummary && analysis.executiveSummary.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-blue-700">
                   <CheckCircle className="h-5 w-5" />
                   Overall Assessment
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-800 leading-relaxed">{analysis.summary}</p>
+                <ul className="space-y-2">
+                  {analysis.executiveSummary.map((point, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <span className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></span>
+                      <p className="text-gray-800 leading-relaxed">{point}</p>
+                    </li>
+                  ))}
+                </ul>
               </CardContent>
             </Card>
           )}
 
-          {/* High Priority Issues */}
-          {analysis.highPriorityIssues && analysis.highPriorityIssues.length > 0 && (
-            <Card className="border-red-200">
+          {/* Cost Summary */}
+          {analysis.costSummary && (
+            <Card className="border-green-200">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-red-700">
-                  {renderPriorityIcon('high')}
-                  High Priority Issues
+                <CardTitle className="flex items-center gap-2 text-green-700">
+                  <DollarSign className="h-5 w-5" />
+                  Estimated Repair Costs
                 </CardTitle>
-                <CardDescription>These issues require immediate attention</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {analysis.highPriorityIssues.map((issue, index) => (
-                    <div key={index} className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <span className="flex-shrink-0 w-6 h-6 bg-red-100 text-red-700 rounded-full flex items-center justify-center text-sm font-medium">
-                        {index + 1}
-                      </span>
-                      <p className="text-gray-800 leading-relaxed">{issue}</p>
-                    </div>
-                  ))}
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <h4 className="font-semibold text-red-800 mb-2">High Priority</h4>
+                    <p className="text-2xl font-bold text-red-900">
+                      {formatCurrency(analysis.costSummary.highPriorityTotal.min)} - {formatCurrency(analysis.costSummary.highPriorityTotal.max)}
+                    </p>
+                  </div>
+                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <h4 className="font-semibold text-yellow-800 mb-2">Medium Priority</h4>
+                    <p className="text-2xl font-bold text-yellow-900">
+                      {formatCurrency(analysis.costSummary.mediumPriorityTotal.min)} - {formatCurrency(analysis.costSummary.mediumPriorityTotal.max)}
+                    </p>
+                  </div>
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="font-semibold text-blue-800 mb-2">Total Estimate</h4>
+                    <p className="text-2xl font-bold text-blue-900">
+                      {formatCurrency(analysis.costSummary.grandTotal.min)} - {formatCurrency(analysis.costSummary.grandTotal.max)}
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -288,15 +375,50 @@ const PDFSummarizer = () => {
                   <AlertCircle className="h-5 w-5" />
                   Safety Concerns
                 </CardTitle>
+                <CardDescription>These issues pose immediate safety risks</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {analysis.safetyIssues.map((issue, index) => (
                     <div key={index} className="flex items-start gap-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                       <span className="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center text-sm font-medium">
                         {index + 1}
                       </span>
                       <p className="text-gray-800 leading-relaxed">{issue}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Detailed Issues */}
+          {analysis.issues && analysis.issues.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Detailed Findings & Cost Estimates</CardTitle>
+                <CardDescription>All identified issues with location and estimated repair costs</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {analysis.issues.map((issue, index) => (
+                    <div key={index} className="p-4 border rounded-lg bg-gray-50">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-3">
+                          {renderPriorityBadge(issue.priority)}
+                          <span className="text-sm bg-gray-200 text-gray-700 px-2 py-1 rounded">{issue.category}</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold text-gray-900">
+                            {formatCurrency(issue.estimatedCost.min)} - {formatCurrency(issue.estimatedCost.max)}
+                          </p>
+                        </div>
+                      </div>
+                      <h4 className="font-semibold text-gray-900 mb-1">{issue.description}</h4>
+                      <p className="text-sm text-gray-600 flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {issue.location}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -324,31 +446,6 @@ const PDFSummarizer = () => {
               </CardContent>
             </Card>
           )}
-
-          {/* Medium Priority Issues */}
-          {analysis.mediumPriorityIssues && analysis.mediumPriorityIssues.length > 0 && (
-            <Card className="border-yellow-200">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-yellow-700">
-                  {renderPriorityIcon('medium')}
-                  Medium Priority Issues
-                </CardTitle>
-                <CardDescription>Address these issues when convenient</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {analysis.mediumPriorityIssues.map((issue, index) => (
-                    <div key={index} className="flex items-start gap-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <span className="flex-shrink-0 w-6 h-6 bg-yellow-100 text-yellow-700 rounded-full flex items-center justify-center text-sm font-medium">
-                        {index + 1}
-                      </span>
-                      <p className="text-gray-800 leading-relaxed">{issue}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
         </div>
       )}
 
@@ -360,10 +457,10 @@ const PDFSummarizer = () => {
               <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
               <div className="text-center">
                 <p className="font-medium text-gray-900">
-                  {extractionProgress > 0 ? `Extracting text... ${Math.round(extractionProgress)}%` : 'Analyzing your home inspection report...'}
+                  {extractionProgress > 0 ? `Extracting text... ${Math.round(extractionProgress)}%` : 'Analyzing your home inspection report with AI...'}
                 </p>
                 <p className="text-sm text-gray-600">
-                  {extractionProgress > 0 ? 'Reading PDF content' : 'Processing extracted text'}
+                  {extractionProgress > 0 ? 'Reading PDF content' : 'Generating comprehensive insights and cost estimates'}
                 </p>
               </div>
             </div>
