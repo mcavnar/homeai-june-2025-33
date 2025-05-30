@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Upload, FileText, Loader2, CheckCircle, AlertCircle, DollarSign, Calendar, MapPin, Clock } from 'lucide-react';
+import { Upload, FileText, Loader2, CheckCircle, AlertCircle, DollarSign, Calendar, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -11,8 +11,7 @@ import { extractTextFromPDF } from '@/utils/pdfTextExtractor';
 interface InspectionIssue {
   description: string;
   location: string;
-  priority: 'critical' | 'high' | 'medium' | 'low';
-  timeframe: string;
+  priority: 'high' | 'medium';
   estimatedCost: {
     min: number;
     max: number;
@@ -36,19 +35,11 @@ interface HomeInspectionAnalysis {
   issues?: InspectionIssue[];
   safetyIssues?: string[];
   costSummary?: {
-    criticalTotal: {
-      min: number;
-      max: number;
-    };
     highPriorityTotal: {
       min: number;
       max: number;
     };
     mediumPriorityTotal: {
-      min: number;
-      max: number;
-    };
-    lowPriorityTotal: {
       min: number;
       max: number;
     };
@@ -69,14 +60,17 @@ const PDFSummarizer = () => {
   const { toast } = useToast();
 
   const handleFileSelect = (selectedFile: File) => {
+    // Reset previous state
     setAnalysis(null);
     setError('');
 
+    // Validate file type
     if (selectedFile.type !== 'application/pdf') {
       setError('Please select a PDF file.');
       return;
     }
 
+    // Validate file size (10MB limit)
     if (selectedFile.size > 10 * 1024 * 1024) {
       setError('File size must be less than 10MB.');
       return;
@@ -104,15 +98,6 @@ const PDFSummarizer = () => {
     }
   };
 
-  const resetTool = () => {
-    setFile(null);
-    setAnalysis(null);
-    setError('');
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
   const processPDF = async () => {
     if (!file) return;
 
@@ -121,6 +106,7 @@ const PDFSummarizer = () => {
     setExtractionProgress(0);
 
     try {
+      // Extract text from PDF in the frontend
       toast({
         title: "Extracting text from PDF...",
         description: "Processing your document, please wait.",
@@ -138,9 +124,10 @@ const PDFSummarizer = () => {
         throw new Error('Unable to extract sufficient text from PDF. The document may be image-based or corrupted.');
       }
 
+      // Send extracted text to Edge Function for analysis
       toast({
         title: "Analyzing with AI...",
-        description: "Processing the content with OpenAI for comprehensive insights.",
+        description: "Processing the content with OpenAI for detailed insights.",
       });
 
       const { data, error: functionError } = await supabase.functions.invoke('process-pdf', {
@@ -159,7 +146,7 @@ const PDFSummarizer = () => {
 
       toast({
         title: "Analysis complete!",
-        description: `Processed ${extractionResult.pageCount} pages and found ${data.analysis.issues?.length || 0} issues.`,
+        description: `Processed ${extractionResult.pageCount} pages and generated comprehensive insights.`,
       });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to process PDF';
@@ -175,6 +162,15 @@ const PDFSummarizer = () => {
     }
   };
 
+  const resetTool = () => {
+    setFile(null);
+    setAnalysis(null);
+    setError('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -184,12 +180,10 @@ const PDFSummarizer = () => {
     }).format(amount);
   };
 
-  const renderPriorityBadge = (priority: 'critical' | 'high' | 'medium' | 'low') => {
+  const renderPriorityBadge = (priority: 'high' | 'medium') => {
     const colors = {
-      critical: 'bg-red-100 text-red-900 border-red-300',
-      high: 'bg-orange-100 text-orange-900 border-orange-300',
-      medium: 'bg-yellow-100 text-yellow-900 border-yellow-300',
-      low: 'bg-blue-100 text-blue-900 border-blue-300'
+      high: 'bg-red-100 text-red-800 border-red-200',
+      medium: 'bg-yellow-100 text-yellow-800 border-yellow-200'
     };
     return (
       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${colors[priority]}`}>
@@ -202,7 +196,7 @@ const PDFSummarizer = () => {
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Home Inspection Report Analyzer</h1>
-        <p className="text-gray-600">Upload a home inspection PDF and get comprehensive analysis with detailed cost estimates and prioritized findings</p>
+        <p className="text-gray-600">Upload a home inspection PDF and get an intelligent summary with prioritized findings and cost estimates</p>
       </div>
 
       {/* Upload Section */}
@@ -327,12 +321,10 @@ const PDFSummarizer = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-3">
+                <ul className="space-y-2">
                   {analysis.executiveSummary.map((point, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-sm font-medium">
-                        {index + 1}
-                      </span>
+                      <span className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></span>
                       <p className="text-gray-800 leading-relaxed">{point}</p>
                     </li>
                   ))}
@@ -351,47 +343,25 @@ const PDFSummarizer = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
-                  {analysis.costSummary.criticalTotal && (
-                    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                      <h4 className="font-semibold text-red-800 mb-2">Critical</h4>
-                      <p className="text-lg font-bold text-red-900">
-                        {formatCurrency(analysis.costSummary.criticalTotal.min)} - {formatCurrency(analysis.costSummary.criticalTotal.max)}
-                      </p>
-                    </div>
-                  )}
-                  {analysis.costSummary.highPriorityTotal && (
-                    <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                      <h4 className="font-semibold text-orange-800 mb-2">High Priority</h4>
-                      <p className="text-lg font-bold text-orange-900">
-                        {formatCurrency(analysis.costSummary.highPriorityTotal.min)} - {formatCurrency(analysis.costSummary.highPriorityTotal.max)}
-                      </p>
-                    </div>
-                  )}
-                  {analysis.costSummary.mediumPriorityTotal && (
-                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <h4 className="font-semibold text-yellow-800 mb-2">Medium Priority</h4>
-                      <p className="text-lg font-bold text-yellow-900">
-                        {formatCurrency(analysis.costSummary.mediumPriorityTotal.min)} - {formatCurrency(analysis.costSummary.mediumPriorityTotal.max)}
-                      </p>
-                    </div>
-                  )}
-                  {analysis.costSummary.lowPriorityTotal && (
-                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <h4 className="font-semibold text-blue-800 mb-2">Low Priority</h4>
-                      <p className="text-lg font-bold text-blue-900">
-                        {formatCurrency(analysis.costSummary.lowPriorityTotal.min)} - {formatCurrency(analysis.costSummary.lowPriorityTotal.max)}
-                      </p>
-                    </div>
-                  )}
-                  {analysis.costSummary.grandTotal && (
-                    <div className="p-4 bg-gray-100 border border-gray-300 rounded-lg">
-                      <h4 className="font-semibold text-gray-800 mb-2">Total Estimate</h4>
-                      <p className="text-lg font-bold text-gray-900">
-                        {formatCurrency(analysis.costSummary.grandTotal.min)} - {formatCurrency(analysis.costSummary.grandTotal.max)}
-                      </p>
-                    </div>
-                  )}
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <h4 className="font-semibold text-red-800 mb-2">High Priority</h4>
+                    <p className="text-2xl font-bold text-red-900">
+                      {formatCurrency(analysis.costSummary.highPriorityTotal.min)} - {formatCurrency(analysis.costSummary.highPriorityTotal.max)}
+                    </p>
+                  </div>
+                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <h4 className="font-semibold text-yellow-800 mb-2">Medium Priority</h4>
+                    <p className="text-2xl font-bold text-yellow-900">
+                      {formatCurrency(analysis.costSummary.mediumPriorityTotal.min)} - {formatCurrency(analysis.costSummary.mediumPriorityTotal.max)}
+                    </p>
+                  </div>
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="font-semibold text-blue-800 mb-2">Total Estimate</h4>
+                    <p className="text-2xl font-bold text-blue-900">
+                      {formatCurrency(analysis.costSummary.grandTotal.min)} - {formatCurrency(analysis.costSummary.grandTotal.max)}
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -405,14 +375,14 @@ const PDFSummarizer = () => {
                   <AlertCircle className="h-5 w-5" />
                   Safety Concerns
                 </CardTitle>
-                <CardDescription>These issues pose immediate safety risks and require urgent attention</CardDescription>
+                <CardDescription>These issues pose immediate safety risks</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {analysis.safetyIssues.map((issue, index) => (
                     <div key={index} className="flex items-start gap-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                       <span className="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center text-sm font-medium">
-                        !
+                        {index + 1}
                       </span>
                       <p className="text-gray-800 leading-relaxed">{issue}</p>
                     </div>
@@ -427,42 +397,28 @@ const PDFSummarizer = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Detailed Findings & Cost Estimates</CardTitle>
-                <CardDescription>All identified issues with priority levels, timeframes, and estimated repair costs</CardDescription>
+                <CardDescription>All identified issues with location and estimated repair costs</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {analysis.issues.map((issue, index) => (
                     <div key={index} className="p-4 border rounded-lg bg-gray-50">
                       <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-center gap-3 flex-wrap">
+                        <div className="flex items-center gap-3">
                           {renderPriorityBadge(issue.priority)}
-                          {issue.category && (
-                            <span className="text-sm bg-gray-200 text-gray-700 px-2 py-1 rounded">{issue.category}</span>
-                          )}
-                          {issue.timeframe && (
-                            <span className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {issue.timeframe}
-                            </span>
-                          )}
+                          <span className="text-sm bg-gray-200 text-gray-700 px-2 py-1 rounded">{issue.category}</span>
                         </div>
                         <div className="text-right">
-                          {issue.estimatedCost && issue.estimatedCost.min !== undefined && issue.estimatedCost.max !== undefined ? (
-                            <p className="font-semibold text-gray-900">
-                              {formatCurrency(issue.estimatedCost.min)} - {formatCurrency(issue.estimatedCost.max)}
-                            </p>
-                          ) : (
-                            <p className="font-semibold text-gray-500">Cost TBD</p>
-                          )}
+                          <p className="font-semibold text-gray-900">
+                            {formatCurrency(issue.estimatedCost.min)} - {formatCurrency(issue.estimatedCost.max)}
+                          </p>
                         </div>
                       </div>
                       <h4 className="font-semibold text-gray-900 mb-1">{issue.description}</h4>
-                      {issue.location && (
-                        <p className="text-sm text-gray-600 flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {issue.location}
-                        </p>
-                      )}
+                      <p className="text-sm text-gray-600 flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {issue.location}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -504,7 +460,7 @@ const PDFSummarizer = () => {
                   {extractionProgress > 0 ? `Extracting text... ${Math.round(extractionProgress)}%` : 'Analyzing your home inspection report with AI...'}
                 </p>
                 <p className="text-sm text-gray-600">
-                  {extractionProgress > 0 ? 'Reading PDF content' : 'Finding all issues and generating cost estimates'}
+                  {extractionProgress > 0 ? 'Reading PDF content' : 'Generating comprehensive insights and cost estimates'}
                 </p>
               </div>
             </div>
