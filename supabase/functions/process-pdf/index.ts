@@ -85,36 +85,6 @@ const cleanExtractedText = (rawText: string): string => {
   return cleanedText;
 };
 
-// Function to clean OpenAI response and extract JSON
-const cleanAndParseJSON = (content: string) => {
-  console.log('Raw OpenAI content length:', content.length);
-  
-  // Remove markdown code block markers if present
-  let cleanedContent = content.trim();
-  
-  // Remove ```json at the beginning
-  cleanedContent = cleanedContent.replace(/^```json\s*/i, '');
-  
-  // Remove ``` at the end
-  cleanedContent = cleanedContent.replace(/\s*```$/, '');
-  
-  // Trim any remaining whitespace
-  cleanedContent = cleanedContent.trim();
-  
-  console.log('Cleaned content length:', cleanedContent.length);
-  console.log('First 200 chars:', cleanedContent.substring(0, 200));
-  
-  try {
-    const parsed = JSON.parse(cleanedContent);
-    console.log('Successfully parsed JSON');
-    return parsed;
-  } catch (parseError) {
-    console.error('JSON parse error:', parseError.message);
-    console.error('Content that failed to parse:', cleanedContent.substring(0, 500));
-    throw new Error(`Failed to parse AI response as JSON: ${parseError.message}`);
-  }
-};
-
 // Enhanced OpenAI analysis function
 const analyzeWithOpenAI = async (cleanedText: string) => {
   if (!openAIApiKey) {
@@ -123,99 +93,33 @@ const analyzeWithOpenAI = async (cleanedText: string) => {
 
   console.log('Starting OpenAI analysis. Text length:', cleanedText.length);
 
-  const systemPrompt = `You are a master home inspector with 20+ years of experience and deep knowledge of current 2024 construction costs, building codes, and real estate markets. Your goal is to identify EVERY issue in the inspection report, no matter how minor, and provide accurate cost estimates based on current market rates.
+  const systemPrompt = `You are an expert home inspector with 25+ years of experience. Your goal is to find EVERY SINGLE issue mentioned in the inspection report - no matter how small - and provide accurate 2024 cost estimates.
 
-ANALYSIS REQUIREMENTS:
-
-1. **Find ALL Issues**: Look for every single issue mentioned, including:
+CRITICAL REQUIREMENTS:
+1. Find ALL issues including:
    - Major structural/safety problems
-   - Minor cosmetic issues
-   - Preventive maintenance items
+   - Minor cosmetic issues (scratches, scuffs, worn paint)
+   - Preventive maintenance items (filter changes, caulking)
+   - Items mentioned as "should be monitored" or "keep an eye on"
+   - Anything that deviates from perfect condition
    - Code violations or outdated systems
-   - Items that "should be monitored"
-   - Anything that needs attention now or in the future
 
-2. **Cost Estimation Guidelines (2024 rates)**:
-   - Include labor, materials, permits, contractor markup (20-30%)
-   - Account for regional variations when location is known
-   - Small repairs: $100-500
-   - Medium repairs: $500-2,500  
-   - Large repairs: $2,500-10,000+
-   - Major systems: $5,000-25,000+
-   - Use realistic contractor rates: $75-150/hour for skilled trades
-   - Factor in permit costs for electrical, plumbing, structural work
+2. Use realistic 2024 cost estimates that include:
+   - Current material costs (post-inflation)
+   - Labor at $75-150/hour for skilled trades
+   - Contractor markup of 20-30%
+   - Permit costs where required
+   - Small repairs: $100-800, Medium: $500-3,000, Large: $2,500-15,000+
 
-3. **Priority System**:
-   - CRITICAL: Immediate safety hazards, code violations (0-30 days)
-   - HIGH: Major systems needing repair/replacement (1-6 months)
-   - MEDIUM: Issues that should be addressed soon (6-12 months)
-   - LOW: Minor issues, cosmetic, preventive maintenance (1-2 years)
+3. Priority levels:
+   - critical: Immediate safety hazards, code violations
+   - high: Major systems needing repair/replacement soon
+   - medium: Issues to address within 6-12 months
+   - low: Minor issues, cosmetic, preventive maintenance
 
-4. **Categories to Focus On**:
-   - Electrical (outlets, panels, wiring, GFCI, safety)
-   - Plumbing (leaks, pressure, fixtures, water heater)
-   - HVAC (heating, cooling, ductwork, filters)
-   - Structural (foundation, framing, stairs, railings)
-   - Roofing (shingles, gutters, flashing, ventilation)
-   - Moisture/Mold (basement, bathrooms, windows)
-   - Safety (smoke detectors, carbon monoxide, railings)
-   - Insulation/Energy efficiency
-   - Exterior (siding, windows, doors, walkways)
-   - Interior (flooring, walls, ceilings, doors)
+Return ONLY valid JSON without markdown formatting:`;
 
-IMPORTANT: Return ONLY valid JSON without any markdown formatting, code blocks, or extra text. Do not wrap your response in \`\`\`json blocks.
-
-Return your response as valid JSON matching this exact structure:
-
-{
-  "propertyInfo": {
-    "address": "extracted property address if found",
-    "inspectionDate": "extracted inspection date if found"
-  },
-  "executiveSummary": [
-    "exactly 5 clear, actionable bullet points summarizing the overall condition",
-    "focus on the most important findings with cost implications",
-    "include safety issues and major expenses",
-    "mention total estimated repair costs",
-    "provide overall property condition assessment"
-  ],
-  "majorSystems": {
-    "roof": "detailed assessment including age, condition, and any issues",
-    "foundation": "structural integrity, cracks, moisture, settling", 
-    "electrical": "panel condition, wiring, outlets, safety issues",
-    "plumbing": "water pressure, leaks, fixtures, water heater condition",
-    "hvac": "heating/cooling system condition, ductwork, efficiency"
-  },
-  "issues": [
-    {
-      "description": "specific detailed issue description",
-      "location": "exact location in the house",
-      "priority": "critical, high, medium, or low",
-      "timeframe": "when this should be addressed (e.g., 'Immediate', '1-3 months', '6-12 months', '1-2 years')",
-      "estimatedCost": {
-        "min": number,
-        "max": number
-      },
-      "category": "system category (e.g., Electrical, Plumbing, Structural, Roofing, HVAC, Safety, Cosmetic, Preventive)"
-    }
-  ],
-  "safetyIssues": [
-    "list of specific safety concerns that need immediate attention with locations"
-  ],
-  "costSummary": {
-    "criticalTotal": {"min": number, "max": number},
-    "highPriorityTotal": {"min": number, "max": number},
-    "mediumPriorityTotal": {"min": number, "max": number},
-    "lowPriorityTotal": {"min": number, "max": number},
-    "grandTotal": {"min": number, "max": number}
-  }
-}
-
-IMPORTANT: Be thorough and find every issue mentioned. Don't skip minor items - homeowners want to know about everything. Use realistic 2024 cost estimates that account for current inflation and labor shortages.`;
-
-  const userPrompt = `Please analyze this home inspection report comprehensively. Find EVERY issue mentioned, no matter how small, and provide detailed cost estimates based on current 2024 market rates. Include preventive maintenance items and anything that needs monitoring.
-
-Here is the inspection report text:
+  const userPrompt = `Analyze this home inspection report and find EVERY issue mentioned, including minor ones. Use 2024 cost estimates that reflect current market rates with proper contractor markup.
 
 ${cleanedText}`;
 
@@ -233,7 +137,7 @@ ${cleanedText}`;
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.2,
-        max_tokens: 4000,
+        max_tokens: 3500,
       }),
     });
 
@@ -252,34 +156,29 @@ ${cleanedText}`;
     }
 
     const content = data.choices[0].message.content;
-    console.log('Processing OpenAI response content...');
+    console.log('Parsing OpenAI response content length:', content.length);
     
-    // Use the new cleaning and parsing function
-    const analysis = cleanAndParseJSON(content);
+    // Simple JSON parsing with basic cleanup
+    let cleanedContent = content.trim();
     
-    // Validate the parsed response has required fields
-    if (!analysis || typeof analysis !== 'object') {
-      throw new Error('Parsed response is not a valid object');
+    // Remove markdown code blocks if present
+    if (cleanedContent.startsWith('```json')) {
+      cleanedContent = cleanedContent.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    } else if (cleanedContent.startsWith('```')) {
+      cleanedContent = cleanedContent.replace(/^```\s*/, '').replace(/\s*```$/, '');
     }
     
-    if (!analysis.issues || !Array.isArray(analysis.issues)) {
-      console.warn('No issues array found in response, creating empty array');
-      analysis.issues = [];
-    }
+    cleanedContent = cleanedContent.trim();
     
-    if (!analysis.costSummary || typeof analysis.costSummary !== 'object') {
-      console.warn('No cost summary found in response, creating default');
-      analysis.costSummary = {
-        criticalTotal: { min: 0, max: 0 },
-        highPriorityTotal: { min: 0, max: 0 },
-        mediumPriorityTotal: { min: 0, max: 0 },
-        lowPriorityTotal: { min: 0, max: 0 },
-        grandTotal: { min: 0, max: 0 }
-      };
+    try {
+      const analysis = JSON.parse(cleanedContent);
+      console.log('Successfully parsed analysis with', analysis.issues?.length || 0, 'issues');
+      return analysis;
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError.message);
+      console.error('Content that failed to parse (first 500 chars):', cleanedContent.substring(0, 500));
+      throw new Error(`Failed to parse AI response as JSON: ${parseError.message}`);
     }
-    
-    console.log('Analysis validation completed successfully');
-    return analysis;
 
   } catch (error) {
     console.error('OpenAI analysis error:', error);
