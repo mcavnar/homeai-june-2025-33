@@ -3,7 +3,7 @@ import { searchPropertyByAddress } from './propertySearchService';
 import { getPropertyDetails } from './propertyDetailsService';
 import { RedfinPropertyData } from '@/types/redfin';
 
-export { RedfinPropertyData } from '@/types/redfin';
+export type { RedfinPropertyData } from '@/types/redfin';
 
 export { searchPropertyByAddress, getPropertyDetails };
 
