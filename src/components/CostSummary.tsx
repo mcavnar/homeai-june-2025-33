@@ -19,7 +19,24 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costSummary }) => {
   const combinedHighPriorityMax = (costSummary.immediatePriorityTotal?.max || 0) + costSummary.highPriorityTotal.max;
   const mediumPriorityMax = costSummary.mediumPriorityTotal.max;
   const lowPriorityMax = costSummary.lowPriorityTotal?.max || 0;
-  const grandTotalMax = costSummary.grandTotal.max;
+  
+  // Calculate total from displayed values instead of using backend grandTotal
+  const calculatedTotalMax = combinedHighPriorityMax + mediumPriorityMax + lowPriorityMax;
+  
+  // Debug logging to identify discrepancies
+  const backendGrandTotalMax = costSummary.grandTotal.max;
+  if (Math.abs(calculatedTotalMax - backendGrandTotalMax) > 10) {
+    console.warn('Cost total discrepancy detected:', {
+      calculatedTotal: calculatedTotalMax,
+      backendGrandTotal: backendGrandTotalMax,
+      difference: calculatedTotalMax - backendGrandTotalMax,
+      breakdown: {
+        highPriority: combinedHighPriorityMax,
+        mediumPriority: mediumPriorityMax,
+        lowPriority: lowPriorityMax
+      }
+    });
+  }
 
   return (
     <Card className="border-green-200">
@@ -52,7 +69,7 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costSummary }) => {
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <h4 className="font-semibold text-blue-800 mb-2">Total Estimate</h4>
             <p className="text-2xl font-bold text-blue-900">
-              {formatCurrency(grandTotalMax)}
+              {formatCurrency(calculatedTotalMax)}
             </p>
           </div>
         </div>
