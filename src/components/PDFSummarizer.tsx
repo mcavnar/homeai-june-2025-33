@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Loader2, AlertCircle, FileText, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +17,7 @@ import SafetyIssues from './SafetyIssues';
 import DetailedFindings from './DetailedFindings';
 import MajorSystems from './MajorSystems';
 import FileUploadSection from './FileUploadSection';
+import ConditionScore from './ConditionScore';
 
 const PDFSummarizer = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -168,6 +168,11 @@ const PDFSummarizer = () => {
               address={analysis.propertyInfo.address}
               inspectionDate={analysis.propertyInfo.inspectionDate}
             />
+          )}
+
+          {/* Condition Score Section - Only show when we have both analysis and property data */}
+          {propertyData && (
+            <ConditionScore analysis={analysis} propertyData={propertyData} />
           )}
 
           {/* Executive Summary */}
