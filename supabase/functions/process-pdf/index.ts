@@ -7,63 +7,71 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// PDF.js text extraction function
+// Simple PDF text extraction using a different approach
 async function extractTextFromPDF(arrayBuffer: ArrayBuffer): Promise<string> {
   try {
-    // Import PDF.js using dynamic import for Deno compatibility
-    const pdfjs = await import('https://esm.sh/pdfjs-dist@2.16.105/legacy/build/pdf.js');
+    console.log('Starting PDF text extraction...');
     
-    // Set up the worker
-    pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    // Convert ArrayBuffer to Uint8Array for processing
+    const uint8Array = new Uint8Array(arrayBuffer);
     
-    console.log('Loading PDF document...');
+    // Simple text extraction approach - look for readable text patterns
+    let extractedText = '';
+    const decoder = new TextDecoder('utf-8', { fatal: false });
     
-    // Load the PDF document
-    const loadingTask = pdfjs.getDocument({
-      data: new Uint8Array(arrayBuffer),
-      verbosity: 0 // Reduce console noise
-    });
+    // Convert to string and extract readable text
+    const pdfString = decoder.decode(uint8Array);
     
-    const pdf = await loadingTask.promise;
-    console.log(`PDF loaded successfully. Pages: ${pdf.numPages}`);
+    // Look for text between parentheses and brackets which often contain readable content
+    const textMatches = pdfString.match(/\(([^)]+)\)/g) || [];
+    const bracketMatches = pdfString.match(/\[([^\]]+)\]/g) || [];
     
-    let fullText = '';
+    // Extract text from matches
+    for (const match of textMatches) {
+      const text = match.slice(1, -1); // Remove parentheses
+      if (text.length > 2 && /[a-zA-Z]/.test(text)) {
+        extractedText += text + ' ';
+      }
+    }
     
-    // Extract text from each page
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-      try {
-        const page = await pdf.getPage(pageNum);
-        const textContent = await page.getTextContent();
-        
-        // Combine all text items from the page
-        const pageText = textContent.items
-          .map((item: any) => item.str)
-          .join(' ');
-        
-        if (pageText.trim()) {
-          fullText += pageText + '\n\n';
-        }
-        
-        console.log(`Page ${pageNum} processed. Text length: ${pageText.length}`);
-      } catch (pageError) {
-        console.error(`Error processing page ${pageNum}:`, pageError);
-        // Continue with other pages even if one fails
+    for (const match of bracketMatches) {
+      const text = match.slice(1, -1); // Remove brackets
+      if (text.length > 2 && /[a-zA-Z]/.test(text)) {
+        extractedText += text + ' ';
+      }
+    }
+    
+    // Also try to extract text using stream objects
+    const streamMatches = pdfString.match(/stream\s*(.*?)\s*endstream/gs) || [];
+    for (const streamMatch of streamMatches) {
+      const streamContent = streamMatch.replace(/^stream\s*/, '').replace(/\s*endstream$/, '');
+      // Look for readable text in streams
+      const readableText = streamContent.match(/[a-zA-Z][a-zA-Z0-9\s.,!?;:'"()-]{10,}/g) || [];
+      for (const text of readableText) {
+        extractedText += text + ' ';
       }
     }
     
     // Clean up the extracted text
-    const cleanedText = fullText
-      .replace(/\s+/g, ' ') // Replace multiple whitespace with single space
-      .replace(/\n\s*\n/g, '\n') // Remove empty lines
+    extractedText = extractedText
+      .replace(/\\[rn]/g, ' ') // Replace escaped newlines
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
       .trim();
     
-    console.log(`Total extracted text length: ${cleanedText.length}`);
+    console.log(`Extracted text length: ${extractedText.length}`);
+    console.log(`Sample text: ${extractedText.substring(0, 200)}`);
     
-    if (cleanedText.length < 50) {
-      throw new Error('Extracted text is too short. The PDF may be image-based or corrupted.');
+    if (extractedText.length < 20) {
+      // Fallback: try to extract any readable sequences
+      const fallbackMatches = pdfString.match(/[A-Za-z][A-Za-z0-9\s.,!?;:'"()-]{5,}/g) || [];
+      extractedText = fallbackMatches.join(' ').substring(0, 5000);
+      
+      if (extractedText.length < 20) {
+        throw new Error('Unable to extract readable text from PDF. The PDF may be image-based or corrupted.');
+      }
     }
     
-    return cleanedText;
+    return extractedText;
     
   } catch (error) {
     console.error('PDF extraction error:', error);
@@ -91,18 +99,22 @@ serve(async (req) => {
       throw new Error('File size exceeds 10MB limit');
     }
 
-    // Extract text from PDF using PDF.js
+    // Validate file type
+    if (!file.type.includes('pdf') && !file.name.toLowerCase().endsWith('.pdf')) {
+      throw new Error('File must be a PDF');
+    }
+
+    // Extract text from PDF
     const arrayBuffer = await file.arrayBuffer();
     const extractedText = await extractTextFromPDF(arrayBuffer);
     
     console.log('Extraction successful. Text length:', extractedText.length);
-    console.log('Sample text (first 500 chars):', extractedText.substring(0, 500));
 
     // Return the raw extracted text for verification
     const analysis = {
       summary: extractedText,
       extractedTextLength: extractedText.length,
-      note: "Raw extracted text using PDF.js (OpenAI analysis disabled for testing)"
+      note: "Raw extracted text (basic extraction method)"
     };
 
     return new Response(
