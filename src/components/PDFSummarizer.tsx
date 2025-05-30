@@ -1,37 +1,30 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { Loader2, AlertCircle, FileText, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { extractTextFromPDF } from '@/utils/pdfTextExtractor';
-import { usePropertyData } from '@/hooks/usePropertyData';
-import { HomeInspectionAnalysis, NegotiationStrategy as NegotiationStrategyType } from '@/types/inspection';
 import PropertyDetails from './PropertyDetails';
-import PropertyInfo from './PropertyInfo';
-import ExecutiveSummary from './ExecutiveSummary';
-import CostSummary from './CostSummary';
-import SafetyIssues from './SafetyIssues';
-import DetailedFindings from './DetailedFindings';
-import MajorSystems from './MajorSystems';
 import FileUploadSection from './FileUploadSection';
-import ConditionScore from './ConditionScore';
-import NegotiationStrategy from './NegotiationStrategy';
+import AnalysisResults from './AnalysisResults';
+import ProcessingStatus from './ProcessingStatus';
+import { usePDFProcessor } from '@/hooks/usePDFProcessor';
+import { usePropertyData } from '@/hooks/usePropertyData';
+import { useNegotiationStrategy } from '@/hooks/useNegotiationStrategy';
 
 const PDFSummarizer = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [extractionProgress, setExtractionProgress] = useState(0);
-  const [analysis, setAnalysis] = useState<HomeInspectionAnalysis | null>(null);
-  const [cleanedText, setCleanedText] = useState<string>('');
-  const [error, setError] = useState<string>('');
-  const [negotiationStrategy, setNegotiationStrategy] = useState<NegotiationStrategyType | null>(null);
-  const [isGeneratingStrategy, setIsGeneratingStrategy] = useState(false);
-  const [strategyError, setStrategyError] = useState<string>('');
-  const { toast } = useToast();
+  const {
+    file,
+    isProcessing,
+    extractionProgress,
+    analysis,
+    cleanedText,
+    error,
+    handleFileSelect,
+    processPDF,
+    resetProcessor,
+  } = usePDFProcessor();
 
   const {
     propertyData,
@@ -41,169 +34,32 @@ const PDFSummarizer = () => {
     resetPropertyData,
   } = usePropertyData();
 
-  // Generate negotiation strategy when both analysis and property data are available
-  useEffect(() => {
-    const generateNegotiationStrategy = async () => {
-      if (!analysis || !propertyData || negotiationStrategy || isGeneratingStrategy) {
-        return;
-      }
+  const {
+    negotiationStrategy,
+    isGeneratingStrategy,
+    strategyError,
+    resetStrategy,
+  } = useNegotiationStrategy(analysis, propertyData);
 
-      setIsGeneratingStrategy(true);
-      setStrategyError('');
-
-      try {
-        toast({
-          title: "Generating negotiation strategy...",
-          description: "Analyzing inspection findings and market data to create your negotiation plan.",
-        });
-
-        const { data, error: functionError } = await supabase.functions.invoke('generate-negotiation-strategy', {
-          body: { 
-            inspectionAnalysis: analysis,
-            propertyData: propertyData 
-          },
-        });
-
-        if (functionError) {
-          throw new Error(functionError.message);
-        }
-
-        if (!data.success) {
-          throw new Error(data.error || 'Failed to generate negotiation strategy');
-        }
-
-        setNegotiationStrategy(data.negotiationStrategy);
-
-        toast({
-          title: "Negotiation strategy ready!",
-          description: "Your comprehensive negotiation plan has been generated based on inspection and market data.",
-        });
-
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to generate negotiation strategy';
-        setStrategyError(errorMessage);
-        console.error('Negotiation strategy error:', err);
-        toast({
-          title: "Strategy generation failed",
-          description: errorMessage,
-          variant: "destructive",
-        });
-      } finally {
-        setIsGeneratingStrategy(false);
-      }
-    };
-
-    generateNegotiationStrategy();
-  }, [analysis, propertyData, negotiationStrategy, isGeneratingStrategy, toast]);
-
-  const handleFileSelect = (selectedFile: File) => {
-    // Reset previous state
-    setAnalysis(null);
-    setError('');
-    setNegotiationStrategy(null);
-    setStrategyError('');
+  const handleFileSelectAndReset = (selectedFile: File) => {
+    // Reset all states when a new file is selected
+    resetStrategy();
     resetPropertyData();
-
-    // Validate file type
-    if (selectedFile.type !== 'application/pdf') {
-      setError('Please select a PDF file.');
-      return;
-    }
-
-    // Validate file size (10MB limit)
-    if (selectedFile.size > 10 * 1024 * 1024) {
-      setError('File size must be less than 10MB.');
-      return;
-    }
-
-    setFile(selectedFile);
-    toast({
-      title: "File selected",
-      description: `${selectedFile.name} is ready for processing.`,
-    });
+    handleFileSelect(selectedFile);
   };
 
-  const processPDF = async () => {
-    if (!file) return;
-
-    setIsProcessing(true);
-    setError('');
-    setExtractionProgress(0);
-    setNegotiationStrategy(null);
-    setStrategyError('');
-    resetPropertyData();
-
-    try {
-      // Extract text from PDF in the frontend
-      toast({
-        title: "Extracting text from PDF...",
-        description: "Processing your document, please wait.",
-      });
-
-      const extractionResult = await extractTextFromPDF(file, (progress) => {
-        setExtractionProgress(progress);
-      });
-
-      if (extractionResult.error) {
-        throw new Error(extractionResult.error);
-      }
-
-      if (!extractionResult.text || extractionResult.text.length < 50) {
-        throw new Error('Unable to extract sufficient text from PDF. The document may be image-based or corrupted.');
-      }
-
-      // Send extracted text to Edge Function for analysis
-      toast({
-        title: "Analyzing with AI...",
-        description: "Processing the content with OpenAI for detailed insights.",
-      });
-
-      const { data, error: functionError } = await supabase.functions.invoke('process-pdf', {
-        body: { extractedText: extractionResult.text },
-      });
-
-      if (functionError) {
-        throw new Error(functionError.message);
-      }
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to analyze extracted text');
-      }
-
-      setAnalysis(data.analysis);
-      setCleanedText(data.cleanedText || '');
-
-      toast({
-        title: "Analysis complete!",
-        description: `Processed ${extractionResult.pageCount} pages and generated comprehensive insights.`,
-      });
-
-      // Fetch property data if address is available
-      if (data.analysis?.propertyInfo?.address) {
-        await fetchPropertyDetails(data.analysis.propertyInfo.address);
-      }
-
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to process PDF';
-      setError(errorMessage);
-      toast({
-        title: "Processing failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessing(false);
-      setExtractionProgress(0);
+  const handleProcessPDF = async () => {
+    const analysisResult = await processPDF();
+    
+    // Fetch property data if address is available
+    if (analysisResult?.propertyInfo?.address) {
+      await fetchPropertyDetails(analysisResult.propertyInfo.address);
     }
   };
 
   const resetTool = () => {
-    setFile(null);
-    setAnalysis(null);
-    setCleanedText('');
-    setError('');
-    setNegotiationStrategy(null);
-    setStrategyError('');
+    resetProcessor();
+    resetStrategy();
     resetPropertyData();
   };
 
@@ -220,82 +76,20 @@ const PDFSummarizer = () => {
         isProcessing={isProcessing}
         extractionProgress={extractionProgress}
         error={error}
-        onFileSelect={handleFileSelect}
-        onProcess={processPDF}
+        onFileSelect={handleFileSelectAndReset}
+        onProcess={handleProcessPDF}
         onReset={resetTool}
       />
 
       {/* Analysis Results */}
       {analysis && (
-        <div className="space-y-6">
-          {/* Property Information */}
-          {analysis.propertyInfo && (
-            <PropertyInfo
-              address={analysis.propertyInfo.address}
-              inspectionDate={analysis.propertyInfo.inspectionDate}
-            />
-          )}
-
-          {/* Condition Score Section - Only show when we have both analysis and property data */}
-          {propertyData && (
-            <ConditionScore analysis={analysis} propertyData={propertyData} />
-          )}
-
-          {/* Executive Summary */}
-          {analysis.executiveSummary && analysis.executiveSummary.length > 0 && (
-            <ExecutiveSummary summary={analysis.executiveSummary} />
-          )}
-
-          {/* Cost Summary */}
-          {analysis.costSummary && (
-            <CostSummary costSummary={analysis.costSummary} />
-          )}
-
-          {/* Negotiation Strategy */}
-          {negotiationStrategy && (
-            <NegotiationStrategy strategy={negotiationStrategy} />
-          )}
-
-          {/* Negotiation Strategy Loading */}
-          {isGeneratingStrategy && (
-            <Card className="border-purple-200">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-center gap-3 py-4">
-                  <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
-                  <div className="text-center">
-                    <p className="font-medium text-gray-900">Generating negotiation strategy...</p>
-                    <p className="text-sm text-gray-600">Analyzing inspection and market data</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Negotiation Strategy Error */}
-          {strategyError && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Negotiation strategy unavailable: {strategyError}
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {/* Safety Issues */}
-          {analysis.safetyIssues && analysis.safetyIssues.length > 0 && (
-            <SafetyIssues issues={analysis.safetyIssues} />
-          )}
-
-          {/* Detailed Issues */}
-          {analysis.issues && analysis.issues.length > 0 && (
-            <DetailedFindings issues={analysis.issues} />
-          )}
-
-          {/* Major Systems */}
-          {analysis.majorSystems && (
-            <MajorSystems systems={analysis.majorSystems} />
-          )}
-        </div>
+        <AnalysisResults
+          analysis={analysis}
+          propertyData={propertyData}
+          negotiationStrategy={negotiationStrategy}
+          isGeneratingStrategy={isGeneratingStrategy}
+          strategyError={strategyError}
+        />
       )}
 
       {/* Property Details Section */}
@@ -361,23 +155,7 @@ const PDFSummarizer = () => {
       )}
 
       {/* Processing Status */}
-      {isProcessing && (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-center gap-3 py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-              <div className="text-center">
-                <p className="font-medium text-gray-900">
-                  {extractionProgress > 0 ? `Extracting text... ${Math.round(extractionProgress)}%` : 'Analyzing your home inspection report with AI...'}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {extractionProgress > 0 ? 'Reading PDF content' : 'Generating comprehensive insights and cost estimates'}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <ProcessingStatus isProcessing={isProcessing} extractionProgress={extractionProgress} />
     </div>
   );
 };
