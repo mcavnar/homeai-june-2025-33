@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Upload, FileText, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { extractTextFromPDF } from '@/utils/pdfTextExtractor';
 
 interface HomeInspectionAnalysis {
   majorSystems?: {
@@ -25,6 +25,7 @@ interface HomeInspectionAnalysis {
 const PDFSummarizer = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [extractionProgress, setExtractionProgress] = useState(0);
   const [analysis, setAnalysis] = useState<HomeInspectionAnalysis | null>(null);
   const [error, setError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -74,15 +75,35 @@ const PDFSummarizer = () => {
 
     setIsProcessing(true);
     setError('');
+    setExtractionProgress(0);
 
     try {
-      // Create form data with the PDF file
-      const formData = new FormData();
-      formData.append('file', file);
+      // Extract text from PDF in the frontend
+      toast({
+        title: "Extracting text from PDF...",
+        description: "Processing your document, please wait.",
+      });
 
-      // Call the Supabase Edge Function
+      const extractionResult = await extractTextFromPDF(file, (progress) => {
+        setExtractionProgress(progress);
+      });
+
+      if (extractionResult.error) {
+        throw new Error(extractionResult.error);
+      }
+
+      if (!extractionResult.text || extractionResult.text.length < 50) {
+        throw new Error('Unable to extract sufficient text from PDF. The document may be image-based or corrupted.');
+      }
+
+      // Send extracted text to Edge Function for analysis
+      toast({
+        title: "Analyzing extracted text...",
+        description: "Processing the content for insights.",
+      });
+
       const { data, error: functionError } = await supabase.functions.invoke('process-pdf', {
-        body: formData,
+        body: { extractedText: extractionResult.text },
       });
 
       if (functionError) {
@@ -90,14 +111,14 @@ const PDFSummarizer = () => {
       }
 
       if (!data.success) {
-        throw new Error(data.error || 'Failed to process PDF');
+        throw new Error(data.error || 'Failed to analyze extracted text');
       }
 
       setAnalysis(data.analysis);
 
       toast({
         title: "Processing complete!",
-        description: "Your home inspection report has been analyzed.",
+        description: `Extracted text from ${extractionResult.pageCount} pages and analyzed successfully.`,
       });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to process PDF';
@@ -109,6 +130,7 @@ const PDFSummarizer = () => {
       });
     } finally {
       setIsProcessing(false);
+      setExtractionProgress(0);
     }
   };
 
@@ -196,7 +218,7 @@ const PDFSummarizer = () => {
               {isProcessing ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Analyzing Report...
+                  {extractionProgress > 0 ? `Extracting... ${Math.round(extractionProgress)}%` : 'Analyzing Report...'}
                 </>
               ) : (
                 <>
@@ -337,8 +359,12 @@ const PDFSummarizer = () => {
             <div className="flex items-center justify-center gap-3 py-8">
               <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
               <div className="text-center">
-                <p className="font-medium text-gray-900">Analyzing your home inspection report...</p>
-                <p className="text-sm text-gray-600">Extracting text and generating intelligent summary</p>
+                <p className="font-medium text-gray-900">
+                  {extractionProgress > 0 ? `Extracting text... ${Math.round(extractionProgress)}%` : 'Analyzing your home inspection report...'}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {extractionProgress > 0 ? 'Reading PDF content' : 'Processing extracted text'}
+                </p>
               </div>
             </div>
           </CardContent>
