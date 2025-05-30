@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -232,6 +231,7 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         analysis,
+        cleanedText, // Include the cleaned text in the response
         extractedTextLength: extractedText.length,
         cleanedTextLength: cleanedText.length
       }),

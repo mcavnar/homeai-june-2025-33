@@ -1,9 +1,10 @@
-
 import React, { useState, useRef } from 'react';
-import { Upload, FileText, Loader2, CheckCircle, AlertCircle, DollarSign, Calendar, MapPin } from 'lucide-react';
+import { Upload, FileText, Loader2, CheckCircle, AlertCircle, DollarSign, Calendar, MapPin, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { extractTextFromPDF } from '@/utils/pdfTextExtractor';
@@ -55,6 +56,7 @@ const PDFSummarizer = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [extractionProgress, setExtractionProgress] = useState(0);
   const [analysis, setAnalysis] = useState<HomeInspectionAnalysis | null>(null);
+  const [cleanedText, setCleanedText] = useState<string>('');
   const [error, setError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -143,6 +145,7 @@ const PDFSummarizer = () => {
       }
 
       setAnalysis(data.analysis);
+      setCleanedText(data.cleanedText || ''); // Store the cleaned text
 
       toast({
         title: "Analysis complete!",
@@ -165,6 +168,7 @@ const PDFSummarizer = () => {
   const resetTool = () => {
     setFile(null);
     setAnalysis(null);
+    setCleanedText('');
     setError('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -447,6 +451,38 @@ const PDFSummarizer = () => {
             </Card>
           )}
         </div>
+      )}
+
+      {/* Cleaned PDF Text Display */}
+      {cleanedText && (
+        <Collapsible>
+          <Card>
+            <CollapsibleTrigger asChild>
+              <CardHeader className="cursor-pointer hover:bg-gray-50">
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Cleaned PDF Text
+                  </span>
+                  <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+                </CardTitle>
+                <CardDescription>
+                  The processed text that was sent to AI for analysis ({cleanedText.length.toLocaleString()} characters)
+                </CardDescription>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent>
+                <Textarea
+                  value={cleanedText}
+                  readOnly
+                  className="min-h-[400px] font-mono text-sm bg-gray-50"
+                  placeholder="Cleaned text will appear here..."
+                />
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
       )}
 
       {/* Processing Status */}
