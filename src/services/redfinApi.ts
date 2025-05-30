@@ -10,6 +10,9 @@ export interface RedfinPropertyData {
   bedrooms: number | null;
   squareFeet: number | null;
   regionCode: string | null;
+  neighborhoodAvgDaysOnMarket: number | null;
+  neighborhoodAvgSaleToListRatio: number | null;
+  nearbyHomesAvgSquareFeet: number | null;
 }
 
 interface AutoCompleteResponse {
@@ -42,6 +45,19 @@ interface PropertyDetailsResponse {
     primaryRegionInfo: {
       regionType: number;
       tableId: number;
+    };
+    marketInsightsInfo?: {
+      aggs?: {
+        dom?: number;
+        saleToList?: number;
+      };
+    };
+    nearbyhomes?: {
+      nearbyHomeDataList?: Array<{
+        sqFt?: {
+          value?: number;
+        };
+      }>;
     };
   };
 }
@@ -127,6 +143,24 @@ export const getPropertyDetails = async (redfinUrl: string): Promise<RedfinPrope
       ? `${data.data.primaryRegionInfo.regionType}_${data.data.primaryRegionInfo.tableId}`
       : null;
 
+    // Extract neighborhood market insights
+    const neighborhoodAvgDaysOnMarket = data.data?.marketInsightsInfo?.aggs?.dom || null;
+    const neighborhoodAvgSaleToListRatio = data.data?.marketInsightsInfo?.aggs?.saleToList || null;
+
+    // Calculate nearby homes average square feet
+    let nearbyHomesAvgSquareFeet: number | null = null;
+    if (data.data?.nearbyhomes?.nearbyHomeDataList) {
+      const squareFeetValues = data.data.nearbyhomes.nearbyHomeDataList
+        .map(home => home.sqFt?.value)
+        .filter((value): value is number => value !== undefined && value !== null);
+      
+      if (squareFeetValues.length > 0) {
+        nearbyHomesAvgSquareFeet = Math.round(
+          squareFeetValues.reduce((sum, value) => sum + value, 0) / squareFeetValues.length
+        );
+      }
+    }
+
     const propertyData: RedfinPropertyData = {
       soldDate,
       soldPrice,
@@ -134,7 +168,10 @@ export const getPropertyDetails = async (redfinUrl: string): Promise<RedfinPrope
       listedPrice,
       bedrooms,
       squareFeet,
-      regionCode
+      regionCode,
+      neighborhoodAvgDaysOnMarket,
+      neighborhoodAvgSaleToListRatio,
+      nearbyHomesAvgSquareFeet
     };
 
     console.log('Extracted property data:', propertyData);
