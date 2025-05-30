@@ -2,6 +2,7 @@
 import React from 'react';
 import { MapPin, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cleanAddressForDisplay } from '@/utils/addressUtils';
 
 interface PropertyInfoProps {
   address?: string;
@@ -9,6 +10,8 @@ interface PropertyInfoProps {
 }
 
 const PropertyInfo: React.FC<PropertyInfoProps> = ({ address, inspectionDate }) => {
+  const displayAddress = address ? cleanAddressForDisplay(address) : undefined;
+
   return (
     <Card>
       <CardHeader>
@@ -19,10 +22,10 @@ const PropertyInfo: React.FC<PropertyInfoProps> = ({ address, inspectionDate }) 
       </CardHeader>
       <CardContent>
         <div className="grid md:grid-cols-2 gap-4">
-          {address && (
+          {displayAddress && (
             <div>
               <h4 className="font-semibold text-gray-900 mb-1">Address</h4>
-              <p className="text-gray-700">{address}</p>
+              <p className="text-gray-700">{displayAddress}</p>
             </div>
           )}
           {inspectionDate && (
