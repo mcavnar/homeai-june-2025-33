@@ -10,14 +10,24 @@ interface DetailedFindingsProps {
 }
 
 const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
-  const renderPriorityBadge = (priority: 'high' | 'medium') => {
+  const renderPriorityBadge = (priority: 'immediate' | 'high' | 'medium' | 'low') => {
     const colors = {
+      immediate: 'bg-red-200 text-red-900 border-red-300',
       high: 'bg-red-100 text-red-800 border-red-200',
-      medium: 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      low: 'bg-orange-100 text-orange-800 border-orange-200'
     };
+    
+    const labels = {
+      immediate: 'Immediate Priority',
+      high: 'High Priority',
+      medium: 'Medium Priority',
+      low: 'Low Priority'
+    };
+    
     return (
       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${colors[priority]}`}>
-        {priority.charAt(0).toUpperCase() + priority.slice(1)} Priority
+        {labels[priority]}
       </span>
     );
   };

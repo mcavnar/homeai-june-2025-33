@@ -2,7 +2,7 @@
 export interface InspectionIssue {
   description: string;
   location: string;
-  priority: 'high' | 'medium';
+  priority: 'immediate' | 'high' | 'medium' | 'low';
   estimatedCost: {
     min: number;
     max: number;
@@ -26,11 +26,19 @@ export interface HomeInspectionAnalysis {
   issues?: InspectionIssue[];
   safetyIssues?: string[];
   costSummary?: {
+    immediatePriorityTotal?: {
+      min: number;
+      max: number;
+    };
     highPriorityTotal: {
       min: number;
       max: number;
     };
     mediumPriorityTotal: {
+      min: number;
+      max: number;
+    };
+    lowPriorityTotal?: {
       min: number;
       max: number;
     };

@@ -18,6 +18,7 @@ import DetailedFindings from './DetailedFindings';
 import MajorSystems from './MajorSystems';
 import FileUploadSection from './FileUploadSection';
 import ConditionScore from './ConditionScore';
+import MarketRepairData from './MarketRepairData';
 
 const PDFSummarizer = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -183,6 +184,11 @@ const PDFSummarizer = () => {
           {/* Cost Summary */}
           {analysis.costSummary && (
             <CostSummary costSummary={analysis.costSummary} />
+          )}
+
+          {/* Market Repair Data - Show when we have both analysis and property data */}
+          {propertyData && (
+            <MarketRepairData propertyData={propertyData} />
           )}
 
           {/* Safety Issues */}
