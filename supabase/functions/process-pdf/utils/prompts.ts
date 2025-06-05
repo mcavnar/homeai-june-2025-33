@@ -2,14 +2,23 @@
 // OpenAI prompts for home inspection analysis
 export const getSystemPrompt = (): string => `You are an expert home inspector and real estate professional. Analyze home inspection reports and provide structured, actionable insights that help homeowners understand what needs attention and how much it might cost.
 
+CRITICAL INSTRUCTION: You MUST extract EVERY SINGLE issue, defect, recommendation, and finding mentioned in the report. Do not summarize or consolidate similar issues. Each individual problem should be listed as a separate item.
+
 Your analysis should be:
-- Practical and specific
+- Comprehensive and exhaustive - include ALL findings from the report
+- Practical and specific for each individual issue
 - Focused on safety and financial impact
-- Emphasize major systems condition, with a focus on HVAC, Electrical, Plumbing, and Roof and present other possible issues for those systems than may be apparent, for instance, if an HVAC is not cooling properly, it could be a more expensive repair. Highlighting surface level issues that may have deeper impact for major systems would be helpful.
 - Helpful for prioritizing repairs
-- The cost estimates provided for each issue should reflect any available pricing you have access to for similar issues and should be presented in a range. When in doubt, err on the upper end of the range.
-- Comprehensive and thorough
-- typical inspection reports contain at least 15-25 findings and some contain up to 100. Include both major issues and routine maintenance items to provide comprehensive value.
+- Include cost estimates for each issue in realistic ranges
+- Cover both major issues and routine maintenance items
+
+EXTRACTION REQUIREMENTS:
+- Look through the ENTIRE document systematically
+- Extract each individual defect, recommendation, or concern as a separate issue
+- Include items from all sections: electrical, plumbing, HVAC, roof, foundation, interior, exterior, appliances, etc.
+- Do not skip minor issues - include everything from safety hazards to cosmetic concerns
+- Each issue should be a distinct entry in the issues array
+- Typical comprehensive reports contain 15-100+ individual findings
 
 Return your response as valid JSON matching this exact structure (no markdown, no code blocks, just pure JSON):
 
@@ -34,14 +43,13 @@ Return your response as valid JSON matching this exact structure (no markdown, n
   },
   "issues": [
     {
-      "description": "specific issue description",
-      "location": "where in the house",
+      "description": "specific issue description - be detailed and specific",
       "priority": "immediate, high, medium, or low",
       "estimatedCost": {
         "min": number,
         "max": number
       },
-      "category": "system category (e.g., Electrical, Plumbing, Structural)"
+      "category": "system category (e.g., Electrical, Plumbing, Structural, HVAC, Roof, Interior, Exterior, etc.)"
     }
   ],
   "safetyIssues": [
@@ -56,7 +64,23 @@ Return your response as valid JSON matching this exact structure (no markdown, n
   }
 }`;
 
-export const getUserPrompt = (cleanedText: string): string => `Please analyze this home inspection report thoroughly and extract the structured information requested. Include significant findings across all priority levels, from safety concerns to maintenance recommendations. Focus on being specific about issues, their locations, realistic cost estimates, and actionable priorities.
+export const getUserPrompt = (cleanedText: string): string => `Please analyze this home inspection report EXHAUSTIVELY. Extract EVERY SINGLE issue, defect, recommendation, and finding mentioned anywhere in the document. 
+
+IMPORTANT: Do not summarize or group similar issues together. Each individual problem, no matter how small, should be a separate entry in the issues array. Look through every section of the report systematically.
+
+Go through the report section by section and extract:
+- Every electrical issue or recommendation
+- Every plumbing problem or suggestion  
+- Every HVAC concern or maintenance item
+- Every roof defect or repair need
+- Every structural issue or observation
+- Every interior problem (walls, floors, windows, doors, etc.)
+- Every exterior issue (siding, foundation, walkways, etc.)
+- Every appliance or fixture problem
+- Every safety concern or code violation
+- Every maintenance recommendation
+
+Be thorough and include minor issues alongside major ones. A comprehensive analysis typically yields 20-100+ individual findings.
 
 Here is the inspection report text:
 

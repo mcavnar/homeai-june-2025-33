@@ -10,6 +10,7 @@ export const analyzeWithOpenAI = async (cleanedText: string) => {
   }
 
   console.log('Starting OpenAI analysis. Text length:', cleanedText.length);
+  console.log('Text sample (first 1000 chars):', cleanedText.substring(0, 1000));
 
   const systemPrompt = getSystemPrompt();
   const userPrompt = getUserPrompt(cleanedText);
@@ -22,13 +23,13 @@ export const analyzeWithOpenAI = async (cleanedText: string) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o', // Upgraded to more powerful model
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 0.3,
-        max_tokens: 6000,
+        temperature: 0.1, // Lower temperature for more consistent extraction
+        max_tokens: 15000, // Increased for comprehensive responses
       }),
     });
 
@@ -40,21 +41,30 @@ export const analyzeWithOpenAI = async (cleanedText: string) => {
 
     const data = await response.json();
     console.log('OpenAI response received');
-    console.log('Full OpenAI response data:', JSON.stringify(data, null, 2));
+    console.log('Usage stats:', JSON.stringify(data.usage, null, 2));
     
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
       throw new Error('Invalid response format from OpenAI');
     }
 
     const content = data.choices[0].message.content;
-    console.log('Raw OpenAI content:', content);
-    console.log('Content length:', content.length);
+    console.log('Raw OpenAI content length:', content.length);
+    console.log('Raw OpenAI content (first 1000 chars):', content.substring(0, 1000));
     
     try {
       const analysis = JSON.parse(content);
       console.log('Successfully parsed OpenAI analysis');
       console.log('Number of issues found:', analysis.issues ? analysis.issues.length : 0);
-      console.log('Issues array:', JSON.stringify(analysis.issues, null, 2));
+      console.log('Executive summary points:', analysis.executiveSummary ? analysis.executiveSummary.length : 0);
+      console.log('Safety issues count:', analysis.safetyIssues ? analysis.safetyIssues.length : 0);
+      
+      if (analysis.issues && analysis.issues.length > 0) {
+        console.log('Sample issues found:');
+        analysis.issues.slice(0, 5).forEach((issue: any, index: number) => {
+          console.log(`${index + 1}. ${issue.description} (${issue.priority}, ${issue.category})`);
+        });
+      }
+      
       return analysis;
     } catch (parseError) {
       console.error('Failed to parse OpenAI response as JSON:', parseError);

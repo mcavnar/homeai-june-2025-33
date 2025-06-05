@@ -1,7 +1,5 @@
-
 export interface InspectionIssue {
   description: string;
-  location: string;
   priority: 'immediate' | 'high' | 'medium' | 'low';
   estimatedCost: {
     min: number;

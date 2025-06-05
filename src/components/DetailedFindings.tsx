@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { MapPin } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { InspectionIssue } from '@/types/inspection';
 import { formatCurrency } from '@/utils/formatters';
@@ -35,8 +34,8 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Detailed Findings & Cost Estimates</CardTitle>
-        <CardDescription>All identified issues with location and estimated repair costs</CardDescription>
+        <CardTitle>Detailed Findings & Cost Estimates ({issues.length} issues found)</CardTitle>
+        <CardDescription>All identified issues with estimated repair costs</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -54,10 +53,6 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
                 </div>
               </div>
               <h4 className="font-semibold text-gray-900 mb-1">{issue.description}</h4>
-              <p className="text-sm text-gray-600 flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                {issue.location}
-              </p>
             </div>
           ))}
         </div>
