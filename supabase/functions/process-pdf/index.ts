@@ -52,7 +52,81 @@ const cleanExtractedText = (rawText: string): string => {
   return cleanedText;
 };
 
-// Inline OpenAI analyzer function with comprehensive error handling
+// Enhanced JSON parsing function with multiple fallback strategies
+const parseAIResponse = (content: string) => {
+  console.log('Starting JSON parsing, content length:', content.length);
+  console.log('Content sample:', content.substring(0, 300));
+
+  // Strategy 1: Try direct JSON parsing first
+  try {
+    const result = JSON.parse(content);
+    console.log('Direct JSON parsing successful');
+    return result;
+  } catch (directError) {
+    console.log('Direct JSON parsing failed:', directError.message);
+  }
+
+  // Strategy 2: Remove markdown code blocks
+  let cleanedContent = content.trim();
+  
+  // Remove markdown code block wrappers
+  if (cleanedContent.startsWith('```json')) {
+    cleanedContent = cleanedContent.substring(7);
+  } else if (cleanedContent.startsWith('```')) {
+    cleanedContent = cleanedContent.substring(3);
+  }
+  
+  if (cleanedContent.endsWith('```')) {
+    cleanedContent = cleanedContent.substring(0, cleanedContent.length - 3);
+  }
+  
+  cleanedContent = cleanedContent.trim();
+  
+  try {
+    const result = JSON.parse(cleanedContent);
+    console.log('Markdown-cleaned JSON parsing successful');
+    return result;
+  } catch (markdownError) {
+    console.log('Markdown-cleaned JSON parsing failed:', markdownError.message);
+  }
+
+  // Strategy 3: Find JSON object boundaries
+  const firstBrace = cleanedContent.indexOf('{');
+  const lastBrace = cleanedContent.lastIndexOf('}');
+  
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    const jsonCandidate = cleanedContent.substring(firstBrace, lastBrace + 1);
+    try {
+      const result = JSON.parse(jsonCandidate);
+      console.log('Boundary-extracted JSON parsing successful');
+      return result;
+    } catch (boundaryError) {
+      console.log('Boundary-extracted JSON parsing failed:', boundaryError.message);
+    }
+  }
+
+  // Strategy 4: Remove common text artifacts
+  let artifactCleaned = cleanedContent
+    .replace(/^Here's the analysis.*?:/i, '')
+    .replace(/^The analysis.*?:/i, '')
+    .replace(/^Based on.*?:/i, '')
+    .trim();
+
+  if (artifactCleaned.startsWith('{') && artifactCleaned.endsWith('}')) {
+    try {
+      const result = JSON.parse(artifactCleaned);
+      console.log('Artifact-cleaned JSON parsing successful');
+      return result;
+    } catch (artifactError) {
+      console.log('Artifact-cleaned JSON parsing failed:', artifactError.message);
+    }
+  }
+
+  // All strategies failed
+  throw new Error(`All JSON parsing strategies failed. Content: ${content.substring(0, 500)}...`);
+};
+
+// Improved OpenAI analyzer function with better error handling
 const analyzeWithOpenAI = async (cleanedText: string) => {
   console.log('=== OpenAI Analysis Starting ===');
   const startTime = Date.now();
@@ -74,17 +148,18 @@ const analyzeWithOpenAI = async (cleanedText: string) => {
   let processedText = cleanedText;
   if (cleanedText.length > 12000) {
     console.log('Text exceeds 12k characters, applying reduction');
-    // Simple reduction - take first portion that contains most important content
     processedText = cleanedText.substring(0, 12000);
     console.log('After reduction, text length:', processedText.length);
   }
 
-  // Inline system prompt
+  // Enhanced system prompt with explicit JSON format requirement
   const systemPrompt = `You are an expert home inspector and real estate professional. Analyze home inspection reports and provide structured, actionable insights.
 
 CRITICAL: Extract ALL significant issues, defects, and recommendations. Each individual problem should be a separate item.
 
-Return ONLY valid JSON with this structure:
+IMPORTANT: Return ONLY a valid JSON object with NO markdown formatting, NO code blocks, NO explanatory text. Start directly with { and end with }.
+
+Use this EXACT JSON structure:
 {
   "propertyInfo": {
     "address": "extracted address if found",
@@ -195,9 +270,9 @@ ${processedText}`;
       contentStart: content.substring(0, 200)
     });
 
-    // Parse JSON with detailed error handling
+    // Parse JSON with enhanced error handling
     try {
-      const analysis = JSON.parse(content);
+      const analysis = parseAIResponse(content);
       
       // Validate required structure
       if (!analysis || typeof analysis !== 'object') {
@@ -219,16 +294,12 @@ ${processedText}`;
       return analysis;
 
     } catch (parseError) {
-      console.error('JSON parsing failed:', {
+      console.error('Enhanced JSON parsing failed:', {
         error: parseError.message,
         contentLength: content.length,
         contentSample: content.substring(0, 1000),
         parseErrorDetails: parseError.stack
       });
-      
-      // Try to identify the parsing issue
-      const bracketCount = (content.match(/\{/g) || []).length - (content.match(/\}/g) || []).length;
-      console.error('JSON validation - bracket imbalance:', bracketCount);
       
       throw new Error(`Failed to parse AI response as JSON: ${parseError.message}`);
     }
@@ -241,15 +312,38 @@ ${processedText}`;
       processingTimeMs: processingTime
     });
 
-    // Simple retry for timeout errors only
+    // Simple retry for timeout errors only (no recursion)
     if (error.message.includes('timeout') && processedText.length > 6000) {
-      console.log('Attempting retry with further reduced text...');
+      console.log('Attempting single retry with reduced text size...');
       try {
         const retryText = processedText.substring(0, 6000);
-        return await analyzeWithOpenAI(retryText);
+        console.log('Retry with text length:', retryText.length);
+        
+        // Make a single retry call with reduced parameters
+        const retryResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openAIApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: `Analyze this inspection report (reduced size):\n\n${retryText}` }
+            ],
+            temperature: 0.1,
+            max_tokens: 4000,
+          }),
+        });
+
+        if (retryResponse.ok) {
+          const retryData = await retryResponse.json();
+          const retryContent = retryData.choices[0].message.content;
+          return parseAIResponse(retryContent);
+        }
       } catch (retryError) {
         console.error('Retry failed:', retryError.message);
-        throw new Error(`Analysis failed: ${error.message}. Retry also failed.`);
       }
     }
 
