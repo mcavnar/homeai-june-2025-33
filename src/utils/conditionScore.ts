@@ -1,4 +1,3 @@
-
 import { HomeInspectionAnalysis } from '@/types/inspection';
 import { RedfinPropertyData } from '@/types/redfin';
 
@@ -71,8 +70,10 @@ const calculateRepairSeverityPenalty = (
 };
 
 const calculateIssueCountPenalty = (totalIssues: number): number => {
-  const issueRatio = totalIssues / NATIONAL_AVG_ISSUES;
-  return Math.min(20, issueRatio * 20);
+  if (totalIssues <= 20) return 0;
+  if (totalIssues <= 30) return ((totalIssues - 20) / 10) * 10; // penalty: 0–10
+  if (totalIssues <= 40) return 10 + ((totalIssues - 30) / 10) * 10; // penalty: 10–20
+  return 20; // anything above 40 gets max penalty
 };
 
 const calculateMarketMisalignmentPenalty = (
