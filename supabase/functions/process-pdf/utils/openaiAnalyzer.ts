@@ -40,21 +40,25 @@ export const analyzeWithOpenAI = async (cleanedText: string) => {
 
     const data = await response.json();
     console.log('OpenAI response received');
+    console.log('Full OpenAI response data:', JSON.stringify(data, null, 2));
     
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
       throw new Error('Invalid response format from OpenAI');
     }
 
     const content = data.choices[0].message.content;
-    console.log('Parsing OpenAI response...');
+    console.log('Raw OpenAI content:', content);
+    console.log('Content length:', content.length);
     
     try {
       const analysis = JSON.parse(content);
       console.log('Successfully parsed OpenAI analysis');
+      console.log('Number of issues found:', analysis.issues ? analysis.issues.length : 0);
+      console.log('Issues array:', JSON.stringify(analysis.issues, null, 2));
       return analysis;
     } catch (parseError) {
       console.error('Failed to parse OpenAI response as JSON:', parseError);
-      console.error('Raw content:', content);
+      console.error('Raw content that failed to parse:', content);
       throw new Error('Failed to parse AI analysis response');
     }
 
