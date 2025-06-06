@@ -30,13 +30,6 @@ export interface HomeInspectionAnalysis {
     address?: string;
     inspectionDate?: string;
   };
-  majorSystems?: {
-    roof?: string;
-    foundation?: string;
-    electrical?: string;
-    plumbing?: string;
-    hvac?: string;
-  };
   issues?: InspectionIssue[];
   costSummary?: {
     immediatePriorityTotal?: {

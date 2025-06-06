@@ -34,13 +34,6 @@ Return your response as valid JSON matching this exact structure (no markdown, n
     "address": "extracted property address if found",
     "inspectionDate": "extracted inspection date if found"
   },
-  "majorSystems": {
-    "roof": "detailed assessment with specific findings",
-    "foundation": "detailed assessment with specific findings", 
-    "electrical": "detailed assessment with specific findings",
-    "plumbing": "detailed assessment with specific findings",
-    "hvac": "detailed assessment with specific findings"
-  },
   "issues": [
     {
       "description": "specific issue description with precise location details",

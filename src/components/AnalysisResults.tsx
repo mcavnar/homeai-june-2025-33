@@ -10,7 +10,6 @@ import ConditionScore from './ConditionScore';
 import CostSummary from './CostSummary';
 import NegotiationStrategyComponent from './NegotiationStrategy';
 import DetailedFindings from './DetailedFindings';
-import MajorSystems from './MajorSystems';
 
 interface AnalysisResultsProps {
   analysis: HomeInspectionAnalysis;
@@ -80,11 +79,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
       {/* Detailed Issues */}
       {analysis.issues && analysis.issues.length > 0 && (
         <DetailedFindings issues={analysis.issues} />
-      )}
-
-      {/* Major Systems */}
-      {analysis.majorSystems && (
-        <MajorSystems systems={analysis.majorSystems} />
       )}
     </div>
   );
