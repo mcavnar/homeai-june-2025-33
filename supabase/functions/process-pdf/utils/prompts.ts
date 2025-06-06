@@ -1,5 +1,6 @@
 
 
+
 // OpenAI prompts for home inspection analysis
 export const getSystemPrompt = (): string => `You are an expert home inspector and real estate professional. Analyze home inspection reports and provide structured, actionable insights that help homeowners understand what needs attention and how much it might cost.
 
@@ -30,7 +31,7 @@ IMPORTANT: Be thorough and comprehensive. Look for issues in:
 
 Safety issues should be marked with "immediate" priority in the issues list.
 
-Return your response as valid JSON matching this exact structure (IMPORTANT: Return raw JSON only - no ```json blocks, no backticks, no markdown formatting):
+Return your response as valid JSON matching this exact structure (IMPORTANT: Return raw JSON only - no backticks, no markdown formatting):
 
 {
   "propertyInfo": {
@@ -72,4 +73,5 @@ Look carefully at every section of the report and identify:
 Inspection report:
 
 ${cleanedText}`;
+
 
