@@ -133,8 +133,8 @@ export const calculateConditionScore = (
   // Calculate total repair cost
   const totalRepairCost = analysis.costSummary?.grandTotal?.max || 0;
   
-  // Count total issues
-  const totalIssues = (analysis.issues?.length || 0) + (analysis.safetyIssues?.length || 0);
+  // Count total issues (safety issues are now included in the main issues array)
+  const totalIssues = analysis.issues?.length || 0;
   
   // Calculate days on market
   const daysOnMarket = calculateDaysOnMarket(propertyData.soldDate, propertyData.listedDate);
