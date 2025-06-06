@@ -4,7 +4,7 @@ export const getSystemPrompt = (): string => `You are an expert home inspector a
 
 Your analysis should be:
 - Comprehensive and thorough with detailed findings across ALL systems and areas
-- Practical and specific with detailed findings and precise locations
+- Practical and specific with clear descriptions
 - Focused on safety and financial impact with realistic cost ranges
 - Include major systems (HVAC, Electrical, Plumbing, Roof, Foundation, Structural) and identify ALL potential issues
 - Helpful for prioritizing repairs with realistic cost ranges based on current market rates
@@ -36,8 +36,8 @@ Return your response as valid JSON matching this exact structure (no markdown, n
   },
   "issues": [
     {
-      "description": "specific issue description with precise location details",
-      "location": "exact location in the house with room/area specifics",
+      "description": "clear issue description",
+      "location": "room or area location",
       "priority": "immediate, high, medium, or low",
       "estimatedCost": {
         "min": number,
@@ -55,7 +55,7 @@ Return your response as valid JSON matching this exact structure (no markdown, n
   }
 }`;
 
-export const getUserPrompt = (cleanedText: string): string => `Analyze this home inspection report comprehensively and extract ALL significant findings across every priority level. Be thorough in identifying issues from immediate safety concerns to routine maintenance recommendations. Include specific findings across all systems, locations, realistic cost estimates, and actionable priorities. Aim for 15-25+ total findings to provide comprehensive value.
+export const getUserPrompt = (cleanedText: string): string => `Analyze this home inspection report comprehensively and extract ALL significant findings across every priority level. Be thorough in identifying issues from immediate safety concerns to routine maintenance recommendations. Include clear findings across all systems, locations, realistic cost estimates, and actionable priorities. Aim for 15-25+ total findings to provide comprehensive value.
 
 Look carefully at every section of the report and identify:
 - All safety issues and code violations (mark as "immediate" priority)
