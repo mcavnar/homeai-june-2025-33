@@ -22,13 +22,13 @@ export const analyzeWithOpenAI = async (cleanedText: string) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14', // Reverted to comprehensive premium model
+        model: 'gpt-4.1-2025-04-14',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 0.3, // Restored to 0.3 for better analysis depth and nuance
-        max_tokens: 8000, // Keeping optimized token limit for speed/quality balance
+        temperature: 0.3,
+        max_tokens: 6000, // Reverted to proven working configuration
       }),
     });
 
