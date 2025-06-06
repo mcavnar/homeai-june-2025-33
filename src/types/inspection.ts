@@ -30,7 +30,6 @@ export interface HomeInspectionAnalysis {
     address?: string;
     inspectionDate?: string;
   };
-  executiveSummary?: string[];
   majorSystems?: {
     roof?: string;
     foundation?: string;
@@ -39,7 +38,6 @@ export interface HomeInspectionAnalysis {
     hvac?: string;
   };
   issues?: InspectionIssue[];
-  safetyIssues?: string[];
   costSummary?: {
     immediatePriorityTotal?: {
       min: number;

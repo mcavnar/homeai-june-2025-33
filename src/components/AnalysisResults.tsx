@@ -7,10 +7,8 @@ import { HomeInspectionAnalysis, NegotiationStrategy } from '@/types/inspection'
 import { RedfinPropertyData } from '@/types/redfin';
 import PropertyInfo from './PropertyInfo';
 import ConditionScore from './ConditionScore';
-import ExecutiveSummary from './ExecutiveSummary';
 import CostSummary from './CostSummary';
 import NegotiationStrategyComponent from './NegotiationStrategy';
-import SafetyIssues from './SafetyIssues';
 import DetailedFindings from './DetailedFindings';
 import MajorSystems from './MajorSystems';
 
@@ -42,11 +40,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
       {/* Condition Score Section - Only show when we have both analysis and property data */}
       {propertyData && (
         <ConditionScore analysis={analysis} propertyData={propertyData} />
-      )}
-
-      {/* Executive Summary */}
-      {analysis.executiveSummary && analysis.executiveSummary.length > 0 && (
-        <ExecutiveSummary summary={analysis.executiveSummary} />
       )}
 
       {/* Cost Summary */}
@@ -82,11 +75,6 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
             Negotiation strategy unavailable: {strategyError}
           </AlertDescription>
         </Alert>
-      )}
-
-      {/* Safety Issues */}
-      {analysis.safetyIssues && analysis.safetyIssues.length > 0 && (
-        <SafetyIssues issues={analysis.safetyIssues} />
       )}
 
       {/* Detailed Issues */}

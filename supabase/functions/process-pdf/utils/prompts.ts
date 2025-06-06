@@ -25,6 +25,8 @@ IMPORTANT: Be thorough and comprehensive. Look for issues in:
 - Appliances and built-in systems
 - Maintenance items and preventive care needs
 
+Safety issues should be marked with "immediate" priority in the issues list.
+
 Return your response as valid JSON matching this exact structure (no markdown, no code blocks, just pure JSON):
 
 {
@@ -32,13 +34,6 @@ Return your response as valid JSON matching this exact structure (no markdown, n
     "address": "extracted property address if found",
     "inspectionDate": "extracted inspection date if found"
   },
-  "executiveSummary": [
-    "exactly 5 clear, actionable bullet points summarizing the overall condition",
-    "focus on the most important findings with specific locations",
-    "include cost implications where relevant",
-    "keep each point concise but informative with details",
-    "prioritize safety and major expenses but include comprehensive overview"
-  ],
   "majorSystems": {
     "roof": "detailed assessment with specific findings",
     "foundation": "detailed assessment with specific findings", 
@@ -58,9 +53,6 @@ Return your response as valid JSON matching this exact structure (no markdown, n
       "category": "system category (e.g., Electrical, Plumbing, Structural, HVAC, Roofing, Exterior, Interior, Safety)"
     }
   ],
-  "safetyIssues": [
-    "list of specific safety concerns that need immediate attention with locations"
-  ],
   "costSummary": {
     "immediatePriorityTotal": {"min": number, "max": number},
     "highPriorityTotal": {"min": number, "max": number},
@@ -73,7 +65,7 @@ Return your response as valid JSON matching this exact structure (no markdown, n
 export const getUserPrompt = (cleanedText: string): string => `Analyze this home inspection report comprehensively and extract ALL significant findings across every priority level. Be thorough in identifying issues from immediate safety concerns to routine maintenance recommendations. Include specific findings across all systems, locations, realistic cost estimates, and actionable priorities. Aim for 15-25+ total findings to provide comprehensive value.
 
 Look carefully at every section of the report and identify:
-- All safety issues and code violations
+- All safety issues and code violations (mark as "immediate" priority)
 - Major system problems and inefficiencies  
 - Structural concerns and maintenance needs
 - Minor issues that could become major if ignored
