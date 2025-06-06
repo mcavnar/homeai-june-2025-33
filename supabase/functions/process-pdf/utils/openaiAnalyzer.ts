@@ -28,7 +28,7 @@ export const analyzeWithOpenAI = async (cleanedText: string) => {
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.3,
-        max_tokens: 6000,
+        max_tokens: 12000, // Increased from 6000 to 12000
       }),
     });
 
@@ -47,6 +47,13 @@ export const analyzeWithOpenAI = async (cleanedText: string) => {
 
     const content = data.choices[0].message.content;
     console.log('Parsing OpenAI response...');
+    console.log('Response length:', content.length);
+    
+    // Check if response appears to be truncated
+    if (!content.trim().endsWith('}')) {
+      console.warn('Response appears to be truncated - does not end with }');
+      console.log('Last 200 characters:', content.slice(-200));
+    }
     
     try {
       const analysis = JSON.parse(content);
@@ -54,8 +61,16 @@ export const analyzeWithOpenAI = async (cleanedText: string) => {
       return analysis;
     } catch (parseError) {
       console.error('Failed to parse OpenAI response as JSON:', parseError);
-      console.error('Raw content:', content);
-      throw new Error('Failed to parse AI analysis response');
+      console.error('Response length:', content.length);
+      console.error('First 500 characters:', content.substring(0, 500));
+      console.error('Last 500 characters:', content.slice(-500));
+      
+      // Try to find where the JSON might be malformed
+      const openBraces = (content.match(/\{/g) || []).length;
+      const closeBraces = (content.match(/\}/g) || []).length;
+      console.error('Open braces:', openBraces, 'Close braces:', closeBraces);
+      
+      throw new Error('Failed to parse AI analysis response - likely truncated due to token limit');
     }
 
   } catch (error) {

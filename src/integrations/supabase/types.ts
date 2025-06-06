@@ -9,7 +9,66 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      analysis_sessions: {
+        Row: {
+          analysis_data: Json | null
+          created_at: string
+          email_capture_source: string | null
+          extracted_text: string | null
+          file_name: string | null
+          file_size: number | null
+          file_type: string | null
+          id: string
+          negotiation_data: Json | null
+          pdf_file_path: string | null
+          property_address: string | null
+          property_data: Json | null
+          session_id: string
+          survey_responses: Json | null
+          updated_at: string
+          user_email: string | null
+          user_question: string | null
+        }
+        Insert: {
+          analysis_data?: Json | null
+          created_at?: string
+          email_capture_source?: string | null
+          extracted_text?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          negotiation_data?: Json | null
+          pdf_file_path?: string | null
+          property_address?: string | null
+          property_data?: Json | null
+          session_id: string
+          survey_responses?: Json | null
+          updated_at?: string
+          user_email?: string | null
+          user_question?: string | null
+        }
+        Update: {
+          analysis_data?: Json | null
+          created_at?: string
+          email_capture_source?: string | null
+          extracted_text?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          negotiation_data?: Json | null
+          pdf_file_path?: string | null
+          property_address?: string | null
+          property_data?: Json | null
+          session_id?: string
+          survey_responses?: Json | null
+          updated_at?: string
+          user_email?: string | null
+          user_question?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
