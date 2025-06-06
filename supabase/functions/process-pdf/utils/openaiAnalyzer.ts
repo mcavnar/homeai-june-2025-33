@@ -28,7 +28,7 @@ export const analyzeWithOpenAI = async (cleanedText: string) => {
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.3,
-        max_tokens: 12000, // Increased from 6000 to 12000
+        max_tokens: 8000, // Reduced from 12000 to 8000 for better speed/quality balance
       }),
     });
 
