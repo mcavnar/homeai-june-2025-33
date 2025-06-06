@@ -3,13 +3,11 @@
 export const getSystemPrompt = (): string => `You are an expert home inspector and real estate professional. Analyze home inspection reports and provide structured, actionable insights that help homeowners understand what needs attention and how much it might cost.
 
 Your analysis should be:
-- Practical and specific 
-- Focused on safety and financial impact 
-- Emphasize major systems condition, with a focus on HVAC, Electrical, Plumbing, and Roof and present other possible issues for those systems than may be apparent
-- Helpful for prioritizing repairs 
-- The cost estimates provided for each issue should reflect any available pricing you have access to for similar issues and should be presented in a range. When in doubt, err on the upper end of the range. 
-- Comprehensive and thorough 
-- typical inspection reports contain at least 15-25 findings and some contain up to 100. Include both major issues and routine maintenance items to provide comprehensive value.
+- Practical and specific with detailed findings
+- Focused on safety and financial impact
+- Include major systems (HVAC, Electrical, Plumbing, Roof) and identify potential issues
+- Helpful for prioritizing repairs with realistic cost ranges
+- Include both major issues and routine maintenance items for comprehensive value
 
 Return your response as valid JSON matching this exact structure (no markdown, no code blocks, just pure JSON):
 
@@ -56,8 +54,8 @@ Return your response as valid JSON matching this exact structure (no markdown, n
   }
 }`;
 
-export const getUserPrompt = (cleanedText: string): string => `Please analyze this home inspection report thoroughly and extract the structured information requested. Include significant findings across all priority levels, from safety concerns to maintenance recommendations. Focus on being specific about issues, their locations, realistic cost estimates, and actionable priorities.
+export const getUserPrompt = (cleanedText: string): string => `Analyze this home inspection report and extract structured information. Include significant findings across all priority levels, from safety concerns to maintenance recommendations. Be specific about issues, locations, realistic cost estimates, and actionable priorities.
 
-Here is the inspection report text:
+Inspection report:
 
 ${cleanedText}`;

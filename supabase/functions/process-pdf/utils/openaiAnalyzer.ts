@@ -22,12 +22,12 @@ export const analyzeWithOpenAI = async (cleanedText: string) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
+        model: 'gpt-4o-mini', // Switched from gpt-4.1-2025-04-14 for 3-5x speed improvement
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 0.3,
+        temperature: 0.1, // Reduced from 0.3 for faster, more deterministic responses
         max_tokens: 8000, // Reduced from 12000 to 8000 for better speed/quality balance
       }),
     });
