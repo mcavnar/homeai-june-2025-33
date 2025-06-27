@@ -2,6 +2,7 @@
 import React from 'react';
 import { DollarSign, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/utils/formatters';
 
 interface CostSummaryProps {
@@ -12,9 +13,14 @@ interface CostSummaryProps {
     lowPriorityTotal?: { min: number; max: number; };
     grandTotal: { min: number; max: number; };
   };
+  issues?: Array<{
+    priority: 'immediate' | 'high' | 'medium' | 'low';
+    description: string;
+    estimatedCost: { min: number; max: number; };
+  }>;
 }
 
-const CostSummary: React.FC<CostSummaryProps> = ({ costSummary }) => {
+const CostSummary: React.FC<CostSummaryProps> = ({ costSummary, issues = [] }) => {
   // Combine immediate and high priority costs
   const combinedHighPriorityMax = (costSummary.immediatePriorityTotal?.max || 0) + costSummary.highPriorityTotal.max;
   const mediumPriorityMax = costSummary.mediumPriorityTotal.max;
@@ -22,6 +28,13 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costSummary }) => {
   
   // Calculate total from displayed values instead of using backend grandTotal
   const calculatedTotalMax = combinedHighPriorityMax + mediumPriorityMax + lowPriorityMax;
+  
+  // Count issues by priority
+  const highPriorityCount = issues.filter(issue => 
+    issue.priority === 'immediate' || issue.priority === 'high'
+  ).length;
+  const mediumPriorityCount = issues.filter(issue => issue.priority === 'medium').length;
+  const lowPriorityCount = issues.filter(issue => issue.priority === 'low').length;
   
   // Debug logging to identify discrepancies
   const backendGrandTotalMax = costSummary.grandTotal.max;
@@ -47,31 +60,71 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costSummary }) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <h4 className="font-semibold text-red-800 mb-2">High Priority</h4>
-            <p className="text-2xl font-bold text-red-900">
-              {formatCurrency(combinedHighPriorityMax)}
-            </p>
-          </div>
-          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <h4 className="font-semibold text-yellow-800 mb-2">Medium Priority</h4>
-            <p className="text-2xl font-bold text-yellow-900">
-              {formatCurrency(mediumPriorityMax)}
-            </p>
-          </div>
-          <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
-            <h4 className="font-semibold text-orange-800 mb-2">Low Priority</h4>
-            <p className="text-2xl font-bold text-orange-900">
-              {formatCurrency(lowPriorityMax)}
-            </p>
-          </div>
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="font-semibold text-blue-800 mb-2">Total Estimate</h4>
-            <p className="text-2xl font-bold text-blue-900">
-              {formatCurrency(calculatedTotalMax)}
-            </p>
-          </div>
+        <div className="mb-6">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Priority Level</TableHead>
+                <TableHead className="text-center">Number of Issues</TableHead>
+                <TableHead className="text-right">Estimated Cost</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow className="bg-red-50">
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                    <span className="font-medium text-red-800">High Priority</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center font-semibold text-red-800">
+                  {highPriorityCount}
+                </TableCell>
+                <TableCell className="text-right font-bold text-red-900">
+                  {formatCurrency(combinedHighPriorityMax)}
+                </TableCell>
+              </TableRow>
+              <TableRow className="bg-yellow-50">
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                    <span className="font-medium text-yellow-800">Medium Priority</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center font-semibold text-yellow-800">
+                  {mediumPriorityCount}
+                </TableCell>
+                <TableCell className="text-right font-bold text-yellow-900">
+                  {formatCurrency(mediumPriorityMax)}
+                </TableCell>
+              </TableRow>
+              <TableRow className="bg-orange-50">
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
+                    <span className="font-medium text-orange-800">Low Priority</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center font-semibold text-orange-800">
+                  {lowPriorityCount}
+                </TableCell>
+                <TableCell className="text-right font-bold text-orange-900">
+                  {formatCurrency(lowPriorityMax)}
+                </TableCell>
+              </TableRow>
+              <TableRow className="bg-blue-50 border-t-2 border-blue-200">
+                <TableCell>
+                  <span className="font-bold text-blue-800">Total Estimate</span>
+                </TableCell>
+                <TableCell className="text-center font-bold text-blue-800">
+                  {highPriorityCount + mediumPriorityCount + lowPriorityCount}
+                </TableCell>
+                <TableCell className="text-right font-bold text-blue-900 text-lg">
+                  {formatCurrency(calculatedTotalMax)}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </div>
 
         {/* Priority Definitions */}

@@ -46,7 +46,10 @@ const Synopsis = () => {
         <div className="space-y-6">
           {analysis.costSummary && (
             <div className="space-y-4">
-              <CostSummary costSummary={analysis.costSummary} />
+              <CostSummary 
+                costSummary={analysis.costSummary} 
+                issues={analysis.issues || []}
+              />
               <ActionButtons />
             </div>
           )}
