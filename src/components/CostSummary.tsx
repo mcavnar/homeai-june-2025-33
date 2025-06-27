@@ -73,53 +73,53 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costSummary, issues = [] }) =
               <TableRow className="bg-red-50">
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                    <span className="font-medium text-red-800">High Priority</span>
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <span className="font-medium text-red-700">High Priority</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-center font-semibold text-red-800">
+                <TableCell className="text-center font-semibold text-red-700">
                   {highPriorityCount}
                 </TableCell>
-                <TableCell className="text-right font-bold text-red-900">
+                <TableCell className="text-right font-bold text-red-700">
                   {formatCurrency(combinedHighPriorityMax)}
                 </TableCell>
               </TableRow>
               <TableRow className="bg-yellow-50">
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                    <span className="font-medium text-yellow-800">Medium Priority</span>
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <span className="font-medium text-yellow-700">Medium Priority</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-center font-semibold text-yellow-800">
+                <TableCell className="text-center font-semibold text-yellow-700">
                   {mediumPriorityCount}
                 </TableCell>
-                <TableCell className="text-right font-bold text-yellow-900">
+                <TableCell className="text-right font-bold text-yellow-700">
                   {formatCurrency(mediumPriorityMax)}
                 </TableCell>
               </TableRow>
-              <TableRow className="bg-orange-50">
+              <TableRow className="bg-green-50">
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
-                    <span className="font-medium text-orange-800">Low Priority</span>
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="font-medium text-green-700">Low Priority</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-center font-semibold text-orange-800">
+                <TableCell className="text-center font-semibold text-green-700">
                   {lowPriorityCount}
                 </TableCell>
-                <TableCell className="text-right font-bold text-orange-900">
+                <TableCell className="text-right font-bold text-green-700">
                   {formatCurrency(lowPriorityMax)}
                 </TableCell>
               </TableRow>
-              <TableRow className="bg-blue-50 border-t-2 border-blue-200">
+              <TableRow className="border-t-2 border-gray-200">
                 <TableCell>
-                  <span className="font-bold text-blue-800">Total Estimate</span>
+                  <span className="font-bold text-gray-900">Total Estimate</span>
                 </TableCell>
-                <TableCell className="text-center font-bold text-blue-800">
+                <TableCell className="text-center font-bold text-gray-900">
                   {highPriorityCount + mediumPriorityCount + lowPriorityCount}
                 </TableCell>
-                <TableCell className="text-right font-bold text-blue-900 text-lg">
+                <TableCell className="text-right font-bold text-gray-900 text-lg">
                   {formatCurrency(calculatedTotalMax)}
                 </TableCell>
               </TableRow>
@@ -135,23 +135,23 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costSummary, issues = [] }) =
           </div>
           <div className="space-y-3 text-sm">
             <div className="flex items-start gap-3">
-              <div className="w-3 h-3 bg-red-400 rounded-full mt-1 flex-shrink-0"></div>
+              <div className="w-3 h-3 bg-red-500 rounded-full mt-1 flex-shrink-0"></div>
               <div>
-                <span className="font-medium text-red-800">High Priority:</span>
+                <span className="font-medium text-red-700">High Priority:</span>
                 <span className="text-gray-700 ml-1">Safety issues, structural problems, or systems that could cause damage if not addressed immediately</span>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-3 h-3 bg-yellow-400 rounded-full mt-1 flex-shrink-0"></div>
+              <div className="w-3 h-3 bg-yellow-500 rounded-full mt-1 flex-shrink-0"></div>
               <div>
-                <span className="font-medium text-yellow-800">Medium Priority:</span>
+                <span className="font-medium text-yellow-700">Medium Priority:</span>
                 <span className="text-gray-700 ml-1">Issues that should be addressed within 1-2 years to prevent deterioration or higher costs</span>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-3 h-3 bg-orange-400 rounded-full mt-1 flex-shrink-0"></div>
+              <div className="w-3 h-3 bg-green-500 rounded-full mt-1 flex-shrink-0"></div>
               <div>
-                <span className="font-medium text-orange-800">Low Priority:</span>
+                <span className="font-medium text-green-700">Low Priority:</span>
                 <span className="text-gray-700 ml-1">Cosmetic or minor maintenance items that can be addressed over time for comfort and aesthetics</span>
               </div>
             </div>
