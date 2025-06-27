@@ -10,6 +10,19 @@ export interface InspectionIssue {
   category: string;
 }
 
+export interface MajorSystem {
+  condition: string;
+  summary: string;
+}
+
+export interface MajorSystems {
+  roof?: MajorSystem;
+  foundation?: MajorSystem;
+  electrical?: MajorSystem;
+  plumbing?: MajorSystem;
+  hvac?: MajorSystem;
+}
+
 export interface NegotiationStrategy {
   quickReference: {
     recommendedAsk: {
@@ -31,6 +44,7 @@ export interface HomeInspectionAnalysis {
     inspectionDate?: string;
   };
   issues?: InspectionIssue[];
+  majorSystems?: MajorSystems;
   costSummary?: {
     immediatePriorityTotal?: {
       min: number;

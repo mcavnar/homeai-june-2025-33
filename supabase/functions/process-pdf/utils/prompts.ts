@@ -1,6 +1,4 @@
 
-
-
 // OpenAI prompts for home inspection analysis
 export const getSystemPrompt = (): string => `You are an expert home inspector and real estate professional. Analyze home inspection reports and provide structured, actionable insights that help homeowners understand what needs attention and how much it might cost.
 
@@ -31,12 +29,38 @@ IMPORTANT: Be thorough and comprehensive. Look for issues in:
 
 Safety issues should be marked with "immediate" priority in the issues list.
 
+For major systems, provide an overall assessment with:
+- Overall condition (e.g., "Good", "Fair", "Poor", "Needs Immediate Attention")
+- Brief summary of the system's current state and any notable findings
+
 Return your response as valid JSON matching this exact structure (IMPORTANT: Return raw JSON only - no backticks, no markdown formatting):
 
 {
   "propertyInfo": {
     "address": "extracted property address if found",
     "inspectionDate": "extracted inspection date if found"
+  },
+  "majorSystems": {
+    "roof": {
+      "condition": "overall condition assessment",
+      "summary": "brief summary of roof condition and key findings"
+    },
+    "foundation": {
+      "condition": "overall condition assessment", 
+      "summary": "brief summary of foundation condition and key findings"
+    },
+    "electrical": {
+      "condition": "overall condition assessment",
+      "summary": "brief summary of electrical system condition and key findings"
+    },
+    "plumbing": {
+      "condition": "overall condition assessment",
+      "summary": "brief summary of plumbing system condition and key findings"
+    },
+    "hvac": {
+      "condition": "overall condition assessment",
+      "summary": "brief summary of HVAC system condition and key findings"
+    }
   },
   "issues": [
     {
@@ -70,8 +94,8 @@ Look carefully at every section of the report and identify:
 - Energy efficiency opportunities
 - Accessibility and functionality improvements
 
+For each major system (roof, foundation, electrical, plumbing, HVAC), provide an overall condition assessment and summary based on all findings related to that system.
+
 Inspection report:
 
 ${cleanedText}`;
-
-

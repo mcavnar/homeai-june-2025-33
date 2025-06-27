@@ -9,6 +9,7 @@ import PropertyInfo from './PropertyInfo';
 import ConditionScore from './ConditionScore';
 import CostSummary from './CostSummary';
 import NegotiationStrategyComponent from './NegotiationStrategy';
+import MajorSystems from './MajorSystems';
 import DetailedFindings from './DetailedFindings';
 
 interface AnalysisResultsProps {
@@ -74,6 +75,11 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
             Negotiation strategy unavailable: {strategyError}
           </AlertDescription>
         </Alert>
+      )}
+
+      {/* Major Systems Assessment */}
+      {analysis.majorSystems && (
+        <MajorSystems systems={analysis.majorSystems} />
       )}
 
       {/* Detailed Issues */}
