@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { MapPin, Filter, Download, FileText, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -171,6 +172,27 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
         </div>
       </CardHeader>
       <CardContent>
+        {/* Search Section */}
+        <div className="bg-gray-50 rounded-lg border p-4 mb-4">
+          <div className="flex items-center gap-3">
+            <Search className="h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Search issues by description or location..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1"
+            />
+            {searchQuery.trim() !== '' && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="text-sm text-blue-600 hover:text-blue-800 underline whitespace-nowrap"
+              >
+                Clear search
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Filter Bar */}
         <div className="bg-gray-50 rounded-lg border p-4 mb-6">
           <div className="flex items-center gap-4 flex-wrap justify-between">
@@ -178,17 +200,6 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
               <div className="flex items-center gap-2 text-gray-700">
                 <Filter className="h-4 w-4" />
                 <span className="font-medium">Filters:</span>
-              </div>
-
-              {/* Search Box */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search issues..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 w-64"
-                />
               </div>
 
               <Select value={severityFilter} onValueChange={setSeverityFilter}>
@@ -230,17 +241,16 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
                 </SelectContent>
               </Select>
 
-              {(severityFilter !== 'all' || typeFilter !== 'all' || priceFilter !== 'all' || searchQuery.trim() !== '') && (
+              {(severityFilter !== 'all' || typeFilter !== 'all' || priceFilter !== 'all') && (
                 <button
                   onClick={() => {
                     setSeverityFilter('all');
                     setTypeFilter('all');
                     setPriceFilter('all');
-                    setSearchQuery('');
                   }}
                   className="text-sm text-blue-600 hover:text-blue-800 underline"
                 >
-                  Clear all filters
+                  Clear filters
                 </button>
               )}
             </div>
