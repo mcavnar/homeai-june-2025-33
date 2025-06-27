@@ -17,34 +17,25 @@ const Upload = () => {
   } = usePDFProcessor();
 
   const handleProcessPDF = async () => {
-    const analysisResult = await processPDF();
+    const result = await processPDF();
     
-    console.log('Analysis result in Upload:', analysisResult);
+    console.log('Analysis result in Upload:', result);
     
-    if (analysisResult) {
-      // Store in sessionStorage as backup
-      sessionStorage.setItem('analysisData', JSON.stringify({
-        analysis: analysisResult,
-        address: analysisResult.propertyInfo?.address,
-        pdfText: analysisResult.pdfText || '',
-        pdfArrayBuffer: Array.from(new Uint8Array(analysisResult.pdfArrayBuffer || new ArrayBuffer(0)))
-      }));
+    if (result) {
+      // Store only essential data in sessionStorage (without ArrayBuffer)
+      const sessionData = {
+        analysis: result.analysis,
+        address: result.address,
+        pdfText: result.pdfText
+      };
+      
+      sessionStorage.setItem('analysisData', JSON.stringify(sessionData));
 
-      console.log('Navigating to /results/synopsis with state:', {
-        analysis: analysisResult,
-        address: analysisResult.propertyInfo?.address,
-        pdfText: analysisResult.pdfText || '',
-        pdfArrayBuffer: analysisResult.pdfArrayBuffer
-      });
+      console.log('Navigating to /results/synopsis with state');
 
-      // Navigate directly to synopsis page to avoid redirect
+      // Navigate directly to synopsis page with complete data via state
       navigate('/results/synopsis', { 
-        state: { 
-          analysis: analysisResult,
-          address: analysisResult.propertyInfo?.address,
-          pdfText: analysisResult.pdfText || '',
-          pdfArrayBuffer: analysisResult.pdfArrayBuffer
-        } 
+        state: result
       });
     } else {
       console.log('No analysis result - not navigating');

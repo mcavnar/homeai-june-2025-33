@@ -54,14 +54,8 @@ const Results = () => {
       if (storedData) {
         try {
           const parsed = JSON.parse(storedData);
-          // Convert pdfArrayBuffer back from array if it exists
-          if (parsed.pdfArrayBuffer && Array.isArray(parsed.pdfArrayBuffer)) {
-            console.log('Converting pdfArrayBuffer from array to ArrayBuffer');
-            parsed.pdfArrayBuffer = new Uint8Array(parsed.pdfArrayBuffer).buffer;
-          }
           dataToUse = parsed;
           console.log('Found data in sessionStorage:', dataToUse);
-          console.log('pdfArrayBuffer from sessionStorage:', dataToUse.pdfArrayBuffer ? 'Available' : 'Not available');
         } catch (e) {
           console.error('Error parsing sessionStorage data:', e);
         }
@@ -84,7 +78,7 @@ const Results = () => {
       console.log('Fetching property details for:', dataToUse.address);
       fetchPropertyDetails(dataToUse.address);
     }
-  }, [navigate, fetchPropertyDetails, hasInitialized]);
+  }, [navigate, fetchPropertyDetails, hasInitialized, state]);
 
   // If no analysis data, don't render anything (will redirect)
   if (!analysisData?.analysis) {

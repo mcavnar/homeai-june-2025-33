@@ -41,7 +41,7 @@ export const usePDFProcessor = () => {
   };
 
   const processPDF = async () => {
-    if (!file) return;
+    if (!file) return null;
 
     setIsProcessing(true);
     setError('');
@@ -88,7 +88,8 @@ export const usePDFProcessor = () => {
         throw new Error(data.error || 'Failed to analyze extracted text');
       }
 
-      setAnalysis(data.analysis);
+      const analysisData = data.analysis;
+      setAnalysis(analysisData);
       setCleanedText(data.cleanedText || '');
 
       toast({
@@ -96,11 +97,12 @@ export const usePDFProcessor = () => {
         description: `Processed ${extractionResult.pageCount} pages and generated comprehensive insights.`,
       });
 
-      // Return analysis with PDF data
+      // Return the structured data with all necessary components
       return {
-        ...data.analysis,
+        analysis: analysisData,
         pdfArrayBuffer: arrayBuffer,
-        pdfText: data.cleanedText || ''
+        pdfText: data.cleanedText || '',
+        address: analysisData.propertyInfo?.address
       };
 
     } catch (err) {
@@ -111,6 +113,7 @@ export const usePDFProcessor = () => {
         description: errorMessage,
         variant: "destructive",
       });
+      return null;
     } finally {
       setIsProcessing(false);
       setExtractionProgress(0);
