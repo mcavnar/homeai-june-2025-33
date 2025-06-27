@@ -34,7 +34,7 @@ const ActionButtons: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <Button 
         onClick={handleShareAccess}
         variant="outline"
@@ -56,7 +56,7 @@ const ActionButtons: React.FC = () => {
       <Button 
         onClick={handleGetNegotiationAdvice}
         size="lg"
-        className="flex items-center gap-2 px-6 py-3 font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+        className="flex items-center gap-2 px-6 py-3 font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 col-span-2 md:col-span-2"
       >
         <MessageSquare className="h-5 w-5" />
         Get Negotiation Advice
