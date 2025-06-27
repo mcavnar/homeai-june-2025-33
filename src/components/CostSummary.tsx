@@ -1,10 +1,8 @@
+
 import React from 'react';
-import { DollarSign, Share, MessageSquare } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/utils/formatters';
-import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
 
 interface CostSummaryProps {
   costSummary: {
@@ -17,9 +15,6 @@ interface CostSummaryProps {
 }
 
 const CostSummary: React.FC<CostSummaryProps> = ({ costSummary }) => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
   // Combine immediate and high priority costs
   const combinedHighPriorityMax = (costSummary.immediatePriorityTotal?.max || 0) + costSummary.highPriorityTotal.max;
   const mediumPriorityMax = costSummary.mediumPriorityTotal.max;
@@ -43,26 +38,6 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costSummary }) => {
     });
   }
 
-  const handleShareAccess = () => {
-    const currentUrl = window.location.origin + '/results/synopsis';
-    navigator.clipboard.writeText(currentUrl).then(() => {
-      toast({
-        title: "Link copied!",
-        description: "Synopsis page link has been copied to your clipboard.",
-      });
-    }).catch(() => {
-      toast({
-        title: "Failed to copy",
-        description: "Please copy the link manually from your browser.",
-        variant: "destructive",
-      });
-    });
-  };
-
-  const handleGetNegotiationAdvice = () => {
-    navigate('/results/negotiation');
-  };
-
   return (
     <Card className="border-green-200">
       <CardHeader>
@@ -72,7 +47,7 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costSummary }) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
             <h4 className="font-semibold text-red-800 mb-2">High Priority</h4>
             <p className="text-2xl font-bold text-red-900">
@@ -97,24 +72,6 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costSummary }) => {
               {formatCurrency(calculatedTotalMax)}
             </p>
           </div>
-        </div>
-        
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button 
-            onClick={handleShareAccess}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <Share className="h-4 w-4" />
-            Share Access
-          </Button>
-          <Button 
-            onClick={handleGetNegotiationAdvice}
-            className="flex items-center gap-2"
-          >
-            <MessageSquare className="h-4 w-4" />
-            Get Negotiation Advice
-          </Button>
         </div>
       </CardContent>
     </Card>

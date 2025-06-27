@@ -4,6 +4,7 @@ import { useOutletContext } from 'react-router-dom';
 import PropertyInfo from '@/components/PropertyInfo';
 import ConditionScore from '@/components/ConditionScore';
 import CostSummary from '@/components/CostSummary';
+import ActionButtons from '@/components/ActionButtons';
 import MostExpensiveIssues from '@/components/MostExpensiveIssues';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -48,6 +49,9 @@ const Synopsis = () => {
           )}
         </div>
       </div>
+
+      {/* Action Buttons Section */}
+      <ActionButtons />
 
       {/* Most Expensive Issues Section */}
       {analysis.issues && analysis.issues.length > 0 && (
