@@ -33,6 +33,16 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
     return 'text-gray-800 bg-gray-100';
   };
 
+  const formatSummaryAsBullets = (summary: string) => {
+    // Split by common sentence endings and filter out empty strings
+    const sentences = summary
+      .split(/[.!?]+/)
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+    
+    return sentences;
+  };
+
   const systemEntries = Object.entries(systems).filter(([_, system]) => system);
 
   if (systemEntries.length === 0) {
@@ -61,8 +71,15 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
             </CardHeader>
             
             <CardContent className="space-y-4">
-              {/* Summary */}
-              <p className="text-gray-700 text-sm leading-relaxed">{system.summary}</p>
+              {/* Summary as bullets */}
+              <div className="space-y-2">
+                {formatSummaryAsBullets(system.summary).map((point, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <span className="text-gray-500 mt-1.5 text-xs">•</span>
+                    <p className="text-gray-700 text-sm leading-relaxed">{point}</p>
+                  </div>
+                ))}
+              </div>
               
               {/* System Details */}
               {(system.brand || system.type || system.age || system.yearsLeft) && (
