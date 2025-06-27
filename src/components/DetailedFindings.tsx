@@ -89,7 +89,7 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Detailed Findings & Cost Estimates</CardTitle>
+        <CardTitle>Detailed Issues List</CardTitle>
         <CardDescription>All identified issues with location and estimated repair costs</CardDescription>
       </CardHeader>
       <CardContent>
