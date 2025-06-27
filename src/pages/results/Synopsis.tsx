@@ -4,8 +4,7 @@ import { useOutletContext } from 'react-router-dom';
 import PropertyInfo from '@/components/PropertyInfo';
 import ConditionScore from '@/components/ConditionScore';
 import CostSummary from '@/components/CostSummary';
-import PropertyDetails from '@/components/PropertyDetails';
-import MarketCompData from '@/components/MarketCompData';
+import MostExpensiveIssues from '@/components/MostExpensiveIssues';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Loader2 } from 'lucide-react';
@@ -50,18 +49,9 @@ const Synopsis = () => {
         </div>
       </div>
 
-      {/* Property Details Section */}
-      {propertyData && (
-        <PropertyDetails propertyData={propertyData} />
-      )}
-
-      {/* Market Comp Data */}
-      {propertyData?.marketData && (
-        <MarketCompData 
-          neighborhoodAvgDaysOnMarket={propertyData.marketData.neighborhoodAvgDaysOnMarket}
-          neighborhoodAvgSaleToListRatio={propertyData.marketData.neighborhoodAvgSaleToListRatio}
-          nearbyHomesAvgSquareFeet={propertyData.marketData.nearbyHomesAvgSquareFeet}
-        />
+      {/* Most Expensive Issues Section */}
+      {analysis.issues && analysis.issues.length > 0 && (
+        <MostExpensiveIssues issues={analysis.issues} />
       )}
 
       {/* Property Loading State */}
