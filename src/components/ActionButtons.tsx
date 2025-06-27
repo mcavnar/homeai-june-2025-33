@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Share, MessageSquare, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -51,7 +50,7 @@ const ActionButtons: React.FC = () => {
         className="flex items-center gap-2 px-6 py-3 font-semibold border-2 hover:border-gray-400 hover:shadow-md transition-all duration-200"
       >
         <DollarSign className="h-5 w-5" />
-        Understand Service Costs
+        See Service Costs
       </Button>
       <Button 
         onClick={handleGetNegotiationAdvice}
