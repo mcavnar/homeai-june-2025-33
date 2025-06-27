@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { MapPin, Filter, Download, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -130,6 +131,33 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
       <CardHeader>
         <CardTitle>Detailed Issues List</CardTitle>
         <CardDescription>All identified issues with location and estimated repair costs</CardDescription>
+        
+        {/* Explanatory Information */}
+        <div className="bg-blue-50 rounded-lg p-4 mt-4 space-y-3">
+          <h4 className="font-semibold text-blue-900 text-sm">How We Analyze Your Inspection Report:</h4>
+          
+          <div className="space-y-3 text-sm text-blue-800">
+            <div>
+              <span className="font-medium">• Priority Classification:</span>
+              <span className="ml-1">Issues are ranked based on safety impact, potential for damage progression, and urgency of repair needs</span>
+            </div>
+            
+            <div>
+              <span className="font-medium">• Cost Estimation:</span>
+              <span className="ml-1">Repair costs are estimated using current market rates, material costs, labor requirements, and regional pricing data</span>
+            </div>
+            
+            <div>
+              <span className="font-medium">• Original Report Reference:</span>
+              <span className="ml-1">Click "See in Report" on any item to view the original inspector's detailed findings and photos in the full PDF report</span>
+            </div>
+            
+            <div>
+              <span className="font-medium">• Professional Validation:</span>
+              <span className="ml-1">While our analysis provides helpful estimates, always consult qualified contractors for final pricing and repair specifications</span>
+            </div>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         {/* Filter Bar */}
