@@ -1,7 +1,14 @@
 
-import React from 'react';
-import { MapPin } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { MapPin, Filter } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { InspectionIssue } from '@/types/inspection';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -10,6 +17,53 @@ interface DetailedFindingsProps {
 }
 
 const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
+  const [severityFilter, setSeverityFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [priceFilter, setPriceFilter] = useState<string>('all');
+
+  const filteredIssues = useMemo(() => {
+    if (!issues || issues.length === 0) return [];
+
+    return issues.filter((issue: InspectionIssue) => {
+      // Filter by severity
+      if (severityFilter !== 'all' && issue.priority !== severityFilter) {
+        return false;
+      }
+
+      // Filter by type/category
+      if (typeFilter !== 'all' && issue.category !== typeFilter) {
+        return false;
+      }
+
+      // Filter by price range
+      if (priceFilter !== 'all') {
+        const maxCost = issue.estimatedCost.max;
+        switch (priceFilter) {
+          case 'low':
+            if (maxCost >= 1000) return false;
+            break;
+          case 'medium':
+            if (maxCost < 1000 || maxCost >= 5000) return false;
+            break;
+          case 'high':
+            if (maxCost < 5000) return false;
+            break;
+        }
+      }
+
+      return true;
+    });
+  }, [issues, severityFilter, typeFilter, priceFilter]);
+
+  // Get unique categories for the type filter
+  const uniqueCategories = useMemo(() => {
+    if (!issues) return [];
+    const categories = issues
+      .map((issue: InspectionIssue) => issue.category)
+      .filter((category: string) => typeof category === 'string');
+    return [...new Set(categories)] as string[];
+  }, [issues]);
+
   const renderPriorityBadge = (priority: 'immediate' | 'high' | 'medium' | 'low') => {
     const colors = {
       immediate: 'bg-red-200 text-red-900 border-red-300',
@@ -39,28 +93,97 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
         <CardDescription>All identified issues with location and estimated repair costs</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {issues.map((issue, index) => (
-            <div key={index} className="p-4 border rounded-lg bg-gray-50">
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-3">
-                  {renderPriorityBadge(issue.priority)}
-                  <span className="text-sm bg-gray-200 text-gray-700 px-2 py-1 rounded">{issue.category}</span>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-gray-900">
-                    {formatCurrency(issue.estimatedCost.min)} - {formatCurrency(issue.estimatedCost.max)}
-                  </p>
-                </div>
-              </div>
-              <h4 className="font-semibold text-gray-900 mb-1">{issue.description}</h4>
-              <p className="text-sm text-gray-600 flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                {issue.location}
-              </p>
+        {/* Filter Bar */}
+        <div className="bg-gray-50 rounded-lg border p-4 mb-6">
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-2 text-gray-700">
+              <Filter className="h-4 w-4" />
+              <span className="font-medium">Filters:</span>
             </div>
-          ))}
+
+            <Select value={severityFilter} onValueChange={setSeverityFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by severity" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Severities</SelectItem>
+                <SelectItem value="immediate">Immediate Priority</SelectItem>
+                <SelectItem value="high">High Priority</SelectItem>
+                <SelectItem value="medium">Medium Priority</SelectItem>
+                <SelectItem value="low">Low Priority</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                {uniqueCategories.map((category: string) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={priceFilter} onValueChange={setPriceFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by price" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Prices</SelectItem>
+                <SelectItem value="low">Under $1,000</SelectItem>
+                <SelectItem value="medium">$1,000 - $5,000</SelectItem>
+                <SelectItem value="high">Over $5,000</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {(severityFilter !== 'all' || typeFilter !== 'all' || priceFilter !== 'all') && (
+              <button
+                onClick={() => {
+                  setSeverityFilter('all');
+                  setTypeFilter('all');
+                  setPriceFilter('all');
+                }}
+                className="text-sm text-blue-600 hover:text-blue-800 underline"
+              >
+                Clear all filters
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* Results */}
+        {filteredIssues.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No issues match the selected filters.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredIssues.map((issue, index) => (
+              <div key={index} className="p-4 border rounded-lg bg-gray-50">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center gap-3">
+                    {renderPriorityBadge(issue.priority)}
+                    <span className="text-sm bg-gray-200 text-gray-700 px-2 py-1 rounded">{issue.category}</span>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-900">
+                      {formatCurrency(issue.estimatedCost.min)} - {formatCurrency(issue.estimatedCost.max)}
+                    </p>
+                  </div>
+                </div>
+                <h4 className="font-semibold text-gray-900 mb-1">{issue.description}</h4>
+                <p className="text-sm text-gray-600 flex items-center gap-1">
+                  <MapPin className="h-3 w-3" />
+                  {issue.location}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
