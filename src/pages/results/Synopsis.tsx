@@ -31,7 +31,10 @@ const Synopsis = () => {
         {/* Left Column */}
         <div className="space-y-6">
           {analysis.propertyInfo && (
-            <PropertyInfo propertyInfo={analysis.propertyInfo} />
+            <PropertyInfo 
+              address={analysis.propertyInfo.address}
+              inspectionDate={analysis.propertyInfo.inspectionDate}
+            />
           )}
           
           {analysis.costSummary && (
@@ -41,8 +44,8 @@ const Synopsis = () => {
 
         {/* Right Column */}
         <div className="space-y-6">
-          {analysis.issues && (
-            <ConditionScore issues={analysis.issues} />
+          {analysis && propertyData && (
+            <ConditionScore analysis={analysis} propertyData={propertyData} />
           )}
         </div>
       </div>
@@ -54,7 +57,11 @@ const Synopsis = () => {
 
       {/* Market Comp Data */}
       {propertyData?.marketData && (
-        <MarketCompData marketData={propertyData.marketData} />
+        <MarketCompData 
+          neighborhoodAvgDaysOnMarket={propertyData.marketData.neighborhoodAvgDaysOnMarket}
+          neighborhoodAvgSaleToListRatio={propertyData.marketData.neighborhoodAvgSaleToListRatio}
+          nearbyHomesAvgSquareFeet={propertyData.marketData.nearbyHomesAvgSquareFeet}
+        />
       )}
 
       {/* Property Loading State */}
