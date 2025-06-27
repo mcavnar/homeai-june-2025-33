@@ -1,8 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Upload } from 'lucide-react';
 import { usePropertyData } from '@/hooks/usePropertyData';
 import { useNegotiationStrategy } from '@/hooks/useNegotiationStrategy';
 import { HomeInspectionAnalysis } from '@/types/inspection';
@@ -70,12 +68,6 @@ const Results = () => {
     }
   }, [navigate, fetchPropertyDetails, hasInitialized]);
 
-  const handleStartOver = () => {
-    // Clear sessionStorage when starting over
-    sessionStorage.removeItem('analysisData');
-    navigate('/');
-  };
-
   // If no analysis data, don't render anything (will redirect)
   if (!analysisData?.analysis) {
     console.log('No analysis data, not rendering');
@@ -99,20 +91,6 @@ const Results = () => {
         <ResultsSidebar />
         
         <main className="flex-1 flex flex-col">
-          {/* Header */}
-          <div className="bg-white border-b shadow-sm">
-            <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Analysis Results</h1>
-                <p className="text-gray-600">Your home inspection report has been analyzed</p>
-              </div>
-              <Button onClick={handleStartOver} variant="outline" className="flex items-center gap-2">
-                <Upload className="h-4 w-4" />
-                Analyze Another Report
-              </Button>
-            </div>
-          </div>
-
           {/* Content */}
           <div className="flex-1 p-6">
             <div className="max-w-7xl mx-auto">

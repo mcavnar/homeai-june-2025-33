@@ -26,37 +26,31 @@ const navigationItems = [
     title: 'Synopsis',
     url: '/results/synopsis',
     icon: FileText,
-    description: 'Overview and key metrics',
   },
   {
     title: 'Issues List',
     url: '/results/issues',
     icon: AlertTriangle,
-    description: 'Detailed findings',
   },
   {
     title: 'Key Systems',
     url: '/results/systems',
     icon: Settings,
-    description: 'Major systems assessment',
   },
   {
     title: 'Service Providers',
     url: '/results/providers',
     icon: Users,
-    description: 'Recommended contractors',
   },
   {
     title: 'Negotiation',
     url: '/results/negotiation',
     icon: Handshake,
-    description: 'Strategy and talking points',
   },
   {
     title: 'Inspection Report',
     url: '/results/report',
     icon: ClipboardList,
-    description: 'Original report text',
   },
 ];
 
@@ -67,8 +61,8 @@ const ResultsSidebar = () => {
     <Sidebar className="border-r bg-white">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-            Report Sections
+          <SidebarGroupLabel className="text-xl font-bold text-gray-900 px-3 py-4 mb-2">
+            HomeAi
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -86,9 +80,8 @@ const ResultsSidebar = () => {
                       }
                     >
                       <item.icon className="h-4 w-4" />
-                      <div className={state === 'collapsed' ? 'hidden' : 'flex flex-col'}>
+                      <div className={state === 'collapsed' ? 'hidden' : 'block'}>
                         <span>{item.title}</span>
-                        <span className="text-xs text-gray-500">{item.description}</span>
                       </div>
                     </NavLink>
                   </SidebarMenuButton>
