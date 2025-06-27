@@ -38,7 +38,10 @@ const Synopsis = () => {
           )}
           
           {analysis.costSummary && (
-            <CostSummary costSummary={analysis.costSummary} />
+            <div className="space-y-4">
+              <CostSummary costSummary={analysis.costSummary} />
+              <ActionButtons />
+            </div>
           )}
         </div>
 
@@ -49,9 +52,6 @@ const Synopsis = () => {
           )}
         </div>
       </div>
-
-      {/* Action Buttons Section */}
-      <ActionButtons />
 
       {/* Most Expensive Issues Section */}
       {analysis.issues && analysis.issues.length > 0 && (
