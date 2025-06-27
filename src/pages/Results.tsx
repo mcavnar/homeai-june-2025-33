@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { usePropertyData } from '@/hooks/usePropertyData';
@@ -55,10 +56,12 @@ const Results = () => {
           const parsed = JSON.parse(storedData);
           // Convert pdfArrayBuffer back from array if it exists
           if (parsed.pdfArrayBuffer && Array.isArray(parsed.pdfArrayBuffer)) {
+            console.log('Converting pdfArrayBuffer from array to ArrayBuffer');
             parsed.pdfArrayBuffer = new Uint8Array(parsed.pdfArrayBuffer).buffer;
           }
           dataToUse = parsed;
           console.log('Found data in sessionStorage:', dataToUse);
+          console.log('pdfArrayBuffer from sessionStorage:', dataToUse.pdfArrayBuffer ? 'Available' : 'Not available');
         } catch (e) {
           console.error('Error parsing sessionStorage data:', e);
         }
@@ -72,6 +75,7 @@ const Results = () => {
     }
 
     console.log('Setting analysis data:', dataToUse);
+    console.log('pdfArrayBuffer in analysisData:', dataToUse.pdfArrayBuffer ? 'Available' : 'Not available');
     setAnalysisData(dataToUse);
     setHasInitialized(true);
 
@@ -99,6 +103,8 @@ const Results = () => {
     pdfText: analysisData.pdfText,
     pdfArrayBuffer: analysisData.pdfArrayBuffer,
   };
+
+  console.log('Results context value pdfArrayBuffer:', contextValue.pdfArrayBuffer ? 'Available' : 'Not available');
 
   return (
     <SidebarProvider>

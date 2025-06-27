@@ -22,28 +22,34 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
   const [pdf, setPdf] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [scale, setScale] = useState(1.0);
+  const [scale, setScale] = useState(1.2);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
     const loadPDF = async () => {
       try {
+        console.log('PDFViewer: Loading PDF from ArrayBuffer, size:', pdfArrayBuffer.byteLength);
         setLoading(true);
         const loadedPdf = await pdfjsLib.getDocument({ data: pdfArrayBuffer }).promise;
         setPdf(loadedPdf);
         setTotalPages(loadedPdf.numPages);
         setError('');
+        console.log('PDFViewer: PDF loaded successfully, pages:', loadedPdf.numPages);
       } catch (err) {
-        console.error('Error loading PDF:', err);
+        console.error('PDFViewer: Error loading PDF:', err);
         setError('Failed to load PDF document');
       } finally {
         setLoading(false);
       }
     };
 
-    if (pdfArrayBuffer) {
+    if (pdfArrayBuffer && pdfArrayBuffer.byteLength > 0) {
       loadPDF();
+    } else {
+      console.error('PDFViewer: Invalid or empty ArrayBuffer provided');
+      setError('Invalid PDF data provided');
+      setLoading(false);
     }
   }, [pdfArrayBuffer]);
 
@@ -52,6 +58,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
       if (!pdf || !canvasRef.current) return;
 
       try {
+        console.log('PDFViewer: Rendering page', currentPage);
         const page = await pdf.getPage(currentPage);
         const viewport = page.getViewport({ scale });
         const canvas = canvasRef.current;
@@ -66,8 +73,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
         };
 
         await page.render(renderContext).promise;
+        console.log('PDFViewer: Page rendered successfully');
       } catch (err) {
-        console.error('Error rendering page:', err);
+        console.error('PDFViewer: Error rendering page:', err);
         setError('Failed to render PDF page');
       }
     };
@@ -96,19 +104,19 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
   };
 
   const resetZoom = () => {
-    setScale(1.0);
+    setScale(1.2);
   };
 
   const fitToWidth = () => {
     if (canvasRef.current) {
       const containerWidth = canvasRef.current.parentElement?.clientWidth || 800;
-      setScale(containerWidth / 612); // 612 is standard PDF width in points
+      setScale((containerWidth - 40) / 612); // 612 is standard PDF width in points, minus padding
     }
   };
 
   if (loading) {
     return (
-      <Card>
+      <Card className="w-full">
         <CardContent className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
@@ -121,7 +129,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
 
   if (error) {
     return (
-      <Card>
+      <Card className="w-full">
         <CardContent className="flex items-center justify-center py-12">
           <div className="text-center">
             <p className="text-red-600 mb-2">Error loading PDF</p>
@@ -133,39 +141,38 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>PDF Viewer</CardTitle>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">
-              Page {currentPage} of {totalPages}
-            </span>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={goToPrevPage}
-                disabled={currentPage <= 1}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={goToNextPage}
-                disabled={currentPage >= totalPages}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+    <div className="w-full bg-white rounded-lg shadow-sm border">
+      {/* Controls Header */}
+      <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+        <div className="flex items-center gap-4">
+          <span className="text-sm font-medium text-gray-700">
+            Page {currentPage} of {totalPages}
+          </span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToPrevPage}
+              disabled={currentPage <= 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToNextPage}
+              disabled={currentPage >= totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
         </div>
+        
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={zoomOut}>
             <ZoomOut className="h-4 w-4" />
           </Button>
-          <span className="text-sm text-gray-600 px-2">
+          <span className="text-sm text-gray-600 px-2 min-w-[60px] text-center">
             {Math.round(scale * 100)}%
           </span>
           <Button variant="outline" size="sm" onClick={zoomIn}>
@@ -178,19 +185,19 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
             <Maximize2 className="h-4 w-4" />
           </Button>
         </div>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[600px] w-full border rounded-md">
-          <div className="flex justify-center p-4">
-            <canvas
-              ref={canvasRef}
-              className="border shadow-lg"
-              style={{ maxWidth: '100%', height: 'auto' }}
-            />
-          </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* PDF Content */}
+      <ScrollArea className="h-[700px] w-full">
+        <div className="flex justify-center p-6 bg-gray-100 min-h-full">
+          <canvas
+            ref={canvasRef}
+            className="border shadow-lg bg-white"
+            style={{ maxWidth: '100%', height: 'auto' }}
+          />
+        </div>
+      </ScrollArea>
+    </div>
   );
 };
 
