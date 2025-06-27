@@ -59,8 +59,10 @@ const IssuesList = () => {
   // Get unique categories for the type filter
   const uniqueCategories = useMemo(() => {
     if (!analysis.issues) return [];
-    const categories = analysis.issues.map((issue: InspectionIssue) => issue.category);
-    return [...new Set(categories)];
+    const categories = analysis.issues
+      .map((issue: InspectionIssue) => issue.category)
+      .filter((category: string) => typeof category === 'string');
+    return [...new Set(categories)] as string[];
   }, [analysis.issues]);
 
   if (!analysis.issues || analysis.issues.length === 0) {
@@ -100,7 +102,7 @@ const IssuesList = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
-              {uniqueCategories.map((category) => (
+              {uniqueCategories.map((category: string) => (
                 <SelectItem key={category} value={category}>
                   {category}
                 </SelectItem>
