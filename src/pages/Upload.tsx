@@ -26,13 +26,15 @@ const Upload = () => {
       sessionStorage.setItem('analysisData', JSON.stringify({
         analysis: analysisResult,
         address: analysisResult.propertyInfo?.address,
-        pdfText: analysisResult.pdfText || ''
+        pdfText: analysisResult.pdfText || '',
+        pdfArrayBuffer: Array.from(new Uint8Array(analysisResult.pdfArrayBuffer || new ArrayBuffer(0)))
       }));
 
       console.log('Navigating to /results/synopsis with state:', {
         analysis: analysisResult,
         address: analysisResult.propertyInfo?.address,
-        pdfText: analysisResult.pdfText || ''
+        pdfText: analysisResult.pdfText || '',
+        pdfArrayBuffer: analysisResult.pdfArrayBuffer
       });
 
       // Navigate directly to synopsis page to avoid redirect
@@ -40,7 +42,8 @@ const Upload = () => {
         state: { 
           analysis: analysisResult,
           address: analysisResult.propertyInfo?.address,
-          pdfText: analysisResult.pdfText || ''
+          pdfText: analysisResult.pdfText || '',
+          pdfArrayBuffer: analysisResult.pdfArrayBuffer
         } 
       });
     } else {

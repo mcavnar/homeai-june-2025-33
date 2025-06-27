@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { usePropertyData } from '@/hooks/usePropertyData';
@@ -10,10 +9,20 @@ import ResultsSidebar from '@/components/ResultsSidebar';
 const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [analysisData, setAnalysisData] = useState<{ analysis: HomeInspectionAnalysis; address?: string; pdfText?: string } | null>(null);
+  const [analysisData, setAnalysisData] = useState<{ 
+    analysis: HomeInspectionAnalysis; 
+    address?: string; 
+    pdfText?: string;
+    pdfArrayBuffer?: ArrayBuffer;
+  } | null>(null);
   const [hasInitialized, setHasInitialized] = useState(false);
   
-  const state = location.state as { analysis: HomeInspectionAnalysis; address?: string; pdfText?: string } | null;
+  const state = location.state as { 
+    analysis: HomeInspectionAnalysis; 
+    address?: string; 
+    pdfText?: string;
+    pdfArrayBuffer?: ArrayBuffer;
+  } | null;
   
   const {
     propertyData,
@@ -43,7 +52,12 @@ const Results = () => {
       const storedData = sessionStorage.getItem('analysisData');
       if (storedData) {
         try {
-          dataToUse = JSON.parse(storedData);
+          const parsed = JSON.parse(storedData);
+          // Convert pdfArrayBuffer back from array if it exists
+          if (parsed.pdfArrayBuffer && Array.isArray(parsed.pdfArrayBuffer)) {
+            parsed.pdfArrayBuffer = new Uint8Array(parsed.pdfArrayBuffer).buffer;
+          }
+          dataToUse = parsed;
           console.log('Found data in sessionStorage:', dataToUse);
         } catch (e) {
           console.error('Error parsing sessionStorage data:', e);
@@ -83,6 +97,7 @@ const Results = () => {
     isGeneratingStrategy,
     strategyError,
     pdfText: analysisData.pdfText,
+    pdfArrayBuffer: analysisData.pdfArrayBuffer,
   };
 
   return (

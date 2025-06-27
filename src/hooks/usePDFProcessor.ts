@@ -11,12 +11,14 @@ export const usePDFProcessor = () => {
   const [extractionProgress, setExtractionProgress] = useState(0);
   const [analysis, setAnalysis] = useState<HomeInspectionAnalysis | null>(null);
   const [cleanedText, setCleanedText] = useState<string>('');
+  const [pdfArrayBuffer, setPdfArrayBuffer] = useState<ArrayBuffer | null>(null);
   const [error, setError] = useState<string>('');
   const { toast } = useToast();
 
   const handleFileSelect = (selectedFile: File) => {
     // Reset previous state
     setAnalysis(null);
+    setPdfArrayBuffer(null);
     setError('');
 
     // Validate file type
@@ -46,6 +48,10 @@ export const usePDFProcessor = () => {
     setExtractionProgress(0);
 
     try {
+      // Convert file to ArrayBuffer and store it
+      const arrayBuffer = await file.arrayBuffer();
+      setPdfArrayBuffer(arrayBuffer);
+
       // Extract text from PDF in the frontend
       toast({
         title: "Extracting text from PDF...",
@@ -90,7 +96,12 @@ export const usePDFProcessor = () => {
         description: `Processed ${extractionResult.pageCount} pages and generated comprehensive insights.`,
       });
 
-      return data.analysis;
+      // Return analysis with PDF data
+      return {
+        ...data.analysis,
+        pdfArrayBuffer: arrayBuffer,
+        pdfText: data.cleanedText || ''
+      };
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to process PDF';
@@ -110,6 +121,7 @@ export const usePDFProcessor = () => {
     setFile(null);
     setAnalysis(null);
     setCleanedText('');
+    setPdfArrayBuffer(null);
     setError('');
   };
 
@@ -119,6 +131,7 @@ export const usePDFProcessor = () => {
     extractionProgress,
     analysis,
     cleanedText,
+    pdfArrayBuffer,
     error,
     handleFileSelect,
     processPDF,
