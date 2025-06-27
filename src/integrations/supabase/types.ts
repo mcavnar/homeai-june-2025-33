@@ -69,6 +69,210 @@ export type Database = {
         }
         Relationships: []
       }
+      pros_inquiries: {
+        Row: {
+          address: string | null
+          created_at: string
+          current_page_url: string | null
+          email: string
+          id: string
+          referrer_url: string | null
+          session_id: string
+          source: string
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          current_page_url?: string | null
+          email: string
+          id?: string
+          referrer_url?: string | null
+          session_id: string
+          source: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          current_page_url?: string | null
+          email?: string
+          id?: string
+          referrer_url?: string | null
+          session_id?: string
+          source?: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      realtor_analysis_sessions: {
+        Row: {
+          analysis_data: Json | null
+          condition_score: number | null
+          created_at: string
+          email_capture_source: string | null
+          extracted_text: string | null
+          file_name: string | null
+          file_size: number | null
+          file_type: string | null
+          id: string
+          market_data: Json | null
+          negotiation_data: Json | null
+          pdf_file_path: string | null
+          property_address: string | null
+          property_data: Json | null
+          session_id: string
+          survey_responses: Json | null
+          updated_at: string
+          user_email: string | null
+          user_question: string | null
+        }
+        Insert: {
+          analysis_data?: Json | null
+          condition_score?: number | null
+          created_at?: string
+          email_capture_source?: string | null
+          extracted_text?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          market_data?: Json | null
+          negotiation_data?: Json | null
+          pdf_file_path?: string | null
+          property_address?: string | null
+          property_data?: Json | null
+          session_id: string
+          survey_responses?: Json | null
+          updated_at?: string
+          user_email?: string | null
+          user_question?: string | null
+        }
+        Update: {
+          analysis_data?: Json | null
+          condition_score?: number | null
+          created_at?: string
+          email_capture_source?: string | null
+          extracted_text?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          market_data?: Json | null
+          negotiation_data?: Json | null
+          pdf_file_path?: string | null
+          property_address?: string | null
+          property_data?: Json | null
+          session_id?: string
+          survey_responses?: Json | null
+          updated_at?: string
+          user_email?: string | null
+          user_question?: string | null
+        }
+        Relationships: []
+      }
+      sample_surveys: {
+        Row: {
+          created_at: string
+          email_capture_source: string | null
+          id: string
+          session_id: string
+          survey_responses: Json | null
+          updated_at: string
+          user_email: string | null
+        }
+        Insert: {
+          created_at?: string
+          email_capture_source?: string | null
+          id?: string
+          session_id: string
+          survey_responses?: Json | null
+          updated_at?: string
+          user_email?: string | null
+        }
+        Update: {
+          created_at?: string
+          email_capture_source?: string | null
+          id?: string
+          session_id?: string
+          survey_responses?: Json | null
+          updated_at?: string
+          user_email?: string | null
+        }
+        Relationships: []
+      }
+      service_pros_inquiries: {
+        Row: {
+          additional_data: Json | null
+          city: string | null
+          country: string | null
+          created_at: string
+          current_page_url: string | null
+          email_capture_source: string | null
+          formatted_address: string | null
+          id: string
+          inquiry_type: string
+          latitude: number | null
+          longitude: number | null
+          property_address: string | null
+          referrer_url: string | null
+          session_id: string
+          state: string | null
+          street_address: string | null
+          updated_at: string
+          user_agent: string | null
+          user_email: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          additional_data?: Json | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          current_page_url?: string | null
+          email_capture_source?: string | null
+          formatted_address?: string | null
+          id?: string
+          inquiry_type: string
+          latitude?: number | null
+          longitude?: number | null
+          property_address?: string | null
+          referrer_url?: string | null
+          session_id: string
+          state?: string | null
+          street_address?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          user_email?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          additional_data?: Json | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          current_page_url?: string | null
+          email_capture_source?: string | null
+          formatted_address?: string | null
+          id?: string
+          inquiry_type?: string
+          latitude?: number | null
+          longitude?: number | null
+          property_address?: string | null
+          referrer_url?: string | null
+          session_id?: string
+          state?: string | null
+          street_address?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          user_email?: string | null
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
