@@ -45,15 +45,17 @@ const Synopsis = () => {
         {/* Right Column */}
         <div className="space-y-6">
           {analysis.costSummary && (
-            <div className="space-y-4">
-              <CostSummary 
-                costSummary={analysis.costSummary} 
-                issues={analysis.issues || []}
-              />
-              <ActionButtons />
-            </div>
+            <CostSummary 
+              costSummary={analysis.costSummary} 
+              issues={analysis.issues || []}
+            />
           )}
         </div>
+      </div>
+
+      {/* Centered Action Buttons */}
+      <div className="flex justify-center">
+        <ActionButtons />
       </div>
 
       {/* Most Expensive Issues Section */}
