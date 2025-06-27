@@ -37,18 +37,18 @@ const Synopsis = () => {
             />
           )}
           
-          {analysis.costSummary && (
-            <div className="space-y-4">
-              <CostSummary costSummary={analysis.costSummary} />
-              <ActionButtons />
-            </div>
+          {analysis && propertyData && (
+            <ConditionScore analysis={analysis} propertyData={propertyData} />
           )}
         </div>
 
         {/* Right Column */}
         <div className="space-y-6">
-          {analysis && propertyData && (
-            <ConditionScore analysis={analysis} propertyData={propertyData} />
+          {analysis.costSummary && (
+            <div className="space-y-4">
+              <CostSummary costSummary={analysis.costSummary} />
+              <ActionButtons />
+            </div>
           )}
         </div>
       </div>

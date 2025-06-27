@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { DollarSign } from 'lucide-react';
+import { DollarSign, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -47,7 +47,7 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costSummary }) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
             <h4 className="font-semibold text-red-800 mb-2">High Priority</h4>
             <p className="text-2xl font-bold text-red-900">
@@ -71,6 +71,37 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costSummary }) => {
             <p className="text-2xl font-bold text-blue-900">
               {formatCurrency(calculatedTotalMax)}
             </p>
+          </div>
+        </div>
+
+        {/* Priority Definitions */}
+        <div className="bg-gray-50 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Info className="h-4 w-4 text-gray-600" />
+            <h5 className="font-semibold text-gray-700">Priority Definitions</h5>
+          </div>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-start gap-3">
+              <div className="w-3 h-3 bg-red-400 rounded-full mt-1 flex-shrink-0"></div>
+              <div>
+                <span className="font-medium text-red-800">High Priority:</span>
+                <span className="text-gray-700 ml-1">Safety issues, structural problems, or systems that could cause damage if not addressed immediately</span>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-3 h-3 bg-yellow-400 rounded-full mt-1 flex-shrink-0"></div>
+              <div>
+                <span className="font-medium text-yellow-800">Medium Priority:</span>
+                <span className="text-gray-700 ml-1">Issues that should be addressed within 1-2 years to prevent deterioration or higher costs</span>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-3 h-3 bg-orange-400 rounded-full mt-1 flex-shrink-0"></div>
+              <div>
+                <span className="font-medium text-orange-800">Low Priority:</span>
+                <span className="text-gray-700 ml-1">Cosmetic or minor maintenance items that can be addressed over time for comfort and aesthetics</span>
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>
