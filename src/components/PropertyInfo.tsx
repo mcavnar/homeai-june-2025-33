@@ -17,7 +17,7 @@ const PropertyInfo: React.FC<PropertyInfoProps> = ({ address, inspectionDate }) 
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MapPin className="h-5 w-5" />
-          Property Synopsis
+          Inspection Report Synopsis
         </CardTitle>
       </CardHeader>
       <CardContent>
