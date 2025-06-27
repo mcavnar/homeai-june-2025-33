@@ -33,6 +33,17 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
     return 'text-gray-800 bg-gray-100';
   };
 
+  const getCostRangeColor = (min: number, max: number) => {
+    const avgCost = (min + max) / 2;
+    if (avgCost < 1000) {
+      return 'text-green-700 bg-green-50';
+    } else if (avgCost < 3000) {
+      return 'text-yellow-700 bg-yellow-50';
+    } else {
+      return 'text-red-700 bg-red-50';
+    }
+  };
+
   const formatSummaryAsBullets = (summary: string) => {
     // Split by common sentence endings and filter out empty strings
     const sentences = summary
@@ -53,7 +64,7 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Major Systems Assessment</h2>
-        <p className="text-gray-600">Detailed evaluation of your property's key systems</p>
+        <p className="text-gray-600">Detailed evaluation of your property's key systems with future cost projections</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -122,6 +133,54 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
                     <span className="text-lg font-bold text-gray-900">
                       {formatCurrency(system.replacementCost.min)} - {formatCurrency(system.replacementCost.max)}
                     </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Future Service Costs */}
+              {system.maintenanceCosts && (
+                <div className="pt-3 border-t border-gray-200">
+                  <h4 className="font-medium text-gray-900 text-sm mb-3">Future Service Costs</h4>
+                  <div className="space-y-3">
+                    {/* 5-Year Costs */}
+                    <div className={`p-3 rounded-lg border ${getCostRangeColor(system.maintenanceCosts.fiveYear.min, system.maintenanceCosts.fiveYear.max)}`}>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium">Next 5 Years</span>
+                        <span className="text-sm font-semibold">
+                          {formatCurrency(system.maintenanceCosts.fiveYear.min)} - {formatCurrency(system.maintenanceCosts.fiveYear.max)}
+                        </span>
+                      </div>
+                      {system.anticipatedRepairs?.fiveYear && system.anticipatedRepairs.fiveYear.length > 0 && (
+                        <div className="space-y-1">
+                          {system.anticipatedRepairs.fiveYear.map((repair, index) => (
+                            <div key={index} className="flex items-start gap-1">
+                              <span className="text-xs mt-0.5">•</span>
+                              <span className="text-xs leading-tight">{repair}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 10-Year Costs */}
+                    <div className={`p-3 rounded-lg border ${getCostRangeColor(system.maintenanceCosts.tenYear.min, system.maintenanceCosts.tenYear.max)}`}>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium">Next 10 Years</span>
+                        <span className="text-sm font-semibold">
+                          {formatCurrency(system.maintenanceCosts.tenYear.min)} - {formatCurrency(system.maintenanceCosts.tenYear.max)}
+                        </span>
+                      </div>
+                      {system.anticipatedRepairs?.tenYear && system.anticipatedRepairs.tenYear.length > 0 && (
+                        <div className="space-y-1">
+                          {system.anticipatedRepairs.tenYear.map((repair, index) => (
+                            <div key={index} className="flex items-start gap-1">
+                              <span className="text-xs mt-0.5">•</span>
+                              <span className="text-xs leading-tight">{repair}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}

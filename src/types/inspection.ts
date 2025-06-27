@@ -20,6 +20,20 @@ export interface MajorSystem {
     min: number;
     max: number;
   };
+  maintenanceCosts?: {
+    fiveYear: {
+      min: number;
+      max: number;
+    };
+    tenYear: {
+      min: number;
+      max: number;
+    };
+  };
+  anticipatedRepairs?: {
+    fiveYear: string[];
+    tenYear: string[];
+  };
 }
 
 export interface MajorSystems {

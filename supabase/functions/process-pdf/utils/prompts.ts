@@ -38,8 +38,19 @@ For major systems, provide an overall assessment with:
   - Age of the system (if stated or can be inferred from installation dates)
   - Estimated years of remaining life (if mentioned by inspector)
   - Replacement cost estimates (if provided in the report)
+  - 5-year and 10-year maintenance cost projections based on system age, condition, and typical service requirements
+  - Anticipated repairs and maintenance items for 5 and 10-year periods
 
-ONLY populate the optional fields (brand, type, age, yearsLeft, replacementCost) if this information is explicitly mentioned or clearly inferable from the inspection report text.
+MAINTENANCE COST CALCULATION GUIDELINES:
+- HVAC: Annual maintenance ($200-400), filter changes ($100-200/year), potential component replacements (blower motor, compressor, etc.)
+- Electrical: Periodic inspections ($150-300), outlet/switch replacements, panel upgrades if aging, GFCI installations
+- Plumbing: Routine maintenance, fixture replacements, pipe repairs based on material/age, water heater maintenance
+- Roof: Annual inspections ($200-400), minor repairs ($500-2000), gutter cleaning/repair, potential partial replacement
+- Foundation: Inspections ($300-500), sealing ($1000-3000), drainage maintenance, structural monitoring
+
+Consider system age, current condition, and regional cost variations when calculating estimates.
+
+ONLY populate the optional fields (brand, type, age, yearsLeft, replacementCost, maintenanceCosts, anticipatedRepairs) if this information is explicitly mentioned or clearly inferable from the inspection report text.
 
 Return your response as valid JSON matching this exact structure (IMPORTANT: Return raw JSON only - no backticks, no markdown formatting):
 
@@ -56,7 +67,15 @@ Return your response as valid JSON matching this exact structure (IMPORTANT: Ret
       "type": "type or style if specified (e.g., asphalt shingle, metal, tile)",
       "age": "age if mentioned (e.g., '10 years', 'installed 2015')",
       "yearsLeft": "remaining lifespan if estimated",
-      "replacementCost": {"min": number, "max": number}
+      "replacementCost": {"min": number, "max": number},
+      "maintenanceCosts": {
+        "fiveYear": {"min": number, "max": number},
+        "tenYear": {"min": number, "max": number}
+      },
+      "anticipatedRepairs": {
+        "fiveYear": ["list of expected maintenance items"],
+        "tenYear": ["list of expected maintenance and repair items"]
+      }
     },
     "foundation": {
       "condition": "overall condition assessment", 
@@ -65,7 +84,15 @@ Return your response as valid JSON matching this exact structure (IMPORTANT: Ret
       "type": "foundation type if specified (e.g., concrete slab, crawl space, basement)",
       "age": "age if mentioned",
       "yearsLeft": "remaining lifespan if estimated",
-      "replacementCost": {"min": number, "max": number}
+      "replacementCost": {"min": number, "max": number},
+      "maintenanceCosts": {
+        "fiveYear": {"min": number, "max": number},
+        "tenYear": {"min": number, "max": number}
+      },
+      "anticipatedRepairs": {
+        "fiveYear": ["list of expected maintenance items"],
+        "tenYear": ["list of expected maintenance and repair items"]
+      }
     },
     "electrical": {
       "condition": "overall condition assessment",
@@ -74,7 +101,15 @@ Return your response as valid JSON matching this exact structure (IMPORTANT: Ret
       "type": "panel type and amperage if specified (e.g., '200 amp main panel')",
       "age": "age if mentioned",
       "yearsLeft": "remaining lifespan if estimated",
-      "replacementCost": {"min": number, "max": number}
+      "replacementCost": {"min": number, "max": number},
+      "maintenanceCosts": {
+        "fiveYear": {"min": number, "max": number},
+        "tenYear": {"min": number, "max": number}
+      },
+      "anticipatedRepairs": {
+        "fiveYear": ["list of expected maintenance items"],
+        "tenYear": ["list of expected maintenance and repair items"]
+      }
     },
     "plumbing": {
       "condition": "overall condition assessment",
@@ -83,7 +118,15 @@ Return your response as valid JSON matching this exact structure (IMPORTANT: Ret
       "type": "pipe materials and fixture types if specified (e.g., 'copper pipes', 'PVC drain lines')",
       "age": "age if mentioned",
       "yearsLeft": "remaining lifespan if estimated",
-      "replacementCost": {"min": number, "max": number}
+      "replacementCost": {"min": number, "max": number},
+      "maintenanceCosts": {
+        "fiveYear": {"min": number, "max": number},
+        "tenYear": {"min": number, "max": number}
+      },
+      "anticipatedRepairs": {
+        "fiveYear": ["list of expected maintenance items"],
+        "tenYear": ["list of expected maintenance and repair items"]
+      }
     },
     "hvac": {
       "condition": "overall condition assessment",
@@ -92,7 +135,15 @@ Return your response as valid JSON matching this exact structure (IMPORTANT: Ret
       "type": "system type if specified (e.g., 'central air', 'heat pump', 'gas furnace')",
       "age": "age if mentioned",
       "yearsLeft": "remaining lifespan if estimated",
-      "replacementCost": {"min": number, "max": number}
+      "replacementCost": {"min": number, "max": number},
+      "maintenanceCosts": {
+        "fiveYear": {"min": number, "max": number},
+        "tenYear": {"min": number, "max": number}
+      },
+      "anticipatedRepairs": {
+        "fiveYear": ["list of expected maintenance items"],
+        "tenYear": ["list of expected maintenance and repair items"]
+      }
     }
   },
   "issues": [
@@ -128,6 +179,14 @@ Look carefully at every section of the report and identify:
 - Accessibility and functionality improvements
 
 For each major system (roof, foundation, electrical, plumbing, HVAC), provide an overall condition assessment and summary based on all findings related to that system.
+
+IMPORTANT: Also calculate realistic 5-year and 10-year maintenance cost projections for each system based on:
+- Current age and condition of the system
+- Typical maintenance schedules and costs
+- Expected wear and component replacement needs
+- Regional cost variations and inflation estimates
+
+Include anticipated repairs and maintenance items that homeowners should expect in the 5-year and 10-year timeframes.
 
 Inspection report:
 
