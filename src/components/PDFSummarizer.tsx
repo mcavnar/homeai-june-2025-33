@@ -52,8 +52,8 @@ const PDFSummarizer = () => {
     const analysisResult = await processPDF();
     
     // Fetch property data if address is available
-    if (analysisResult?.propertyInfo?.address) {
-      await fetchPropertyDetails(analysisResult.propertyInfo.address);
+    if (analysisResult?.analysis?.propertyInfo?.address) {
+      await fetchPropertyDetails(analysisResult.analysis.propertyInfo.address);
     }
   };
 
