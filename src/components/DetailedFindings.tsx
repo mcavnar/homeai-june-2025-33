@@ -1,7 +1,8 @@
 
 import React, { useState, useMemo } from 'react';
-import { MapPin, Filter } from 'lucide-react';
+import { MapPin, Filter, Download } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -64,6 +65,33 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
     return [...new Set(categories)] as string[];
   }, [issues]);
 
+  const exportToCSV = () => {
+    if (filteredIssues.length === 0) return;
+
+    const headers = ['Description', 'Location', 'Priority', 'Category', 'Min Cost', 'Max Cost'];
+    const csvContent = [
+      headers.join(','),
+      ...filteredIssues.map(issue => [
+        `"${issue.description.replace(/"/g, '""')}"`,
+        `"${issue.location.replace(/"/g, '""')}"`,
+        issue.priority,
+        issue.category,
+        issue.estimatedCost.min,
+        issue.estimatedCost.max
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'inspection-issues.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const renderPriorityBadge = (priority: 'immediate' | 'high' | 'medium' | 'low') => {
     const colors = {
       immediate: 'bg-red-200 text-red-900 border-red-300',
@@ -95,63 +123,76 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
       <CardContent>
         {/* Filter Bar */}
         <div className="bg-gray-50 rounded-lg border p-4 mb-6">
-          <div className="flex items-center gap-4 flex-wrap">
-            <div className="flex items-center gap-2 text-gray-700">
-              <Filter className="h-4 w-4" />
-              <span className="font-medium">Filters:</span>
+          <div className="flex items-center gap-4 flex-wrap justify-between">
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2 text-gray-700">
+                <Filter className="h-4 w-4" />
+                <span className="font-medium">Filters:</span>
+              </div>
+
+              <Select value={severityFilter} onValueChange={setSeverityFilter}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Filter by severity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Severities</SelectItem>
+                  <SelectItem value="immediate">Immediate Priority</SelectItem>
+                  <SelectItem value="high">High Priority</SelectItem>
+                  <SelectItem value="medium">Medium Priority</SelectItem>
+                  <SelectItem value="low">Low Priority</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Filter by type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  {uniqueCategories.map((category: string) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={priceFilter} onValueChange={setPriceFilter}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Filter by price" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Prices</SelectItem>
+                  <SelectItem value="low">Under $1,000</SelectItem>
+                  <SelectItem value="medium">$1,000 - $5,000</SelectItem>
+                  <SelectItem value="high">Over $5,000</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {(severityFilter !== 'all' || typeFilter !== 'all' || priceFilter !== 'all') && (
+                <button
+                  onClick={() => {
+                    setSeverityFilter('all');
+                    setTypeFilter('all');
+                    setPriceFilter('all');
+                  }}
+                  className="text-sm text-blue-600 hover:text-blue-800 underline"
+                >
+                  Clear all filters
+                </button>
+              )}
             </div>
 
-            <Select value={severityFilter} onValueChange={setSeverityFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by severity" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Severities</SelectItem>
-                <SelectItem value="immediate">Immediate Priority</SelectItem>
-                <SelectItem value="high">High Priority</SelectItem>
-                <SelectItem value="medium">Medium Priority</SelectItem>
-                <SelectItem value="low">Low Priority</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                {uniqueCategories.map((category: string) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={priceFilter} onValueChange={setPriceFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by price" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Prices</SelectItem>
-                <SelectItem value="low">Under $1,000</SelectItem>
-                <SelectItem value="medium">$1,000 - $5,000</SelectItem>
-                <SelectItem value="high">Over $5,000</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {(severityFilter !== 'all' || typeFilter !== 'all' || priceFilter !== 'all') && (
-              <button
-                onClick={() => {
-                  setSeverityFilter('all');
-                  setTypeFilter('all');
-                  setPriceFilter('all');
-                }}
-                className="text-sm text-blue-600 hover:text-blue-800 underline"
-              >
-                Clear all filters
-              </button>
-            )}
+            <Button 
+              onClick={exportToCSV}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+              disabled={filteredIssues.length === 0}
+            >
+              <Download className="h-4 w-4" />
+              Export List
+            </Button>
           </div>
         </div>
 
