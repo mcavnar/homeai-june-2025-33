@@ -34,28 +34,31 @@ const ActionButtons: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+    <div className="flex flex-col sm:flex-row gap-4 justify-center">
       <Button 
         onClick={handleShareAccess}
         variant="outline"
-        className="flex items-center gap-2"
+        size="lg"
+        className="flex items-center gap-2 px-6 py-3 font-semibold border-2 hover:border-gray-400 hover:shadow-md transition-all duration-200"
       >
-        <Share className="h-4 w-4" />
+        <Share className="h-5 w-5" />
         Share Access
       </Button>
       <Button 
         onClick={handleUnderstandServiceCosts}
         variant="outline"
-        className="flex items-center gap-2"
+        size="lg"
+        className="flex items-center gap-2 px-6 py-3 font-semibold border-2 hover:border-gray-400 hover:shadow-md transition-all duration-200"
       >
-        <DollarSign className="h-4 w-4" />
+        <DollarSign className="h-5 w-5" />
         Understand Service Costs
       </Button>
       <Button 
         onClick={handleGetNegotiationAdvice}
-        className="flex items-center gap-2"
+        size="lg"
+        className="flex items-center gap-2 px-6 py-3 font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
       >
-        <MessageSquare className="h-4 w-4" />
+        <MessageSquare className="h-5 w-5" />
         Get Negotiation Advice
       </Button>
     </div>
