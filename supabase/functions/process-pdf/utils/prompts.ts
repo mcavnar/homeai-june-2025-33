@@ -32,6 +32,14 @@ Safety issues should be marked with "immediate" priority in the issues list.
 For major systems, provide an overall assessment with:
 - Overall condition (e.g., "Good", "Fair", "Poor", "Needs Immediate Attention")
 - Brief summary of the system's current state and any notable findings
+- Extract additional details when available in the report:
+  - Brand/manufacturer name (if mentioned)
+  - Type or model information (if specified)
+  - Age of the system (if stated or can be inferred from installation dates)
+  - Estimated years of remaining life (if mentioned by inspector)
+  - Replacement cost estimates (if provided in the report)
+
+ONLY populate the optional fields (brand, type, age, yearsLeft, replacementCost) if this information is explicitly mentioned or clearly inferable from the inspection report text.
 
 Return your response as valid JSON matching this exact structure (IMPORTANT: Return raw JSON only - no backticks, no markdown formatting):
 
@@ -43,23 +51,48 @@ Return your response as valid JSON matching this exact structure (IMPORTANT: Ret
   "majorSystems": {
     "roof": {
       "condition": "overall condition assessment",
-      "summary": "brief summary of roof condition and key findings"
+      "summary": "brief summary of roof condition and key findings",
+      "brand": "manufacturer/brand name if mentioned",
+      "type": "type or style if specified (e.g., asphalt shingle, metal, tile)",
+      "age": "age if mentioned (e.g., '10 years', 'installed 2015')",
+      "yearsLeft": "remaining lifespan if estimated",
+      "replacementCost": {"min": number, "max": number}
     },
     "foundation": {
       "condition": "overall condition assessment", 
-      "summary": "brief summary of foundation condition and key findings"
+      "summary": "brief summary of foundation condition and key findings",
+      "brand": "manufacturer/brand name if mentioned",
+      "type": "foundation type if specified (e.g., concrete slab, crawl space, basement)",
+      "age": "age if mentioned",
+      "yearsLeft": "remaining lifespan if estimated",
+      "replacementCost": {"min": number, "max": number}
     },
     "electrical": {
       "condition": "overall condition assessment",
-      "summary": "brief summary of electrical system condition and key findings"
+      "summary": "brief summary of electrical system condition and key findings",
+      "brand": "panel brand if mentioned (e.g., Square D, GE, Siemens)",
+      "type": "panel type and amperage if specified (e.g., '200 amp main panel')",
+      "age": "age if mentioned",
+      "yearsLeft": "remaining lifespan if estimated",
+      "replacementCost": {"min": number, "max": number}
     },
     "plumbing": {
       "condition": "overall condition assessment",
-      "summary": "brief summary of plumbing system condition and key findings"
+      "summary": "brief summary of plumbing system condition and key findings",
+      "brand": "fixture or system brands if mentioned",
+      "type": "pipe materials and fixture types if specified (e.g., 'copper pipes', 'PVC drain lines')",
+      "age": "age if mentioned",
+      "yearsLeft": "remaining lifespan if estimated",
+      "replacementCost": {"min": number, "max": number}
     },
     "hvac": {
       "condition": "overall condition assessment",
-      "summary": "brief summary of HVAC system condition and key findings"
+      "summary": "brief summary of HVAC system condition and key findings",
+      "brand": "manufacturer if mentioned (e.g., Carrier, Trane, Lennox)",
+      "type": "system type if specified (e.g., 'central air', 'heat pump', 'gas furnace')",
+      "age": "age if mentioned",
+      "yearsLeft": "remaining lifespan if estimated",
+      "replacementCost": {"min": number, "max": number}
     }
   },
   "issues": [

@@ -1,4 +1,3 @@
-
 export interface InspectionIssue {
   description: string;
   location: string;
@@ -13,6 +12,14 @@ export interface InspectionIssue {
 export interface MajorSystem {
   condition: string;
   summary: string;
+  brand?: string;
+  type?: string;
+  age?: string;
+  yearsLeft?: string;
+  replacementCost?: {
+    min: number;
+    max: number;
+  };
 }
 
 export interface MajorSystems {
