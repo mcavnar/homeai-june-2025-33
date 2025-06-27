@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
@@ -12,6 +12,7 @@ import ResultsSidebar from '@/components/ResultsSidebar';
 const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [analysisData, setAnalysisData] = useState<{ analysis: HomeInspectionAnalysis; address?: string; pdfText?: string } | null>(null);
   
   const state = location.state as { analysis: HomeInspectionAnalysis; address?: string; pdfText?: string } | null;
   
@@ -26,39 +27,65 @@ const Results = () => {
     negotiationStrategy,
     isGeneratingStrategy,
     strategyError,
-  } = useNegotiationStrategy(state?.analysis || null, propertyData);
+  } = useNegotiationStrategy(analysisData?.analysis || null, propertyData);
 
   useEffect(() => {
-    // If no analysis data, redirect to upload page
-    if (!state?.analysis) {
+    console.log('Results component mounted');
+    console.log('Location state:', state);
+    
+    let dataToUse = state;
+    
+    // If no state from navigation, try sessionStorage
+    if (!dataToUse) {
+      console.log('No state from navigation, checking sessionStorage');
+      const storedData = sessionStorage.getItem('analysisData');
+      if (storedData) {
+        try {
+          dataToUse = JSON.parse(storedData);
+          console.log('Found data in sessionStorage:', dataToUse);
+        } catch (e) {
+          console.error('Error parsing sessionStorage data:', e);
+        }
+      }
+    }
+
+    if (!dataToUse?.analysis) {
+      console.log('No analysis data found, redirecting to upload');
       navigate('/');
       return;
     }
 
+    console.log('Setting analysis data:', dataToUse);
+    setAnalysisData(dataToUse);
+
     // Fetch property data if address is available
-    if (state.address) {
-      fetchPropertyDetails(state.address);
+    if (dataToUse.address) {
+      console.log('Fetching property details for:', dataToUse.address);
+      fetchPropertyDetails(dataToUse.address);
     }
-  }, [state, navigate, fetchPropertyDetails]);
+  }, [location.pathname, navigate, fetchPropertyDetails]);
 
   const handleStartOver = () => {
+    // Clear sessionStorage when starting over
+    sessionStorage.removeItem('analysisData');
     navigate('/');
   };
 
   // If no analysis data, don't render anything (will redirect)
-  if (!state?.analysis) {
+  if (!analysisData?.analysis) {
+    console.log('No analysis data, not rendering');
     return null;
   }
 
   const contextValue = {
-    analysis: state.analysis,
+    analysis: analysisData.analysis,
     propertyData,
     isLoadingProperty,
     propertyError,
     negotiationStrategy,
     isGeneratingStrategy,
     strategyError,
-    pdfText: state.pdfText,
+    pdfText: analysisData.pdfText,
   };
 
   return (

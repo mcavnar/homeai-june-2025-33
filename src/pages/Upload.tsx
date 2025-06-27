@@ -19,15 +19,32 @@ const Upload = () => {
   const handleProcessPDF = async () => {
     const analysisResult = await processPDF();
     
+    console.log('Analysis result in Upload:', analysisResult);
+    
     if (analysisResult) {
-      // Navigate to results page with the analysis data and PDF text
-      navigate('/results', { 
+      // Store in sessionStorage as backup
+      sessionStorage.setItem('analysisData', JSON.stringify({
+        analysis: analysisResult,
+        address: analysisResult.propertyInfo?.address,
+        pdfText: analysisResult.pdfText || ''
+      }));
+
+      console.log('Navigating to /results/synopsis with state:', {
+        analysis: analysisResult,
+        address: analysisResult.propertyInfo?.address,
+        pdfText: analysisResult.pdfText || ''
+      });
+
+      // Navigate directly to synopsis page to avoid redirect
+      navigate('/results/synopsis', { 
         state: { 
           analysis: analysisResult,
           address: analysisResult.propertyInfo?.address,
           pdfText: analysisResult.pdfText || ''
         } 
       });
+    } else {
+      console.log('No analysis result - not navigating');
     }
   };
 
