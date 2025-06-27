@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Share, MessageSquare } from 'lucide-react';
+import { Share, MessageSquare, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -25,6 +25,10 @@ const ActionButtons: React.FC = () => {
     });
   };
 
+  const handleUnderstandServiceCosts = () => {
+    navigate('/results/providers');
+  };
+
   const handleGetNegotiationAdvice = () => {
     navigate('/results/negotiation');
   };
@@ -38,6 +42,14 @@ const ActionButtons: React.FC = () => {
       >
         <Share className="h-4 w-4" />
         Share Access
+      </Button>
+      <Button 
+        onClick={handleUnderstandServiceCosts}
+        variant="outline"
+        className="flex items-center gap-2"
+      >
+        <DollarSign className="h-4 w-4" />
+        Understand Service Costs
       </Button>
       <Button 
         onClick={handleGetNegotiationAdvice}
