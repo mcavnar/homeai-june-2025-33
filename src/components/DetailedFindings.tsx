@@ -1,9 +1,9 @@
-
 import React, { useState, useMemo } from 'react';
-import { MapPin, Filter, Download, FileText } from 'lucide-react';
+import { MapPin, Filter, Download, FileText, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -23,6 +23,7 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [priceFilter, setPriceFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -30,6 +31,16 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
     if (!issues || issues.length === 0) return [];
 
     return issues.filter((issue: InspectionIssue) => {
+      // Filter by search query
+      if (searchQuery.trim() !== '') {
+        const query = searchQuery.toLowerCase().trim();
+        const matchesDescription = issue.description.toLowerCase().includes(query);
+        const matchesLocation = issue.location.toLowerCase().includes(query);
+        if (!matchesDescription && !matchesLocation) {
+          return false;
+        }
+      }
+
       // Filter by severity
       if (severityFilter !== 'all' && issue.priority !== severityFilter) {
         return false;
@@ -58,7 +69,7 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
 
       return true;
     });
-  }, [issues, severityFilter, typeFilter, priceFilter]);
+  }, [issues, severityFilter, typeFilter, priceFilter, searchQuery]);
 
   // Get unique categories for the type filter
   const uniqueCategories = useMemo(() => {
@@ -169,6 +180,17 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
                 <span className="font-medium">Filters:</span>
               </div>
 
+              {/* Search Box */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search issues..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 w-64"
+                />
+              </div>
+
               <Select value={severityFilter} onValueChange={setSeverityFilter}>
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="Filter by severity" />
@@ -208,12 +230,13 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
                 </SelectContent>
               </Select>
 
-              {(severityFilter !== 'all' || typeFilter !== 'all' || priceFilter !== 'all') && (
+              {(severityFilter !== 'all' || typeFilter !== 'all' || priceFilter !== 'all' || searchQuery.trim() !== '') && (
                 <button
                   onClick={() => {
                     setSeverityFilter('all');
                     setTypeFilter('all');
                     setPriceFilter('all');
+                    setSearchQuery('');
                   }}
                   className="text-sm text-blue-600 hover:text-blue-800 underline"
                 >
