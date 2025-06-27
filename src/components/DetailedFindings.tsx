@@ -1,6 +1,6 @@
-
 import React, { useState, useMemo } from 'react';
-import { MapPin, Filter, Download } from 'lucide-react';
+import { MapPin, Filter, Download, FileText } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from '@/hooks/use-toast';
 import { InspectionIssue } from '@/types/inspection';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -21,6 +22,8 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [priceFilter, setPriceFilter] = useState<string>('all');
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const filteredIssues = useMemo(() => {
     if (!issues || issues.length === 0) return [];
@@ -64,6 +67,14 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
       .filter((category: string) => typeof category === 'string');
     return [...new Set(categories)] as string[];
   }, [issues]);
+
+  const handleSeeInReport = (issue: InspectionIssue) => {
+    navigate('/results/report');
+    toast({
+      title: "Navigated to Inspection Report",
+      description: `Look for: "${issue.description}" in the ${issue.location} section`,
+    });
+  };
 
   const exportToCSV = () => {
     if (filteredIssues.length === 0) return;
@@ -210,10 +221,21 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
                     {renderPriorityBadge(issue.priority)}
                     <span className="text-sm bg-gray-200 text-gray-700 px-2 py-1 rounded">{issue.category}</span>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-gray-900">
-                      {formatCurrency(issue.estimatedCost.min)} - {formatCurrency(issue.estimatedCost.max)}
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className="font-semibold text-gray-900">
+                        {formatCurrency(issue.estimatedCost.min)} - {formatCurrency(issue.estimatedCost.max)}
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => handleSeeInReport(issue)}
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+                    >
+                      <FileText className="h-4 w-4" />
+                      See in Report
+                    </Button>
                   </div>
                 </div>
                 <h4 className="font-semibold text-gray-900 mb-1">{issue.description}</h4>
