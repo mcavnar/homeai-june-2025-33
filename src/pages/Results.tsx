@@ -13,6 +13,7 @@ const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [analysisData, setAnalysisData] = useState<{ analysis: HomeInspectionAnalysis; address?: string; pdfText?: string } | null>(null);
+  const [hasInitialized, setHasInitialized] = useState(false);
   
   const state = location.state as { analysis: HomeInspectionAnalysis; address?: string; pdfText?: string } | null;
   
@@ -30,6 +31,9 @@ const Results = () => {
   } = useNegotiationStrategy(analysisData?.analysis || null, propertyData);
 
   useEffect(() => {
+    // Only run initialization once
+    if (hasInitialized) return;
+
     console.log('Results component mounted');
     console.log('Location state:', state);
     
@@ -57,13 +61,14 @@ const Results = () => {
 
     console.log('Setting analysis data:', dataToUse);
     setAnalysisData(dataToUse);
+    setHasInitialized(true);
 
     // Fetch property data if address is available
     if (dataToUse.address) {
       console.log('Fetching property details for:', dataToUse.address);
       fetchPropertyDetails(dataToUse.address);
     }
-  }, [location.pathname, navigate, fetchPropertyDetails]);
+  }, [navigate, fetchPropertyDetails, hasInitialized]);
 
   const handleStartOver = () => {
     // Clear sessionStorage when starting over
