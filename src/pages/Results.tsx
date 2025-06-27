@@ -1,23 +1,19 @@
 
 import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Upload } from 'lucide-react';
-import AnalysisResults from '@/components/AnalysisResults';
-import PropertyDetails from '@/components/PropertyDetails';
-import ProcessingStatus from '@/components/ProcessingStatus';
-import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { usePropertyData } from '@/hooks/usePropertyData';
 import { useNegotiationStrategy } from '@/hooks/useNegotiationStrategy';
 import { HomeInspectionAnalysis } from '@/types/inspection';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import ResultsSidebar from '@/components/ResultsSidebar';
 
 const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  const state = location.state as { analysis: HomeInspectionAnalysis; address?: string } | null;
+  const state = location.state as { analysis: HomeInspectionAnalysis; address?: string; pdfText?: string } | null;
   
   const {
     propertyData,
@@ -54,61 +50,46 @@ const Results = () => {
     return null;
   }
 
+  const contextValue = {
+    analysis: state.analysis,
+    propertyData,
+    isLoadingProperty,
+    propertyError,
+    negotiationStrategy,
+    isGeneratingStrategy,
+    strategyError,
+    pdfText: state.pdfText,
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
-        {/* Header with navigation */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Analysis Results</h1>
-            <p className="text-gray-600">Your home inspection report has been analyzed</p>
-          </div>
-          <Button onClick={handleStartOver} variant="outline" className="flex items-center gap-2">
-            <Upload className="h-4 w-4" />
-            Analyze Another Report
-          </Button>
-        </div>
-
-        {/* Analysis Results */}
-        <AnalysisResults
-          analysis={state.analysis}
-          propertyData={propertyData}
-          negotiationStrategy={negotiationStrategy}
-          isGeneratingStrategy={isGeneratingStrategy}
-          strategyError={strategyError}
-        />
-
-        {/* Property Details Section */}
-        {propertyData && (
-          <PropertyDetails propertyData={propertyData} />
-        )}
-
-        {/* Property Loading State */}
-        {isLoadingProperty && (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-center gap-3 py-4">
-                <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
-                <div className="text-center">
-                  <p className="font-medium text-gray-900">Fetching property details...</p>
-                  <p className="text-sm text-gray-600">Looking up market information</p>
-                </div>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-blue-50 to-indigo-100">
+        <ResultsSidebar />
+        
+        <main className="flex-1 flex flex-col">
+          {/* Header */}
+          <div className="bg-white border-b shadow-sm">
+            <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Analysis Results</h1>
+                <p className="text-gray-600">Your home inspection report has been analyzed</p>
               </div>
-            </CardContent>
-          </Card>
-        )}
+              <Button onClick={handleStartOver} variant="outline" className="flex items-center gap-2">
+                <Upload className="h-4 w-4" />
+                Analyze Another Report
+              </Button>
+            </div>
+          </div>
 
-        {/* Property Error */}
-        {propertyError && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Property details unavailable: {propertyError}
-            </AlertDescription>
-          </Alert>
-        )}
+          {/* Content */}
+          <div className="flex-1 p-6">
+            <div className="max-w-7xl mx-auto">
+              <Outlet context={contextValue} />
+            </div>
+          </div>
+        </main>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 

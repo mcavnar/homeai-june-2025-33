@@ -20,11 +20,12 @@ const Upload = () => {
     const analysisResult = await processPDF();
     
     if (analysisResult) {
-      // Navigate to results page with the analysis data
+      // Navigate to results page with the analysis data and PDF text
       navigate('/results', { 
         state: { 
           analysis: analysisResult,
-          address: analysisResult.propertyInfo?.address 
+          address: analysisResult.propertyInfo?.address,
+          pdfText: analysisResult.pdfText || ''
         } 
       });
     }
