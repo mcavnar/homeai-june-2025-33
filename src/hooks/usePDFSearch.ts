@@ -1,13 +1,10 @@
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface SearchMatch {
   pageNumber: number;
   textIndex: number;
   text: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
 }
 
 interface PageTextContent {
@@ -62,7 +59,7 @@ export const usePDFSearch = (pdf: any) => {
     extractAllText();
   }, [pdf?.numPages]);
 
-  // Debounced search function
+  // Simplified search function - no coordinates needed
   const performSearch = useCallback(async (query: string) => {
     if (!query.trim() || pageTextContent.size === 0) {
       setMatches([]);
@@ -76,33 +73,18 @@ export const usePDFSearch = (pdf: any) => {
 
     try {
       for (const [pageNum, content] of pageTextContent.entries()) {
-        const { textItems, fullText } = content;
+        const { fullText } = content;
         
         let searchIndex = 0;
         while (true) {
           const matchIndex = fullText.indexOf(searchTerm, searchIndex);
           if (matchIndex === -1) break;
 
-          let currentTextLength = 0;
-          for (const item of textItems) {
-            const itemText = item.str.toLowerCase();
-            const itemStart = currentTextLength;
-            const itemEnd = currentTextLength + itemText.length;
-
-            if (matchIndex >= itemStart && matchIndex < itemEnd) {
-              foundMatches.push({
-                pageNumber: pageNum,
-                textIndex: matchIndex,
-                text: searchTerm,
-                x: item.transform[4],
-                y: item.transform[5],
-                width: item.width,
-                height: item.height
-              });
-              break;
-            }
-            currentTextLength += itemText.length + 1;
-          }
+          foundMatches.push({
+            pageNumber: pageNum,
+            textIndex: matchIndex,
+            text: searchTerm
+          });
 
           searchIndex = matchIndex + 1;
         }

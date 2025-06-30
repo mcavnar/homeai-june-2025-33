@@ -26,7 +26,6 @@ interface PDFViewerProps {
 
 const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSearchQuery }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const highlightCanvasRef = useRef<HTMLCanvasElement>(null);
   const [pdf, setPdf] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -34,7 +33,6 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const [showSearch, setShowSearch] = useState(false);
-  const [pageRendered, setPageRendered] = useState(false);
 
   const {
     searchQuery,
@@ -91,7 +89,6 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
 
       try {
         console.log('PDFViewer: Rendering page', currentPage);
-        setPageRendered(false);
         
         const page = await pdf.getPage(currentPage);
         const viewport = page.getViewport({ scale });
@@ -103,24 +100,12 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
-        // Clear highlight canvas
-        if (highlightCanvasRef.current) {
-          const highlightCanvas = highlightCanvasRef.current;
-          highlightCanvas.height = viewport.height;
-          highlightCanvas.width = viewport.width;
-          const highlightContext = highlightCanvas.getContext('2d');
-          if (highlightContext) {
-            highlightContext.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height);
-          }
-        }
-
         const renderContext = {
           canvasContext: context,
           viewport: viewport,
         };
 
         await page.render(renderContext).promise;
-        setPageRendered(true);
         console.log('PDFViewer: Page rendered successfully');
       } catch (err) {
         console.error('PDFViewer: Error rendering page:', err);
@@ -130,50 +115,6 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
 
     renderPage();
   }, [pdf, currentPage, scale]);
-
-  // Render search highlights after page is rendered
-  const renderSearchHighlights = useCallback(async () => {
-    if (!pdf || !highlightCanvasRef.current || !pageRendered || matches.length === 0) return;
-
-    try {
-      const page = await pdf.getPage(currentPage);
-      const viewport = page.getViewport({ scale });
-      const highlightCanvas = highlightCanvasRef.current;
-      const highlightContext = highlightCanvas.getContext('2d');
-      
-      if (!highlightContext) return;
-
-      highlightContext.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height);
-
-      const currentPageMatches = matches.filter(match => match.pageNumber === currentPage);
-      
-      currentPageMatches.forEach((match) => {
-        const isCurrentMatch = matches.indexOf(match) === currentMatchIndex;
-        
-        const [x, y] = viewport.convertToViewportPoint(match.x, match.y);
-        const width = match.width * scale;
-        const height = match.height * scale;
-
-        highlightContext.fillStyle = isCurrentMatch ? 'rgba(255, 165, 0, 0.4)' : 'rgba(255, 255, 0, 0.3)';
-        highlightContext.fillRect(x, viewport.height - y - height, width, height);
-        
-        if (isCurrentMatch) {
-          highlightContext.strokeStyle = 'orange';
-          highlightContext.lineWidth = 2;
-          highlightContext.strokeRect(x, viewport.height - y - height, width, height);
-        }
-      });
-    } catch (error) {
-      console.error('Error rendering highlights:', error);
-    }
-  }, [pdf, currentPage, scale, pageRendered, matches, currentMatchIndex]);
-
-  // Render highlights when dependencies change
-  useEffect(() => {
-    if (pageRendered) {
-      renderSearchHighlights();
-    }
-  }, [renderSearchHighlights, pageRendered]);
 
   // Auto-navigate to current match page
   useEffect(() => {
@@ -374,11 +315,6 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
             <canvas
               ref={canvasRef}
               className="border shadow-lg bg-white"
-              style={{ maxWidth: '100%', height: 'auto' }}
-            />
-            <canvas
-              ref={highlightCanvasRef}
-              className="absolute top-0 left-0 pointer-events-none"
               style={{ maxWidth: '100%', height: 'auto' }}
             />
           </div>
