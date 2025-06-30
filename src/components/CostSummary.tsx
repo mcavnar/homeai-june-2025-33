@@ -56,7 +56,7 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costSummary, issues = [] }) =
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-green-700">
           <DollarSign className="h-5 w-5" />
-          Estimated Repair Costs
+          Number of Issues and Their Estimated Repair Costs
         </CardTitle>
       </CardHeader>
       <CardContent>
