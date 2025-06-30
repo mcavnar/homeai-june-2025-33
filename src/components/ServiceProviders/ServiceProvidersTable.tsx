@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -6,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ChevronDown, ChevronUp, Star } from 'lucide-react';
+import { ChevronDown, ChevronUp, Star, Plus } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -43,7 +44,13 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Service Provider Overview</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-2xl font-bold">Service Provider Overview</CardTitle>
+          <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Service Provider
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <Table>
