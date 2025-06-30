@@ -164,21 +164,21 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             </div>
           </div>
           
-          {/* Main Metric Section - Increased Height from h-40 to h-48 with Chart Buffer */}
+          {/* Main Metric Section - Increased Height from h-40 to h-48 with Short Chart */}
           <div className="px-4 sm:px-6 pb-4 h-48 flex flex-col justify-center items-center">
             <div className="text-4xl font-bold text-gray-900 mb-2">
               {totalIssues}
             </div>
             <div className="text-sm text-gray-600 mb-2">Total issues</div>
             
-            {/* Bar Chart - Proper Height for Visibility with Buffer */}
+            {/* Bar Chart - Compact Height to Prevent Overflow */}
             {chartData.length > 0 && (
-              <div className="h-16 w-full mb-2">
+              <div className="h-8 w-full">
                 <ChartContainer config={chartConfig}>
-                  <BarChart data={chartData} margin={{ top: 2, right: 5, left: 5, bottom: 12 }}>
+                  <BarChart data={chartData} margin={{ top: 1, right: 5, left: 5, bottom: 6 }}>
                     <XAxis 
                       dataKey="priority" 
-                      tick={{ fontSize: 9 }}
+                      tick={{ fontSize: 8 }}
                       axisLine={false}
                       tickLine={false}
                     />
