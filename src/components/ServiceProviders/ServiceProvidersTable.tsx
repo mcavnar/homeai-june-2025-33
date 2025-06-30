@@ -31,8 +31,6 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
               <TableHead className="text-left font-semibold text-gray-900">Service Type</TableHead>
               <TableHead className="text-left font-semibold text-gray-900">Company</TableHead>
               <TableHead className="text-left font-semibold text-gray-900">Frequency</TableHead>
-              <TableHead className="text-right font-semibold text-gray-900">Monthly Cost</TableHead>
-              <TableHead className="text-right font-semibold text-gray-900">Annual Cost</TableHead>
               <TableHead className="text-center font-semibold text-gray-900">Actions</TableHead>
             </TableRow>
           </TableHeader>

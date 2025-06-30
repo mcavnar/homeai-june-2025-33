@@ -103,20 +103,15 @@ const ServiceProviderRow: React.FC<ServiceProviderRowProps> = ({ provider }) => 
         <TableCell>
           <div className="flex items-center gap-2">
             <span className="text-gray-900">{provider.frequency}</span>
-            <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-blue-600 hover:text-blue-700">
-              <ChevronDown className="h-3 w-3" />
-            </Button>
+            <div className="text-sm text-gray-600">
+              <div className="font-semibold text-green-600">
+                {provider.monthlyCost > 0 ? `${formatCurrency(provider.monthlyCost)}/mo` : '-'}
+              </div>
+              <div className="font-semibold text-green-600">
+                {formatCurrency(provider.annualCost)}/yr
+              </div>
+            </div>
           </div>
-        </TableCell>
-        <TableCell className="text-right">
-          <span className="font-semibold text-green-600">
-            {provider.monthlyCost > 0 ? formatCurrency(provider.monthlyCost) : '-'}
-          </span>
-        </TableCell>
-        <TableCell className="text-right">
-          <span className="font-semibold text-green-600">
-            {formatCurrency(provider.annualCost)}
-          </span>
         </TableCell>
         <TableCell>
           <div className="flex justify-center gap-2">
@@ -140,7 +135,7 @@ const ServiceProviderRow: React.FC<ServiceProviderRowProps> = ({ provider }) => 
       
       <CollapsibleContent asChild>
         <TableRow>
-          <TableCell colSpan={6} className="bg-gray-50 border-t">
+          <TableCell colSpan={4} className="bg-gray-50 border-t">
             <div className="p-6 space-y-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Service Provider Information</h3>
               
