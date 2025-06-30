@@ -127,21 +127,6 @@ const ActionButtons: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* Helpful tip */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
-          <div className="flex items-start gap-3">
-            <div className="bg-blue-500 rounded-full p-1 mt-0.5">
-              <ArrowRight className="h-3 w-3 text-white" />
-            </div>
-            <div>
-              <p className="text-sm text-blue-800 font-medium">💡 Pro Tip</p>
-              <p className="text-sm text-blue-700 mt-1">
-                Following this sequence helps you make informed decisions. Understanding your systems and costs first gives you confidence when negotiating and sharing insights with others.
-              </p>
-            </div>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );
