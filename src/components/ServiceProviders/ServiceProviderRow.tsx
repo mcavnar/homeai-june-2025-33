@@ -1,17 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Phone, Star, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { formatCurrency } from '@/utils/formatters';
+import { useToast } from '@/hooks/use-toast';
 
 interface ServiceProvider {
   id: number;
@@ -31,6 +32,32 @@ interface ServiceProviderRowProps {
 }
 
 const ServiceProviderRow: React.FC<ServiceProviderRowProps> = ({ provider }) => {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    phoneNumber: provider.phone,
+    price: provider.monthlyCost > 0 ? provider.monthlyCost.toString() : '',
+    website: '',
+    email: '',
+    companyName: provider.company,
+    mainContact: '',
+    notes: ''
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSaveDetails = () => {
+    console.log('Saving provider details:', formData);
+    toast({
+      title: "Details Saved",
+      description: "Provider information has been updated successfully.",
+    });
+  };
+
   return (
     <TableRow className="hover:bg-gray-50">
       <TableCell>
@@ -79,35 +106,110 @@ const ServiceProviderRow: React.FC<ServiceProviderRowProps> = ({ provider }) => 
                 <ChevronDown className="h-3 w-3 ml-1" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64 bg-white border shadow-lg">
-              <DropdownMenuItem className="flex-col items-start p-3">
-                <div className="font-medium text-gray-900 mb-1">Contact Information</div>
-                <div className="text-sm text-gray-600">Phone: {provider.phone}</div>
-                <div className="text-sm text-gray-600">Distance: {provider.distance}</div>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="flex-col items-start p-3">
-                <div className="font-medium text-gray-900 mb-1">Service Details</div>
-                <div className="text-sm text-gray-600">Service Type: {provider.serviceType}</div>
-                <div className="text-sm text-gray-600">Frequency: {provider.frequency}</div>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="flex-col items-start p-3">
-                <div className="font-medium text-gray-900 mb-1">Pricing</div>
-                <div className="text-sm text-gray-600">
-                  Monthly: {provider.monthlyCost > 0 ? formatCurrency(provider.monthlyCost) : 'As needed'}
+            <DropdownMenuContent align="end" className="w-80 bg-white border shadow-lg z-50">
+              <div className="p-4 space-y-4">
+                <h3 className="font-semibold text-gray-900 mb-3">Provider Details</h3>
+                
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="companyName" className="text-sm font-medium text-gray-700">
+                      Company Name
+                    </Label>
+                    <Input
+                      id="companyName"
+                      value={formData.companyName}
+                      onChange={(e) => handleInputChange('companyName', e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="phoneNumber" className="text-sm font-medium text-gray-700">
+                      Phone Number
+                    </Label>
+                    <Input
+                      id="phoneNumber"
+                      value={formData.phoneNumber}
+                      onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="website" className="text-sm font-medium text-gray-700">
+                      Website
+                    </Label>
+                    <Input
+                      id="website"
+                      value={formData.website}
+                      onChange={(e) => handleInputChange('website', e.target.value)}
+                      placeholder="https://"
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="price" className="text-sm font-medium text-gray-700">
+                      Price
+                    </Label>
+                    <Input
+                      id="price"
+                      value={formData.price}
+                      onChange={(e) => handleInputChange('price', e.target.value)}
+                      placeholder="Enter price"
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="mainContact" className="text-sm font-medium text-gray-700">
+                      Main Contact
+                    </Label>
+                    <Input
+                      id="mainContact"
+                      value={formData.mainContact}
+                      onChange={(e) => handleInputChange('mainContact', e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="notes" className="text-sm font-medium text-gray-700">
+                      Notes
+                    </Label>
+                    <textarea
+                      id="notes"
+                      value={formData.notes}
+                      onChange={(e) => handleInputChange('notes', e.target.value)}
+                      className="mt-1 w-full min-h-[80px] px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                      placeholder="Add any additional notes..."
+                    />
+                  </div>
                 </div>
-                <div className="text-sm text-gray-600">Annual: {formatCurrency(provider.annualCost)}</div>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="flex-col items-start p-3">
-                <div className="font-medium text-gray-900 mb-1">Reviews</div>
-                <div className="flex items-center gap-1 text-sm text-gray-600">
-                  <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                  <span>{provider.rating} out of 5</span>
+
+                <div className="flex justify-end pt-3">
+                  <Button 
+                    onClick={handleSaveDetails}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    size="sm"
+                  >
+                    Save Details
+                  </Button>
                 </div>
-                <div className="text-sm text-gray-600">{provider.reviews} customer reviews</div>
-              </DropdownMenuItem>
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
