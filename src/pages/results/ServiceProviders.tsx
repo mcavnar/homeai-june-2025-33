@@ -1,10 +1,8 @@
-
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import CostSummaryCards from '@/components/ServiceProviders/CostSummaryCards';
 import ActionCards from '@/components/ServiceProviders/ActionCards';
 import ServiceProvidersTable from '@/components/ServiceProviders/ServiceProvidersTable';
-import FindMoreProvidersCard from '@/components/ServiceProviders/FindMoreProvidersCard';
 
 interface ServiceProvidersContextType {
   analysis: any;
@@ -87,13 +85,12 @@ const ServiceProviders = () => {
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Provider Overview</h1>
-        <p className="text-gray-600">Recommended service schedules and cost estimates for your property</p>
+        <p className="text-gray-600">We've analyzed your property and recommend the following service types. We've pre-populated the list with estimated costs for your area. You can add your own service providers or request information about existing providers from the seller.</p>
       </div>
 
       <CostSummaryCards costSummary={costSummary} />
       <ActionCards />
       <ServiceProvidersTable providers={serviceProviders} />
-      <FindMoreProvidersCard />
     </div>
   );
 };
