@@ -57,21 +57,29 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
       </div>
       <div className="text-sm text-gray-600 mb-3">Total issues</div>
       
-      {/* Custom Mini Bar Chart - Guaranteed to Fit */}
+      {/* Enhanced Bar Chart - Larger and More Interactive */}
       {chartData.length > 0 && (
-        <div className="flex gap-2 items-end justify-center w-full h-6">
+        <div className="flex gap-3 items-end justify-center w-full h-10">
           {chartData.map((item, index) => (
-            <div key={index} className="flex flex-col items-center gap-1">
+            <div 
+              key={index} 
+              className="flex flex-col items-center gap-1 group cursor-default"
+              title={`${item.priority} Priority: ${item.count} issue${item.count > 1 ? 's' : ''}`}
+            >
               <div 
-                className="rounded-t-sm min-h-[4px] transition-all hover:opacity-80" 
+                className="rounded-t-sm min-h-[6px] transition-all duration-200 hover:opacity-80 group-hover:shadow-sm" 
                 style={{ 
                   backgroundColor: item.color, 
-                  width: '16px',
-                  height: `${Math.max(4, (item.count / maxCount) * 16)}px`
+                  width: '20px',
+                  height: `${Math.max(6, (item.count / maxCount) * 32)}px`
                 }}
-                title={`${item.priority}: ${item.count}`}
               />
-              <span className="text-[7px] text-gray-500 font-medium">{item.priority}</span>
+              <span className="text-[8px] text-gray-500 font-medium group-hover:text-gray-700 transition-colors">
+                {item.priority}
+              </span>
+              <span className="text-[7px] text-gray-400 font-semibold group-hover:text-gray-600 transition-colors">
+                {item.count}
+              </span>
             </div>
           ))}
         </div>

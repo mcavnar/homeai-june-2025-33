@@ -27,8 +27,8 @@ const MetricCard: React.FC<MetricCardProps> = ({
           </div>
         </div>
         
-        {/* Main Metric Section - Reduced Padding */}
-        <div className="px-4 sm:px-6 pb-2 h-48 flex flex-col justify-center items-center">
+        {/* Main Metric Section - Reduced Height */}
+        <div className="px-4 sm:px-6 pb-2 h-36 flex flex-col justify-center items-center">
           {children}
         </div>
         
