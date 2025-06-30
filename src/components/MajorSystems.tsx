@@ -287,9 +287,9 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
         </div>
       )}
 
-      {/* Foundation system - always underneath */}
+      {/* Foundation system - same width as other boxes */}
       {foundationSystem && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {renderSystemCard('foundation', foundationSystem)}
         </div>
       )}
