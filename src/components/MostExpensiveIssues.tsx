@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -69,8 +70,8 @@ const MostExpensiveIssues: React.FC<MostExpensiveIssuesProps> = ({ issues }) => 
           </div>
           <Button 
             onClick={handleCompleteListClick}
-            variant="outline"
             size="sm"
+            className="bg-green-400 hover:bg-green-500 text-white border-2 border-green-500 hover:border-green-600 shadow-md hover:shadow-lg transition-all duration-200 font-semibold"
           >
             Complete Issues List
           </Button>
