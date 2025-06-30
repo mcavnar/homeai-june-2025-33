@@ -21,7 +21,7 @@ const CostSummaryCards: React.FC<CostSummaryCardsProps> = ({ costSummary }) => {
             <Calendar className="h-8 w-8 text-blue-100" />
           </div>
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-blue-100">Monthly Average</h3>
+            <h3 className="text-lg font-semibold text-blue-100">Estimated Monthly Average</h3>
             <p className="text-3xl font-bold">{formatCurrency(costSummary.monthlyAverage)}</p>
             <p className="text-sm text-blue-100">Based on scheduled services only</p>
           </div>
@@ -34,7 +34,7 @@ const CostSummaryCards: React.FC<CostSummaryCardsProps> = ({ costSummary }) => {
             <Calculator className="h-8 w-8 text-purple-100" />
           </div>
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-purple-100">Annual Total</h3>
+            <h3 className="text-lg font-semibold text-purple-100">Estimated Annual Total</h3>
             <p className="text-3xl font-bold">{formatCurrency(costSummary.annualTotal)}</p>
             <p className="text-sm text-purple-100">Excludes as-needed services</p>
           </div>
