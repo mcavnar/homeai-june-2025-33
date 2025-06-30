@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { ChevronDown, ChevronUp, Star, Plus } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { formatCurrency } from '@/utils/formatters';
 
 interface ServiceProvider {
@@ -19,17 +20,60 @@ interface ServiceProvider {
   rating: number;
   monthlyCost: number;
   annualCost: number;
+  contact?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  notes?: string;
 }
 
 interface ServiceProvidersTableProps {
   providers: ServiceProvider[];
 }
 
-const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers }) => {
+const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers: initialProviders }) => {
+  const [providers, setProviders] = useState<ServiceProvider[]>(initialProviders);
   const [openDetails, setOpenDetails] = useState<number | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newProvider, setNewProvider] = useState({
+    serviceType: '',
+    company: '',
+    frequency: '',
+    rating: 0,
+    monthlyCost: 0,
+    annualCost: 0,
+    contact: '',
+    phone: '',
+    email: '',
+    website: '',
+    notes: ''
+  });
 
   const toggleDetails = (providerId: number) => {
     setOpenDetails(openDetails === providerId ? null : providerId);
+  };
+
+  const handleAddProvider = () => {
+    const newId = Math.max(...providers.map(p => p.id)) + 1;
+    const providerToAdd: ServiceProvider = {
+      ...newProvider,
+      id: newId
+    };
+    setProviders([...providers, providerToAdd]);
+    setNewProvider({
+      serviceType: '',
+      company: '',
+      frequency: '',
+      rating: 0,
+      monthlyCost: 0,
+      annualCost: 0,
+      contact: '',
+      phone: '',
+      email: '',
+      website: '',
+      notes: ''
+    });
+    setIsAddModalOpen(false);
   };
 
   const renderRating = (rating: number) => {
@@ -46,10 +90,153 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl font-bold">Service Provider Overview</CardTitle>
-          <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Service Provider
-          </Button>
+          <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Service Provider
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Add New Service Provider</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="new-service-type">Service Type</Label>
+                    <Input 
+                      id="new-service-type" 
+                      value={newProvider.serviceType}
+                      onChange={(e) => setNewProvider({...newProvider, serviceType: e.target.value})}
+                      placeholder="e.g., Lawn Care, Plumbing"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="new-company">Company Name</Label>
+                    <Input 
+                      id="new-company" 
+                      value={newProvider.company}
+                      onChange={(e) => setNewProvider({...newProvider, company: e.target.value})}
+                      placeholder="Company name"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="new-frequency">Frequency</Label>
+                    <Input 
+                      id="new-frequency" 
+                      value={newProvider.frequency}
+                      onChange={(e) => setNewProvider({...newProvider, frequency: e.target.value})}
+                      placeholder="e.g., Weekly, Monthly, As-needed"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="new-rating">Rating</Label>
+                    <Input 
+                      id="new-rating" 
+                      type="number" 
+                      min="0" 
+                      max="5" 
+                      step="0.1"
+                      value={newProvider.rating}
+                      onChange={(e) => setNewProvider({...newProvider, rating: parseFloat(e.target.value) || 0})}
+                      placeholder="0.0 - 5.0"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="new-monthly-cost">Monthly Cost</Label>
+                    <Input 
+                      id="new-monthly-cost" 
+                      type="number" 
+                      min="0"
+                      value={newProvider.monthlyCost}
+                      onChange={(e) => setNewProvider({...newProvider, monthlyCost: parseFloat(e.target.value) || 0})}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="new-annual-cost">Annual Cost</Label>
+                    <Input 
+                      id="new-annual-cost" 
+                      type="number" 
+                      min="0"
+                      value={newProvider.annualCost}
+                      onChange={(e) => setNewProvider({...newProvider, annualCost: parseFloat(e.target.value) || 0})}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="new-contact">Main Contact</Label>
+                    <Input 
+                      id="new-contact" 
+                      value={newProvider.contact}
+                      onChange={(e) => setNewProvider({...newProvider, contact: e.target.value})}
+                      placeholder="Contact name"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="new-phone">Phone Number</Label>
+                    <Input 
+                      id="new-phone" 
+                      type="tel"
+                      value={newProvider.phone}
+                      onChange={(e) => setNewProvider({...newProvider, phone: e.target.value})}
+                      placeholder="(555) 123-4567"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="new-email">Email</Label>
+                    <Input 
+                      id="new-email" 
+                      type="email"
+                      value={newProvider.email}
+                      onChange={(e) => setNewProvider({...newProvider, email: e.target.value})}
+                      placeholder="contact@company.com"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="new-website">Website</Label>
+                    <Input 
+                      id="new-website" 
+                      type="url"
+                      value={newProvider.website}
+                      onChange={(e) => setNewProvider({...newProvider, website: e.target.value})}
+                      placeholder="https://company.com"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="new-notes">Notes</Label>
+                  <Textarea 
+                    id="new-notes"
+                    value={newProvider.notes}
+                    onChange={(e) => setNewProvider({...newProvider, notes: e.target.value})}
+                    placeholder="Additional notes about this service provider..."
+                    rows={3}
+                  />
+                </div>
+                
+                <div className="flex justify-end space-x-2 pt-4">
+                  <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleAddProvider}>
+                    Add Provider
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </CardHeader>
       <CardContent>
@@ -119,22 +306,22 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
                             
                             <div className="space-y-2">
                               <Label htmlFor={`contact-${provider.id}`}>Main Contact</Label>
-                              <Input id={`contact-${provider.id}`} placeholder="Contact name" />
+                              <Input id={`contact-${provider.id}`} defaultValue={provider.contact} placeholder="Contact name" />
                             </div>
                             
                             <div className="space-y-2">
                               <Label htmlFor={`phone-${provider.id}`}>Phone Number</Label>
-                              <Input id={`phone-${provider.id}`} type="tel" placeholder="(555) 123-4567" />
+                              <Input id={`phone-${provider.id}`} type="tel" defaultValue={provider.phone} placeholder="(555) 123-4567" />
                             </div>
                             
                             <div className="space-y-2">
                               <Label htmlFor={`email-${provider.id}`}>Email</Label>
-                              <Input id={`email-${provider.id}`} type="email" placeholder="contact@company.com" />
+                              <Input id={`email-${provider.id}`} type="email" defaultValue={provider.email} placeholder="contact@company.com" />
                             </div>
                             
                             <div className="space-y-2">
                               <Label htmlFor={`website-${provider.id}`}>Website</Label>
-                              <Input id={`website-${provider.id}`} type="url" placeholder="https://company.com" />
+                              <Input id={`website-${provider.id}`} type="url" defaultValue={provider.website} placeholder="https://company.com" />
                             </div>
                             
                             <div className="space-y-2">
@@ -152,6 +339,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
                             <Label htmlFor={`notes-${provider.id}`}>Notes</Label>
                             <Textarea 
                               id={`notes-${provider.id}`} 
+                              defaultValue={provider.notes}
                               placeholder="Additional notes about this service provider..."
                               rows={3}
                             />
