@@ -80,7 +80,7 @@ const ActionButtons: React.FC = () => {
             <div className="space-y-3">
               <Button 
                 onClick={handleSeeCompleteIssuesList}
-                variant="green"
+                variant="green-dark"
                 size="lg"
                 className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
               >
@@ -119,7 +119,7 @@ const ActionButtons: React.FC = () => {
             <div className="space-y-3">
               <Button 
                 onClick={handleGetNegotiationAdvice}
-                variant="green"
+                variant="green-dark"
                 size="lg"
                 className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
               >
