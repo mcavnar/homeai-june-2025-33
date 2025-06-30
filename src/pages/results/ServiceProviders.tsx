@@ -2,6 +2,7 @@
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import CostSummaryCards from '@/components/ServiceProviders/CostSummaryCards';
+import ServiceProvidersTable from '@/components/ServiceProviders/ServiceProvidersTable';
 import FindMoreProvidersCard from '@/components/ServiceProviders/FindMoreProvidersCard';
 
 interface ServiceProvidersContextType {
@@ -37,6 +38,50 @@ const ServiceProviders = () => {
 
   const costSummary = calculateCostSummary();
 
+  // Mock service providers data
+  const serviceProviders = [
+    {
+      id: 1,
+      serviceType: "Lawn Care",
+      company: "PerfectLawn Care",
+      frequency: "Weekly",
+      monthlyCost: 80,
+      annualCost: 4160,
+    },
+    {
+      id: 2,
+      serviceType: "House Cleaning",
+      company: "Spotless Home Cleaning",
+      frequency: "Bi-weekly",
+      monthlyCost: 125,
+      annualCost: 3250,
+    },
+    {
+      id: 3,
+      serviceType: "Plumbing",
+      company: "AquaFlow Plumbing",
+      frequency: "As-needed",
+      monthlyCost: 0,
+      annualCost: 1200,
+    },
+    {
+      id: 4,
+      serviceType: "HVAC",
+      company: "Climate Control Experts",
+      frequency: "Quarterly",
+      monthlyCost: 100,
+      annualCost: 1200,
+    },
+    {
+      id: 5,
+      serviceType: "Electrical",
+      company: "Elite Electrical Solutions",
+      frequency: "As-needed",
+      monthlyCost: 0,
+      annualCost: 800,
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
@@ -45,6 +90,7 @@ const ServiceProviders = () => {
       </div>
 
       <CostSummaryCards costSummary={costSummary} />
+      <ServiceProvidersTable providers={serviceProviders} />
       <FindMoreProvidersCard />
     </div>
   );
