@@ -55,7 +55,7 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
       <div className="text-4xl font-bold text-gray-900 mb-2">
         {totalIssues}
       </div>
-      <div className="text-sm text-gray-600 mb-2">Total issues</div>
+      <div className="text-sm text-gray-600 mb-3">Total issues</div>
       
       {/* Compact Bar Chart with Numbers on Bars */}
       {chartData.length > 0 && (
