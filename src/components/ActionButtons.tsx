@@ -2,7 +2,6 @@
 import React from 'react';
 import { Share, MessageSquare, DollarSign, Settings, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
@@ -39,17 +38,19 @@ const ActionButtons: React.FC = () => {
   };
 
   return (
-    <Card className="w-full border-2 border-green-100 bg-gradient-to-br from-green-50 to-emerald-50">
-      <CardHeader className="text-center pb-4">
-        <CardTitle className="flex items-center justify-center gap-2 text-2xl font-bold text-gray-900">
+    <div className="w-full">
+      {/* Header */}
+      <div className="text-center pb-4">
+        <h2 className="flex items-center justify-center gap-2 text-2xl font-bold text-gray-900">
           <ArrowRight className="h-6 w-6 text-green-500" />
           Your Next Steps
-        </CardTitle>
+        </h2>
         <p className="text-gray-700 mt-2 text-lg">
           Follow this recommended path to maximize the value of your inspection report
         </p>
-      </CardHeader>
-      <CardContent className="space-y-8">
+      </div>
+      
+      <div className="space-y-8">
         {/* Step 1: Understanding Foundation */}
         <div>
           <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
@@ -127,8 +128,8 @@ const ActionButtons: React.FC = () => {
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
