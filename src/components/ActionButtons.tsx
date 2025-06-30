@@ -50,11 +50,11 @@ const ActionButtons: React.FC = () => {
         </p>
       </CardHeader>
       <CardContent className="space-y-8">
-        {/* Step 1 & 2: Foundation Understanding */}
+        {/* Step 1: Understanding Foundation */}
         <div>
           <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
             <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">1</span>
-            Start Here: Understand Your Property
+            Start Here: Build Your Foundation Knowledge
           </h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-3">
@@ -68,7 +68,7 @@ const ActionButtons: React.FC = () => {
                 Learn About Key Systems
               </Button>
               <p className="text-sm text-gray-600 text-center leading-relaxed">
-                <strong>Recommended first step:</strong> Understand what major systems (HVAC, electrical, plumbing) mean for your home's condition and future maintenance
+                <strong>Start here:</strong> Understand what major systems (HVAC, electrical, plumbing) mean for your home's condition and safety
               </p>
             </div>
 
@@ -80,16 +80,16 @@ const ActionButtons: React.FC = () => {
                 className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
               >
                 <DollarSign className="h-5 w-5" />
-                Explore Repair Costs
+                Understand Property Service Costs
               </Button>
               <p className="text-sm text-gray-600 text-center leading-relaxed">
-                <strong>Next:</strong> Get detailed cost breakdowns and connect with qualified contractors to understand your investment needs
+                <strong>Then:</strong> Explore monthly service provider costs and connect with qualified contractors for ongoing maintenance
               </p>
             </div>
           </div>
         </div>
 
-        {/* Step 3 & 4: Action & Sharing */}
+        {/* Step 2: Action & Sharing */}
         <div>
           <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
             <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
