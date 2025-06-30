@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -86,29 +85,27 @@ const ServiceProviderRow: React.FC<ServiceProviderRowProps> = ({ provider }) => 
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <TableRow className="hover:bg-gray-50">
         <TableCell>
-          <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
-            {provider.serviceType}
-          </Badge>
-        </TableCell>
-        <TableCell>
-          <div>
-            <div className="font-medium text-gray-900">{provider.company}</div>
-            <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
-              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-              <span>{provider.rating}</span>
-              <span>({provider.reviews} reviews)</span>
-            </div>
-          </div>
-        </TableCell>
-        <TableCell>
-          <div className="flex items-center gap-2">
-            <span className="text-gray-900">{provider.frequency}</span>
-            <div className="text-sm text-gray-600">
-              <div className="font-semibold text-green-600">
-                {provider.monthlyCost > 0 ? `${formatCurrency(provider.monthlyCost)}/mo` : '-'}
+          <div className="space-y-2">
+            <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+              {provider.serviceType}
+            </Badge>
+            <div>
+              <div className="font-medium text-gray-900">{provider.company}</div>
+              <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
+                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                <span>{provider.rating}</span>
+                <span>({provider.reviews} reviews)</span>
               </div>
-              <div className="font-semibold text-green-600">
-                {formatCurrency(provider.annualCost)}/yr
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-900">{provider.frequency}</span>
+              <div className="text-sm text-gray-600">
+                <div className="font-semibold text-green-600">
+                  {provider.monthlyCost > 0 ? `${formatCurrency(provider.monthlyCost)}/mo` : '-'}
+                </div>
+                <div className="font-semibold text-green-600">
+                  {formatCurrency(provider.annualCost)}/yr
+                </div>
               </div>
             </div>
           </div>
@@ -135,7 +132,7 @@ const ServiceProviderRow: React.FC<ServiceProviderRowProps> = ({ provider }) => 
       
       <CollapsibleContent asChild>
         <TableRow>
-          <TableCell colSpan={4} className="bg-gray-50 border-t">
+          <TableCell colSpan={2} className="bg-gray-50 border-t">
             <div className="p-6 space-y-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Service Provider Information</h3>
               

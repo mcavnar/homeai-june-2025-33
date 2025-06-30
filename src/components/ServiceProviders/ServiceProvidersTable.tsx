@@ -29,9 +29,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
           <TableHeader>
             <TableRow>
               <TableHead className="text-left font-semibold text-gray-900">Service Type</TableHead>
-              <TableHead className="text-left font-semibold text-gray-900">Company</TableHead>
-              <TableHead className="text-left font-semibold text-gray-900">Frequency</TableHead>
-              <TableHead className="text-center font-semibold text-gray-900">Actions</TableHead>
+              <TableHead className="text-center font-semibold text-gray-900">Details</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
