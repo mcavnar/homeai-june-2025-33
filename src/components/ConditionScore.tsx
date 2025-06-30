@@ -44,7 +44,7 @@ const ConditionScore: React.FC<ConditionScoreProps> = ({ analysis, propertyData 
     <TooltipProvider>
       <Card className="border-indigo-200">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-indigo-700">
+          <CardTitle className="flex items-center gap-2 text-black">
             <TrendingUp className="h-5 w-5" />
             Property Condition Score
           </CardTitle>
