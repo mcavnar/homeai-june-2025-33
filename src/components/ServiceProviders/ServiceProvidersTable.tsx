@@ -7,9 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ChevronDown, ChevronUp, Star, Plus } from 'lucide-react';
+import { ChevronDown, ChevronUp, Star, Plus, Trash2 } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/utils/formatters';
 
 interface ServiceProvider {
@@ -48,6 +50,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
     website: '',
     notes: ''
   });
+  const { toast } = useToast();
 
   const toggleDetails = (providerId: number) => {
     setOpenDetails(openDetails === providerId ? null : providerId);
@@ -74,6 +77,20 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
       notes: ''
     });
     setIsAddModalOpen(false);
+    toast({
+      title: "Provider Added",
+      description: "Service provider has been successfully added.",
+    });
+  };
+
+  const handleDeleteProvider = (providerId: number) => {
+    const updatedProviders = providers.filter(provider => provider.id !== providerId);
+    setProviders(updatedProviders);
+    setOpenDetails(null);
+    toast({
+      title: "Provider Deleted",
+      description: "Service provider has been successfully removed.",
+    });
   };
 
   const renderRating = (rating: number) => {
@@ -345,13 +362,41 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
                             />
                           </div>
                           
-                          <div className="flex justify-end space-x-2 pt-4">
-                            <Button variant="outline" onClick={() => setOpenDetails(null)}>
-                              Cancel
-                            </Button>
-                            <Button>
-                              Save Changes
-                            </Button>
+                          <div className="flex justify-between pt-4">
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="destructive" className="bg-red-500 hover:bg-red-600">
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Service Provider</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete {provider.company}? This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction 
+                                    onClick={() => handleDeleteProvider(provider.id)}
+                                    className="bg-red-500 hover:bg-red-600"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                            
+                            <div className="flex space-x-2">
+                              <Button variant="outline" onClick={() => setOpenDetails(null)}>
+                                Cancel
+                              </Button>
+                              <Button>
+                                Save Changes
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </CollapsibleContent>
