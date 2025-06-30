@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -287,9 +288,9 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
         </div>
       )}
 
-      {/* Foundation system - same width as other boxes */}
+      {/* Foundation system - full page width */}
       {foundationSystem && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
           {renderSystemCard('foundation', foundationSystem)}
         </div>
       )}
