@@ -49,6 +49,7 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
       icon={TrendingUp}
       title="Condition Score"
       bulletPoints={bulletPoints}
+      bulletHeadline="Scoring Methodology"
     >
       <div className={`text-5xl font-bold ${getScoreColor(score)} mb-2`}>
         {score}

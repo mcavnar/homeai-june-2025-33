@@ -12,9 +12,9 @@ const RepairCostsCard: React.FC<RepairCostsCardProps> = ({
   totalRepairCost 
 }) => {
   const bulletPoints = [
-    'Labor and material estimates',
-    'Current market rates',
-    'Worst-case scenario costs'
+    'Labor and material estimates updated weekly for local markets',
+    'Current market rates drawn from a database of millions of contractor bids',
+    'Costs will vary by contractor but represent average prices in the property\'s area'
   ];
 
   return (
@@ -22,6 +22,7 @@ const RepairCostsCard: React.FC<RepairCostsCardProps> = ({
       icon={Wrench}
       title="Total Repair Costs"
       bulletPoints={bulletPoints}
+      bulletHeadline="Cost Factors Considered"
     >
       <div className="text-4xl font-bold text-red-600 mb-2">
         {formatCurrency(totalRepairCost)}
