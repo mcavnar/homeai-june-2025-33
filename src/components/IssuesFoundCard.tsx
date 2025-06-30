@@ -55,11 +55,11 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
       <div className="text-4xl font-bold text-gray-900 mb-2">
         {totalIssues}
       </div>
-      <div className="text-sm text-gray-600 mb-3">Total issues</div>
+      <div className="text-sm text-gray-600 mb-2">Total issues</div>
       
-      {/* Enhanced Bar Chart - Larger and More Interactive */}
+      {/* Compact Bar Chart with Numbers on Bars */}
       {chartData.length > 0 && (
-        <div className="flex gap-3 items-end justify-center w-full h-10">
+        <div className="flex gap-2 items-end justify-center w-full h-8">
           {chartData.map((item, index) => (
             <div 
               key={index} 
@@ -67,18 +67,19 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
               title={`${item.priority} Priority: ${item.count} issue${item.count > 1 ? 's' : ''}`}
             >
               <div 
-                className="rounded-t-sm min-h-[6px] transition-all duration-200 hover:opacity-80 group-hover:shadow-sm" 
+                className="rounded-t-sm min-h-[8px] transition-all duration-200 hover:opacity-80 group-hover:shadow-sm relative flex items-center justify-center" 
                 style={{ 
                   backgroundColor: item.color, 
-                  width: '20px',
-                  height: `${Math.max(6, (item.count / maxCount) * 32)}px`
+                  width: '32px',
+                  height: `${Math.max(8, (item.count / maxCount) * 24)}px`
                 }}
-              />
-              <span className="text-[8px] text-gray-500 font-medium group-hover:text-gray-700 transition-colors">
+              >
+                <span className="text-xs font-bold text-white drop-shadow-sm">
+                  {item.count}
+                </span>
+              </div>
+              <span className="text-xs text-gray-500 font-medium group-hover:text-gray-700 transition-colors">
                 {item.priority}
-              </span>
-              <span className="text-[7px] text-gray-400 font-semibold group-hover:text-gray-600 transition-colors">
-                {item.count}
               </span>
             </div>
           ))}
