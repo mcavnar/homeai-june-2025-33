@@ -38,7 +38,7 @@ const ActionButtons: React.FC = () => {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full py-8">
       {/* Header */}
       <div className="text-center pb-4">
         <h2 className="flex items-center justify-center gap-2 text-2xl font-bold text-gray-900">
