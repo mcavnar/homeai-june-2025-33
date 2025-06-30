@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -111,7 +110,17 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
   const formatProviderCost = (cost: number, isPlaceholder: boolean) => {
     if (cost === 0) return '-';
     const formattedCost = formatCurrency(cost);
-    return isPlaceholder ? `Est. ${formattedCost}` : formattedCost;
+    
+    if (isPlaceholder) {
+      return (
+        <span>
+          <span className="text-gray-500 font-normal">Est. </span>
+          <span className="text-gray-900 font-bold">{formattedCost}</span>
+        </span>
+      );
+    }
+    
+    return <span className="text-gray-900 font-bold">{formattedCost}</span>;
   };
 
   return (
@@ -121,7 +130,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
           <div>
             <CardTitle className="text-2xl font-bold">Service Provider Overview</CardTitle>
             <p className="text-gray-600 mt-2">
-              We've analyzed your property and recommend the following service types. We've pre-populated the list with our recommended providers from your area. You can use the Provider Request Form to have the seller fill out the details of the existing providers to assure continuity of care.
+              We've analyzed your property and recommend the following service types. We've pre-populated the list with estimated costs for your area. You can add your own service providers or request information about existing providers from the seller.
             </p>
           </div>
           <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
@@ -299,123 +308,127 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
                   <TableCell>
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-gray-900">{provider.company}</span>
-                      <Collapsible open={openDetails === provider.id} onOpenChange={() => toggleDetails(provider.id)}>
-                        <CollapsibleTrigger asChild>
-                          <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
-                            Details
-                            {openDetails === provider.id ? 
-                              <ChevronUp className="ml-1 h-4 w-4" /> : 
-                              <ChevronDown className="ml-1 h-4 w-4" />
-                            }
-                          </Button>
-                        </CollapsibleTrigger>
-                      </Collapsible>
+                      {!isPlaceholderProvider(provider) && (
+                        <Collapsible open={openDetails === provider.id} onOpenChange={() => toggleDetails(provider.id)}>
+                          <CollapsibleTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
+                              Details
+                              {openDetails === provider.id ? 
+                                <ChevronUp className="ml-1 h-4 w-4" /> : 
+                                <ChevronDown className="ml-1 h-4 w-4" />
+                              }
+                            </Button>
+                          </CollapsibleTrigger>
+                        </Collapsible>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell className="text-gray-700">{provider.frequency}</TableCell>
-                  <TableCell className="text-right font-semibold text-green-600">
+                  <TableCell className="text-right">
                     {formatProviderCost(provider.monthlyCost, isPlaceholderProvider(provider))}
                   </TableCell>
-                  <TableCell className="text-right font-semibold text-green-600">
+                  <TableCell className="text-right">
                     {formatProviderCost(provider.annualCost, isPlaceholderProvider(provider))}
                   </TableCell>
                 </TableRow>
                 
-                <TableRow>
-                  <TableCell colSpan={5} className="p-0">
-                    <Collapsible open={openDetails === provider.id}>
-                      <CollapsibleContent className="bg-gray-50 border-t">
-                        <div className="p-6 space-y-4">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-4">Provider Details</h3>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label htmlFor={`company-${provider.id}`}>Company Name</Label>
-                              <Input id={`company-${provider.id}`} defaultValue={provider.company} />
+                {!isPlaceholderProvider(provider) && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="p-0">
+                      <Collapsible open={openDetails === provider.id}>
+                        <CollapsibleContent className="bg-gray-50 border-t">
+                          <div className="p-6 space-y-4">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Provider Details</h3>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <Label htmlFor={`company-${provider.id}`}>Company Name</Label>
+                                <Input id={`company-${provider.id}`} defaultValue={provider.company} />
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <Label htmlFor={`contact-${provider.id}`}>Main Contact</Label>
+                                <Input id={`contact-${provider.id}`} defaultValue={provider.contact} placeholder="Contact name" />
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <Label htmlFor={`phone-${provider.id}`}>Phone Number</Label>
+                                <Input id={`phone-${provider.id}`} type="tel" defaultValue={provider.phone} placeholder="(555) 123-4567" />
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <Label htmlFor={`email-${provider.id}`}>Email</Label>
+                                <Input id={`email-${provider.id}`} type="email" defaultValue={provider.email} placeholder="contact@company.com" />
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <Label htmlFor={`website-${provider.id}`}>Website</Label>
+                                <Input id={`website-${provider.id}`} type="url" defaultValue={provider.website} placeholder="https://company.com" />
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <Label htmlFor={`monthly-cost-${provider.id}`}>Monthly Cost</Label>
+                                <Input 
+                                  id={`monthly-cost-${provider.id}`} 
+                                  type="number" 
+                                  defaultValue={provider.monthlyCost} 
+                                  placeholder="0.00" 
+                                />
+                              </div>
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor={`contact-${provider.id}`}>Main Contact</Label>
-                              <Input id={`contact-${provider.id}`} defaultValue={provider.contact} placeholder="Contact name" />
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <Label htmlFor={`phone-${provider.id}`}>Phone Number</Label>
-                              <Input id={`phone-${provider.id}`} type="tel" defaultValue={provider.phone} placeholder="(555) 123-4567" />
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <Label htmlFor={`email-${provider.id}`}>Email</Label>
-                              <Input id={`email-${provider.id}`} type="email" defaultValue={provider.email} placeholder="contact@company.com" />
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <Label htmlFor={`website-${provider.id}`}>Website</Label>
-                              <Input id={`website-${provider.id}`} type="url" defaultValue={provider.website} placeholder="https://company.com" />
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <Label htmlFor={`monthly-cost-${provider.id}`}>Monthly Cost</Label>
-                              <Input 
-                                id={`monthly-cost-${provider.id}`} 
-                                type="number" 
-                                defaultValue={provider.monthlyCost} 
-                                placeholder="0.00" 
+                              <Label htmlFor={`notes-${provider.id}`}>Notes</Label>
+                              <Textarea 
+                                id={`notes-${provider.id}`} 
+                                defaultValue={provider.notes}
+                                placeholder="Additional notes about this service provider..."
+                                rows={3}
                               />
                             </div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label htmlFor={`notes-${provider.id}`}>Notes</Label>
-                            <Textarea 
-                              id={`notes-${provider.id}`} 
-                              defaultValue={provider.notes}
-                              placeholder="Additional notes about this service provider..."
-                              rows={3}
-                            />
-                          </div>
-                          
-                          <div className="flex justify-between pt-4">
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="destructive" className="bg-red-500 hover:bg-red-600">
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  Delete
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Service Provider</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to delete {provider.company}? This action cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction 
-                                    onClick={() => handleDeleteProvider(provider.id)}
-                                    className="bg-red-500 hover:bg-red-600"
-                                  >
-                                    Delete
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
                             
-                            <div className="flex space-x-2">
-                              <Button variant="outline" onClick={() => setOpenDetails(null)}>
-                                Cancel
-                              </Button>
-                              <Button>
-                                Save Changes
-                              </Button>
+                            <div className="flex justify-between pt-4">
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="destructive" className="bg-red-500 hover:bg-red-600">
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Delete Service Provider</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to delete {provider.company}? This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction 
+                                      onClick={() => handleDeleteProvider(provider.id)}
+                                      className="bg-red-500 hover:bg-red-600"
+                                    >
+                                      Delete
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                              
+                              <div className="flex space-x-2">
+                                <Button variant="outline" onClick={() => setOpenDetails(null)}>
+                                  Cancel
+                                </Button>
+                                <Button>
+                                  Save Changes
+                                </Button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  </TableCell>
-                </TableRow>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </TableCell>
+                  </TableRow>
+                )}
               </React.Fragment>
             ))}
           </TableBody>
