@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { MapPin, Filter, Download, FileText, Search, ChevronDown, Share } from 'lucide-react';
+import { MapPin, Filter, Download, FileText, Search, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,22 +32,6 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  const handleShareAccess = () => {
-    const currentUrl = window.location.origin + '/results/issues';
-    navigator.clipboard.writeText(currentUrl).then(() => {
-      toast({
-        title: "Link copied!",
-        description: "Issues list page link has been copied to your clipboard.",
-      });
-    }).catch(() => {
-      toast({
-        title: "Failed to copy",
-        description: "Please copy the link manually from your browser.",
-        variant: "destructive",
-      });
-    });
-  };
 
   const filteredIssues = useMemo(() => {
     if (!issues || issues.length === 0) return [];
@@ -167,15 +151,6 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
             <CardTitle>Detailed Issues List</CardTitle>
             <CardDescription>All identified issues with location and estimated repair costs</CardDescription>
           </div>
-          <Button 
-            onClick={handleShareAccess}
-            variant="green"
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <Share className="h-4 w-4" />
-            Share
-          </Button>
         </div>
         
         {/* Collapsible Analysis Information */}
