@@ -109,7 +109,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
           <div>
             <CardTitle className="text-2xl font-bold">Service Provider Overview</CardTitle>
             <p className="text-gray-600 mt-2">
-              We've analyzed your property and recommend the following service types. We've pre-populated the list with our recommended providers from your area. You can remove these and add your own. You can also have the seller fill out the details of the existing provider to assure continuity of care by using the Provider Request Form.
+              We've analyzed your property and recommend the following service types. We've pre-populated the list with our recommended providers from your area. You can edit the list and have the seller fill out the details of the existing provider to assure continuity of care by using the Provider Request Form.
             </p>
           </div>
           <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
