@@ -3,8 +3,6 @@ import React from 'react';
 import { TrendingUp, AlertTriangle, Wrench } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { HomeInspectionAnalysis } from '@/types/inspection';
 import { RedfinPropertyData } from '@/types/redfin';
 import { calculateConditionScore } from '@/utils/conditionScore';
@@ -28,30 +26,26 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
     low: analysis.issues?.filter(issue => issue.priority === 'low').length || 0,
   };
 
-  // Prepare data for bar chart
+  // Prepare data for custom mini bars
   const chartData = [
     {
       priority: 'High',
       count: issueCounts.immediate + issueCounts.high,
-      fill: '#ef4444'
+      color: '#ef4444'
     },
     {
       priority: 'Medium',
       count: issueCounts.medium,
-      fill: '#eab308'
+      color: '#eab308'
     },
     {
       priority: 'Low',
       count: issueCounts.low,
-      fill: '#3b82f6'
+      color: '#3b82f6'
     }
   ].filter(item => item.count > 0);
 
-  const chartConfig = {
-    count: {
-      label: "Issues",
-    },
-  };
+  const maxCount = Math.max(...chartData.map(d => d.count), 1);
 
   const getRatingColor = (rating: string) => {
     switch (rating) {
@@ -164,36 +158,30 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             </div>
           </div>
           
-          {/* Main Metric Section - Increased Height from h-40 to h-48 with Short Chart */}
+          {/* Main Metric Section - Custom Mini Bar Chart */}
           <div className="px-4 sm:px-6 pb-4 h-48 flex flex-col justify-center items-center">
             <div className="text-4xl font-bold text-gray-900 mb-2">
               {totalIssues}
             </div>
-            <div className="text-sm text-gray-600 mb-2">Total issues</div>
+            <div className="text-sm text-gray-600 mb-3">Total issues</div>
             
-            {/* Bar Chart - Compact Height to Prevent Overflow */}
+            {/* Custom Mini Bar Chart - Guaranteed to Fit */}
             {chartData.length > 0 && (
-              <div className="h-8 w-full">
-                <ChartContainer config={chartConfig}>
-                  <BarChart data={chartData} margin={{ top: 1, right: 5, left: 5, bottom: 6 }}>
-                    <XAxis 
-                      dataKey="priority" 
-                      tick={{ fontSize: 8 }}
-                      axisLine={false}
-                      tickLine={false}
+              <div className="flex gap-2 items-end justify-center w-full h-6">
+                {chartData.map((item, index) => (
+                  <div key={index} className="flex flex-col items-center gap-1">
+                    <div 
+                      className="rounded-t-sm min-h-[4px] transition-all hover:opacity-80" 
+                      style={{ 
+                        backgroundColor: item.color, 
+                        width: '16px',
+                        height: `${Math.max(4, (item.count / maxCount) * 16)}px`
+                      }}
+                      title={`${item.priority}: ${item.count}`}
                     />
-                    <YAxis hide />
-                    <ChartTooltip 
-                      content={<ChartTooltipContent />}
-                      cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
-                    />
-                    <Bar 
-                      dataKey="count" 
-                      radius={[2, 2, 0, 0]}
-                      stroke="none"
-                    />
-                  </BarChart>
-                </ChartContainer>
+                    <span className="text-[7px] text-gray-500 font-medium">{item.priority}</span>
+                  </div>
+                ))}
               </div>
             )}
           </div>
