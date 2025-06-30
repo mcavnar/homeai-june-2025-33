@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import CostSummaryCards from '@/components/ServiceProviders/CostSummaryCards';
+import ActionCards from '@/components/ServiceProviders/ActionCards';
 import ServiceProvidersTable from '@/components/ServiceProviders/ServiceProvidersTable';
 import FindMoreProvidersCard from '@/components/ServiceProviders/FindMoreProvidersCard';
 
@@ -95,6 +95,7 @@ const ServiceProviders = () => {
       </div>
 
       <CostSummaryCards costSummary={costSummary} />
+      <ActionCards />
       <ServiceProvidersTable providers={serviceProviders} />
       <FindMoreProvidersCard />
     </div>
