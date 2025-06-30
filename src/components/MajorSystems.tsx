@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -28,23 +27,23 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
   const getConditionColor = (condition: string) => {
     const lowerCondition = condition.toLowerCase();
     if (lowerCondition.includes('good') || lowerCondition.includes('excellent')) {
-      return 'bg-green-500 text-white';
+      return 'bg-green-100 text-green-800 border-green-200';
     } else if (lowerCondition.includes('fair') || lowerCondition.includes('satisfactory')) {
-      return 'bg-yellow-500 text-white';
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
     } else if (lowerCondition.includes('poor') || lowerCondition.includes('immediate')) {
-      return 'bg-red-500 text-white';
+      return 'bg-red-100 text-red-800 border-red-200';
     }
-    return 'bg-gray-500 text-white';
+    return 'bg-gray-100 text-gray-800 border-gray-200';
   };
 
   const getUrgencyColor = (yearsLeft: string) => {
     const years = parseInt(yearsLeft);
     if (years <= 0) {
-      return 'bg-red-500 text-white';
+      return 'bg-red-100 text-red-800 border-red-200';
     } else if (years <= 3) {
-      return 'bg-orange-500 text-white';
+      return 'bg-orange-100 text-orange-800 border-orange-200';
     }
-    return 'bg-green-500 text-white';
+    return 'bg-green-100 text-green-800 border-green-200';
   };
 
   // Calculate total maintenance costs
@@ -74,9 +73,9 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
               {displayName || systemName.charAt(0).toUpperCase() + systemName.slice(1)}
             </CardTitle>
           </div>
-          <Badge className={`${getConditionColor(system.condition)} px-2 py-1 text-xs font-medium rounded`}>
+          <span className={`${getConditionColor(system.condition)} px-3 py-1 text-xs font-medium rounded-full border`}>
             {system.condition}
-          </Badge>
+          </span>
         </div>
       </CardHeader>
       
@@ -96,9 +95,9 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Years Left:</span>
-            <Badge className={`${getUrgencyColor(system.yearsLeft || '0')} px-2 py-1 text-xs font-medium rounded`}>
+            <span className={`${getUrgencyColor(system.yearsLeft || '0')} px-3 py-1 text-xs font-medium rounded-full border`}>
               {system.yearsLeft || '0'} years
-            </Badge>
+            </span>
           </div>
         </div>
 
