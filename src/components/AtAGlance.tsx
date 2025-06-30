@@ -78,12 +78,12 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
   };
 
   return (
-    <div className="grid md:grid-cols-3 gap-6">
+    <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
       {/* Condition Score Card */}
       <Card className="border-indigo-200">
         <CardContent className="p-0">
           {/* Header Section - Fixed Height */}
-          <div className="p-6 pb-4">
+          <div className="p-4 sm:p-6 pb-4">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-gray-600" />
               <h3 className="text-lg font-semibold text-gray-900">Condition Score</h3>
@@ -91,7 +91,7 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           </div>
           
           {/* Main Metric Section - Increased Height for Better Spacing */}
-          <div className="px-6 pb-4 h-40 flex flex-col justify-center items-center">
+          <div className="px-4 sm:px-6 pb-4 h-40 flex flex-col justify-center items-center">
             <div className={`text-5xl font-bold ${getScoreColor(conditionResult.score)} mb-2`}>
               {conditionResult.score}
             </div>
@@ -105,14 +105,14 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           </div>
           
           {/* Visual Separator */}
-          <div className="border-t border-gray-100 mx-6"></div>
+          <div className="border-t border-gray-100 mx-4 sm:mx-6"></div>
           
           {/* Context Bullets Section - Increased Top Padding */}
-          <div className="p-6 pt-6 h-24 flex items-start">
-            <ul className="text-xs text-gray-600 space-y-1 w-full">
-              <li>• Factors in repair costs vs. property value</li>
-              <li>• Compares to similar properties in area</li>
-              <li>• Considers age and maintenance history</li>
+          <div className="p-4 sm:p-6 pt-6 h-24 flex items-start">
+            <ul className="text-xs text-gray-600 space-y-1 w-full break-words">
+              <li>• Repair costs vs. property value</li>
+              <li>• Compares to similar area properties</li>
+              <li>• Age and maintenance history</li>
             </ul>
           </div>
         </CardContent>
@@ -122,7 +122,7 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
       <Card className="border-indigo-200">
         <CardContent className="p-0">
           {/* Header Section - Fixed Height */}
-          <div className="p-6 pb-4">
+          <div className="p-4 sm:p-6 pb-4">
             <div className="flex items-center gap-2">
               <Wrench className="h-5 w-5 text-gray-600" />
               <h3 className="text-lg font-semibold text-gray-900">Total Repair Costs</h3>
@@ -130,7 +130,7 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           </div>
           
           {/* Main Metric Section - Increased Height for Better Spacing */}
-          <div className="px-6 pb-4 h-40 flex flex-col justify-center items-center">
+          <div className="px-4 sm:px-6 pb-4 h-40 flex flex-col justify-center items-center">
             <div className="text-4xl font-bold text-red-600 mb-2">
               {formatCurrency(totalRepairCost)}
             </div>
@@ -140,14 +140,14 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           </div>
           
           {/* Visual Separator */}
-          <div className="border-t border-gray-100 mx-6"></div>
+          <div className="border-t border-gray-100 mx-4 sm:mx-6"></div>
           
           {/* Context Bullets Section - Increased Top Padding */}
-          <div className="p-6 pt-6 h-24 flex items-start">
-            <ul className="text-xs text-gray-600 space-y-1 w-full">
-              <li>• Includes labor and material estimates</li>
-              <li>• Based on current market rates</li>
-              <li>• Represents worst-case scenario costs</li>
+          <div className="p-4 sm:p-6 pt-6 h-24 flex items-start">
+            <ul className="text-xs text-gray-600 space-y-1 w-full break-words">
+              <li>• Labor and material estimates</li>
+              <li>• Current market rates</li>
+              <li>• Worst-case scenario costs</li>
             </ul>
           </div>
         </CardContent>
@@ -157,7 +157,7 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
       <Card className="border-indigo-200">
         <CardContent className="p-0">
           {/* Header Section - Fixed Height */}
-          <div className="p-6 pb-4">
+          <div className="p-4 sm:p-6 pb-4">
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-gray-600" />
               <h3 className="text-lg font-semibold text-gray-900">Issues Found</h3>
@@ -165,17 +165,17 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           </div>
           
           {/* Main Metric Section - Increased Height with Better Chart Sizing */}
-          <div className="px-6 pb-4 h-40 flex flex-col justify-center items-center">
+          <div className="px-4 sm:px-6 pb-4 h-40 flex flex-col justify-center items-center">
             <div className="text-4xl font-bold text-gray-900 mb-2">
               {totalIssues}
             </div>
             <div className="text-sm text-gray-600 mb-2">Total issues</div>
             
-            {/* Bar Chart - Reduced Height to Prevent Overflow */}
+            {/* Bar Chart - Proper Height for Visibility */}
             {chartData.length > 0 && (
-              <div className="h-8 w-full overflow-hidden">
+              <div className="h-16 w-full">
                 <ChartContainer config={chartConfig}>
-                  <BarChart data={chartData} margin={{ top: 0, right: 5, left: 5, bottom: 0 }}>
+                  <BarChart data={chartData} margin={{ top: 2, right: 5, left: 5, bottom: 12 }}>
                     <XAxis 
                       dataKey="priority" 
                       tick={{ fontSize: 9 }}
@@ -199,14 +199,14 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           </div>
           
           {/* Visual Separator */}
-          <div className="border-t border-gray-100 mx-6"></div>
+          <div className="border-t border-gray-100 mx-4 sm:mx-6"></div>
           
           {/* Context Bullets Section - Increased Top Padding */}
-          <div className="p-6 pt-6 h-24 flex items-start">
-            <ul className="text-xs text-gray-600 space-y-1 w-full">
-              <li>• High: Safety hazards & structural concerns</li>
-              <li>• Medium: Systems needing attention soon</li>
-              <li>• Low: Cosmetic & preventive maintenance</li>
+          <div className="p-4 sm:p-6 pt-6 h-24 flex items-start">
+            <ul className="text-xs text-gray-600 space-y-1 w-full break-words">
+              <li>• High: Safety & structural issues</li>
+              <li>• Medium: Systems needing attention</li>
+              <li>• Low: Cosmetic & maintenance</li>
             </ul>
           </div>
         </CardContent>
