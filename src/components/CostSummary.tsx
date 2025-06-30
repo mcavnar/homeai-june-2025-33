@@ -114,7 +114,7 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costSummary, issues = [] }) =
               </TableRow>
               <TableRow className="border-t-2 border-gray-200">
                 <TableCell>
-                  <span className="font-bold text-gray-900">Total Estimate</span>
+                  <span className="font-bold text-gray-900">Total</span>
                 </TableCell>
                 <TableCell className="text-center font-bold text-gray-900">
                   {highPriorityCount + mediumPriorityCount + lowPriorityCount}
