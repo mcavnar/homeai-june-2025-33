@@ -11,7 +11,7 @@ const ActionCards: React.FC = () => {
   return (
     <>
       <div className="grid grid-cols-1 gap-6 mb-8">
-        <Card className="bg-green-50 border-green-200">
+        <Card className="border-gray-200">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
               <div className="bg-green-500 rounded-lg p-3 flex-shrink-0">
