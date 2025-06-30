@@ -1,6 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown, ChevronUp, Home, Zap, Droplets, Wind, Building } from 'lucide-react';
 import { MajorSystems as MajorSystemsType } from '@/types/inspection';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -9,49 +13,96 @@ interface MajorSystemsProps {
 }
 
 const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
+  const [expandedSystems, setExpandedSystems] = useState<Record<string, boolean>>({});
+
+  const getSystemIcon = (systemName: string) => {
+    const iconProps = { className: "h-6 w-6" };
+    switch (systemName.toLowerCase()) {
+      case 'roof': return <Home {...iconProps} />;
+      case 'electrical': return <Zap {...iconProps} />;
+      case 'plumbing': return <Droplets {...iconProps} />;
+      case 'hvac': return <Wind {...iconProps} />;
+      case 'foundation': return <Building {...iconProps} />;
+      default: return <Home {...iconProps} />;
+    }
+  };
+
   const getConditionColor = (condition: string) => {
     const lowerCondition = condition.toLowerCase();
     if (lowerCondition.includes('good') || lowerCondition.includes('excellent')) {
-      return 'border-green-200 bg-green-50';
+      return 'bg-green-100 text-green-800 border-green-200';
     } else if (lowerCondition.includes('fair') || lowerCondition.includes('satisfactory')) {
-      return 'border-yellow-200 bg-yellow-50';
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
     } else if (lowerCondition.includes('poor') || lowerCondition.includes('immediate')) {
-      return 'border-red-200 bg-red-50';
+      return 'bg-red-100 text-red-800 border-red-200';
     }
-    return 'border-gray-200 bg-gray-50';
+    return 'bg-gray-100 text-gray-800 border-gray-200';
   };
 
-  const getConditionTextColor = (condition: string) => {
+  const getConditionCardBorder = (condition: string) => {
     const lowerCondition = condition.toLowerCase();
     if (lowerCondition.includes('good') || lowerCondition.includes('excellent')) {
-      return 'text-green-800 bg-green-100';
+      return 'border-l-green-500';
     } else if (lowerCondition.includes('fair') || lowerCondition.includes('satisfactory')) {
-      return 'text-yellow-800 bg-yellow-100';
+      return 'border-l-yellow-500';
     } else if (lowerCondition.includes('poor') || lowerCondition.includes('immediate')) {
-      return 'text-red-800 bg-red-100';
+      return 'border-l-red-500';
     }
-    return 'text-gray-800 bg-gray-100';
+    return 'border-l-gray-500';
   };
 
-  const getCostRangeColor = (min: number, max: number) => {
-    const avgCost = (min + max) / 2;
-    if (avgCost < 1000) {
-      return 'text-green-700 bg-green-50';
-    } else if (avgCost < 3000) {
-      return 'text-yellow-700 bg-yellow-50';
-    } else {
-      return 'text-red-700 bg-red-50';
+  const getCostSeverity = (cost: number) => {
+    if (cost < 1000) return 'low';
+    if (cost < 5000) return 'medium';
+    return 'high';
+  };
+
+  const getCostSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'low': return 'bg-green-500';
+      case 'medium': return 'bg-yellow-500';
+      case 'high': return 'bg-red-500';
+      default: return 'bg-gray-500';
     }
   };
 
-  const formatSummaryAsBullets = (summary: string) => {
-    // Split by common sentence endings and filter out empty strings
-    const sentences = summary
-      .split(/[.!?]+/)
-      .map(s => s.trim())
-      .filter(s => s.length > 0);
-    
-    return sentences;
+  const toggleExpanded = (systemName: string) => {
+    setExpandedSystems(prev => ({
+      ...prev,
+      [systemName]: !prev[systemName]
+    }));
+  };
+
+  const getMaintenanceProgressBar = (fiveYear: number, tenYear: number) => {
+    const maxCost = Math.max(fiveYear, tenYear, 5000);
+    const fiveYearPercent = (fiveYear / maxCost) * 100;
+    const tenYearPercent = (tenYear / maxCost) * 100;
+
+    return (
+      <div className="space-y-2">
+        <div className="flex justify-between text-xs text-gray-600">
+          <span>5-Year Cost</span>
+          <span>{formatCurrency(fiveYear)}</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div 
+            className={`h-2 rounded-full ${getCostSeverityColor(getCostSeverity(fiveYear))}`}
+            style={{ width: `${Math.min(fiveYearPercent, 100)}%` }}
+          />
+        </div>
+        
+        <div className="flex justify-between text-xs text-gray-600 mt-3">
+          <span>10-Year Cost</span>
+          <span>{formatCurrency(tenYear)}</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div 
+            className={`h-2 rounded-full ${getCostSeverityColor(getCostSeverity(tenYear))}`}
+            style={{ width: `${Math.min(tenYearPercent, 100)}%` }}
+          />
+        </div>
+      </div>
+    );
   };
 
   const systemEntries = Object.entries(systems).filter(([_, system]) => system);
@@ -63,127 +114,162 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Major Systems Assessment</h2>
-        <p className="text-gray-600">Detailed evaluation of your property's key systems with future cost projections</p>
+        <h2 className="text-3xl font-bold text-gray-900 mb-3">Major Systems Assessment</h2>
+        <p className="text-gray-600 text-lg">Quick overview of your property's key systems</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {systemEntries.map(([systemName, system]) => (
-          <Card key={systemName} className={`${getConditionColor(system.condition)} border-2`}>
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <CardTitle className="text-lg font-semibold text-gray-900 capitalize">
-                  {systemName}
-                </CardTitle>
-                <span className={`text-xs font-medium px-3 py-1 rounded-full ${getConditionTextColor(system.condition)}`}>
+          <Card key={systemName} className={`border-l-4 ${getConditionCardBorder(system.condition)} hover:shadow-lg transition-all duration-200`}>
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {getSystemIcon(systemName)}
+                  <div>
+                    <CardTitle className="text-xl font-bold text-gray-900 capitalize">
+                      {systemName}
+                    </CardTitle>
+                    <div className="flex items-center gap-2 mt-1">
+                      {system.age && (
+                        <Badge variant="outline" className="text-xs">
+                          {system.age}
+                        </Badge>
+                      )}
+                      {system.yearsLeft && (
+                        <Badge variant="outline" className="text-xs">
+                          {system.yearsLeft} left
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <Badge className={`${getConditionColor(system.condition)} font-semibold px-3 py-1`}>
                   {system.condition}
-                </span>
+                </Badge>
               </div>
             </CardHeader>
             
             <CardContent className="space-y-4">
-              {/* Summary as bullets */}
-              <div className="space-y-2">
-                {formatSummaryAsBullets(system.summary).map((point, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <span className="text-gray-500 mt-1.5 text-xs">•</span>
-                    <p className="text-gray-700 text-sm leading-relaxed">{point}</p>
-                  </div>
-                ))}
+              {/* Quick Status */}
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-sm text-gray-700 font-medium">
+                  {system.summary.split('.')[0]}.
+                </p>
               </div>
-              
-              {/* System Details */}
-              {(system.brand || system.type || system.age || system.yearsLeft) && (
-                <div className="space-y-2">
-                  <h4 className="font-medium text-gray-900 text-sm">System Details</h4>
-                  <div className="space-y-1 text-sm">
-                    {system.brand && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Brand:</span>
-                        <span className="text-gray-900 font-medium">{system.brand}</span>
-                      </div>
-                    )}
-                    {system.type && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Type:</span>
-                        <span className="text-gray-900 font-medium">{system.type}</span>
-                      </div>
-                    )}
-                    {system.age && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Age:</span>
-                        <span className="text-gray-900 font-medium">{system.age}</span>
-                      </div>
-                    )}
-                    {system.yearsLeft && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Est. Years Left:</span>
-                        <span className="text-gray-900 font-medium">{system.yearsLeft}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-              
-              {/* Replacement Cost */}
+
+              {/* Replacement Cost - Prominent Display */}
               {system.replacementCost && (
-                <div className="pt-3 border-t border-gray-200">
-                  <h4 className="font-medium text-gray-900 text-sm mb-2">Replacement Cost</h4>
+                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                  <h4 className="text-sm font-semibold text-blue-900 mb-2">Replacement Cost</h4>
                   <div className="text-center">
-                    <span className="text-lg font-bold text-gray-900">
+                    <span className="text-2xl font-bold text-blue-900">
                       {formatCurrency(system.replacementCost.min)} - {formatCurrency(system.replacementCost.max)}
                     </span>
                   </div>
                 </div>
               )}
 
-              {/* Future Service Costs */}
+              {/* Maintenance Timeline */}
               {system.maintenanceCosts && (
-                <div className="pt-3 border-t border-gray-200">
-                  <h4 className="font-medium text-gray-900 text-sm mb-3">Future Service Costs</h4>
-                  <div className="space-y-3">
-                    {/* 5-Year Costs */}
-                    <div className={`p-3 rounded-lg border ${getCostRangeColor(system.maintenanceCosts.fiveYear.min, system.maintenanceCosts.fiveYear.max)}`}>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium">Next 5 Years</span>
-                        <span className="text-sm font-semibold">
-                          {formatCurrency(system.maintenanceCosts.fiveYear.min)} - {formatCurrency(system.maintenanceCosts.fiveYear.max)}
-                        </span>
-                      </div>
-                      {system.anticipatedRepairs?.fiveYear && system.anticipatedRepairs.fiveYear.length > 0 && (
-                        <div className="space-y-1">
-                          {system.anticipatedRepairs.fiveYear.map((repair, index) => (
-                            <div key={index} className="flex items-start gap-1">
-                              <span className="text-xs mt-0.5">•</span>
-                              <span className="text-xs leading-tight">{repair}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* 10-Year Costs */}
-                    <div className={`p-3 rounded-lg border ${getCostRangeColor(system.maintenanceCosts.tenYear.min, system.maintenanceCosts.tenYear.max)}`}>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium">Next 10 Years</span>
-                        <span className="text-sm font-semibold">
-                          {formatCurrency(system.maintenanceCosts.tenYear.min)} - {formatCurrency(system.maintenanceCosts.tenYear.max)}
-                        </span>
-                      </div>
-                      {system.anticipatedRepairs?.tenYear && system.anticipatedRepairs.tenYear.length > 0 && (
-                        <div className="space-y-1">
-                          {system.anticipatedRepairs.tenYear.map((repair, index) => (
-                            <div key={index} className="flex items-start gap-1">
-                              <span className="text-xs mt-0.5">•</span>
-                              <span className="text-xs leading-tight">{repair}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                <div className="space-y-3">
+                  <h4 className="text-sm font-semibold text-gray-900">Maintenance Timeline</h4>
+                  {getMaintenanceProgressBar(
+                    (system.maintenanceCosts.fiveYear.min + system.maintenanceCosts.fiveYear.max) / 2,
+                    (system.maintenanceCosts.tenYear.min + system.maintenanceCosts.tenYear.max) / 2
+                  )}
                 </div>
               )}
+
+              {/* Expandable Details */}
+              <Collapsible 
+                open={expandedSystems[systemName]} 
+                onOpenChange={() => toggleExpanded(systemName)}
+              >
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" className="w-full justify-between p-2 h-auto">
+                    <span className="text-sm font-medium">View Details</span>
+                    {expandedSystems[systemName] ? 
+                      <ChevronUp className="h-4 w-4" /> : 
+                      <ChevronDown className="h-4 w-4" />
+                    }
+                  </Button>
+                </CollapsibleTrigger>
+                
+                <CollapsibleContent className="space-y-4 pt-3">
+                  {/* Full Summary */}
+                  <div className="text-sm text-gray-700 leading-relaxed">
+                    {system.summary}
+                  </div>
+
+                  {/* System Details */}
+                  {(system.brand || system.type) && (
+                    <div className="bg-gray-50 rounded-lg p-3 space-y-2">
+                      <h5 className="font-medium text-gray-900 text-sm">System Details</h5>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        {system.brand && (
+                          <div>
+                            <span className="text-gray-600">Brand:</span>
+                            <span className="ml-2 font-medium">{system.brand}</span>
+                          </div>
+                        )}
+                        {system.type && (
+                          <div>
+                            <span className="text-gray-600">Type:</span>
+                            <span className="ml-2 font-medium">{system.type}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Detailed Maintenance Costs */}
+                  {system.maintenanceCosts && (
+                    <div className="space-y-3">
+                      <h5 className="font-medium text-gray-900 text-sm">Detailed Maintenance Costs</h5>
+                      
+                      <div className="space-y-3">
+                        <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-200">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium text-yellow-900">Next 5 Years</span>
+                            <span className="text-sm font-semibold text-yellow-900">
+                              {formatCurrency(system.maintenanceCosts.fiveYear.min)} - {formatCurrency(system.maintenanceCosts.fiveYear.max)}
+                            </span>
+                          </div>
+                          {system.anticipatedRepairs?.fiveYear && system.anticipatedRepairs.fiveYear.length > 0 && (
+                            <ul className="text-xs text-yellow-800 space-y-1">
+                              {system.anticipatedRepairs.fiveYear.map((repair, index) => (
+                                <li key={index} className="flex items-start gap-2">
+                                  <span className="mt-1">•</span>
+                                  <span>{repair}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+
+                        <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium text-orange-900">Next 10 Years</span>
+                            <span className="text-sm font-semibold text-orange-900">
+                              {formatCurrency(system.maintenanceCosts.tenYear.min)} - {formatCurrency(system.maintenanceCosts.tenYear.max)}
+                            </span>
+                          </div>
+                          {system.anticipatedRepairs?.tenYear && system.anticipatedRepairs.tenYear.length > 0 && (
+                            <ul className="text-xs text-orange-800 space-y-1">
+                              {system.anticipatedRepairs.tenYear.map((repair, index) => (
+                                <li key={index} className="flex items-start gap-2">
+                                  <span className="mt-1">•</span>
+                                  <span>{repair}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CollapsibleContent>
+              </Collapsible>
             </CardContent>
           </Card>
         ))}
