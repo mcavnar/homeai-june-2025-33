@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface SearchMatch {
@@ -33,7 +32,7 @@ export const usePDFSearch = (pdf: any) => {
     const extractAllText = async () => {
       console.log('Starting text extraction for search...');
       textExtractionRef.current = true;
-      const textContentMap = new Map<PageTextContent>();
+      const textContentMap = new Map<number, PageTextContent>();
       
       try {
         for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
@@ -61,7 +60,7 @@ export const usePDFSearch = (pdf: any) => {
     };
 
     extractAllText();
-  }, [pdf?.numPages]); // Only depend on numPages to avoid loops
+  }, [pdf?.numPages]);
 
   // Debounced search function
   const performSearch = useCallback(async (query: string) => {
