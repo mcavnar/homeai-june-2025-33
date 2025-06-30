@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Share, MessageSquare, DollarSign } from 'lucide-react';
+import { Share, MessageSquare, DollarSign, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -29,12 +29,16 @@ const ActionButtons: React.FC = () => {
     navigate('/results/providers');
   };
 
+  const handleUnderstandKeySystems = () => {
+    navigate('/results/systems');
+  };
+
   const handleGetNegotiationAdvice = () => {
     navigate('/results/negotiation');
   };
 
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-4 gap-4">
       <Button 
         onClick={handleShareAccess}
         variant="green"
@@ -52,6 +56,15 @@ const ActionButtons: React.FC = () => {
       >
         <DollarSign className="h-5 w-5" />
         See Service Costs
+      </Button>
+      <Button 
+        onClick={handleUnderstandKeySystems}
+        variant="green"
+        size="lg"
+        className="flex items-center gap-2 px-6 py-3"
+      >
+        <Settings className="h-5 w-5" />
+        Understand Key Systems
       </Button>
       <Button 
         onClick={handleGetNegotiationAdvice}
