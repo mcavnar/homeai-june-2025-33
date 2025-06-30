@@ -6,7 +6,7 @@ import ConditionScore from '@/components/ConditionScore';
 import CostSummary from '@/components/CostSummary';
 import ActionButtons from '@/components/ActionButtons';
 import MostExpensiveIssues from '@/components/MostExpensiveIssues';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Loader2 } from 'lucide-react';
 
@@ -53,10 +53,15 @@ const Synopsis = () => {
         </div>
       </div>
 
-      {/* Centered Action Buttons */}
-      <div className="flex justify-center">
-        <ActionButtons />
-      </div>
+      {/* Next Steps Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Next Steps</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ActionButtons />
+        </CardContent>
+      </Card>
 
       {/* Most Expensive Issues Section */}
       {analysis.issues && analysis.issues.length > 0 && (
