@@ -84,8 +84,8 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             </div>
           </div>
           
-          {/* Main Metric Section - Increased Height from h-40 to h-48 */}
-          <div className="px-4 sm:px-6 pb-4 h-48 flex flex-col justify-center items-center">
+          {/* Main Metric Section - Reduced Padding */}
+          <div className="px-4 sm:px-6 pb-2 h-48 flex flex-col justify-center items-center">
             <div className={`text-5xl font-bold ${getScoreColor(conditionResult.score)} mb-2`}>
               {conditionResult.score}
             </div>
@@ -101,9 +101,9 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           {/* Visual Separator */}
           <div className="border-t border-gray-100 mx-4 sm:mx-6"></div>
           
-          {/* Context Bullets Section */}
-          <div className="p-4 sm:p-6 pt-6 h-24 flex items-start">
-            <ul className="text-xs text-gray-600 space-y-1 w-full break-words">
+          {/* Context Bullets Section - Responsive and Overflow Protected */}
+          <div className="p-3 sm:p-6 pt-6 min-h-24 flex items-start overflow-hidden">
+            <ul className="text-[10px] sm:text-xs text-gray-600 space-y-1 w-full break-words leading-tight">
               <li>• Repair costs vs. property value</li>
               <li>• Compares to similar area properties</li>
               <li>• Age and maintenance history</li>
@@ -123,8 +123,8 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             </div>
           </div>
           
-          {/* Main Metric Section - Increased Height from h-40 to h-48 */}
-          <div className="px-4 sm:px-6 pb-4 h-48 flex flex-col justify-center items-center">
+          {/* Main Metric Section - Reduced Padding */}
+          <div className="px-4 sm:px-6 pb-2 h-48 flex flex-col justify-center items-center">
             <div className="text-4xl font-bold text-red-600 mb-2">
               {formatCurrency(totalRepairCost)}
             </div>
@@ -136,9 +136,9 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           {/* Visual Separator */}
           <div className="border-t border-gray-100 mx-4 sm:mx-6"></div>
           
-          {/* Context Bullets Section */}
-          <div className="p-4 sm:p-6 pt-6 h-24 flex items-start">
-            <ul className="text-xs text-gray-600 space-y-1 w-full break-words">
+          {/* Context Bullets Section - Responsive and Overflow Protected */}
+          <div className="p-3 sm:p-6 pt-6 min-h-24 flex items-start overflow-hidden">
+            <ul className="text-[10px] sm:text-xs text-gray-600 space-y-1 w-full break-words leading-tight">
               <li>• Labor and material estimates</li>
               <li>• Current market rates</li>
               <li>• Worst-case scenario costs</li>
@@ -158,8 +158,8 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             </div>
           </div>
           
-          {/* Main Metric Section - Custom Mini Bar Chart */}
-          <div className="px-4 sm:px-6 pb-4 h-48 flex flex-col justify-center items-center">
+          {/* Main Metric Section - Custom Mini Bar Chart with Reduced Padding */}
+          <div className="px-4 sm:px-6 pb-2 h-48 flex flex-col justify-center items-center">
             <div className="text-4xl font-bold text-gray-900 mb-2">
               {totalIssues}
             </div>
@@ -189,9 +189,9 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           {/* Visual Separator */}
           <div className="border-t border-gray-100 mx-4 sm:mx-6"></div>
           
-          {/* Context Bullets Section */}
-          <div className="p-4 sm:p-6 pt-6 h-24 flex items-start">
-            <ul className="text-xs text-gray-600 space-y-1 w-full break-words">
+          {/* Context Bullets Section - Responsive and Overflow Protected */}
+          <div className="p-3 sm:p-6 pt-6 min-h-24 flex items-start overflow-hidden">
+            <ul className="text-[10px] sm:text-xs text-gray-600 space-y-1 w-full break-words leading-tight">
               <li>• High: Safety & structural issues</li>
               <li>• Medium: Systems needing attention</li>
               <li>• Low: Cosmetic & maintenance</li>
