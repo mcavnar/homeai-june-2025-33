@@ -11,7 +11,7 @@ const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ summary }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-blue-700">
+        <CardTitle className="flex items-center gap-2 text-black">
           <CheckCircle className="h-5 w-5" />
           Overall Assessment
         </CardTitle>
