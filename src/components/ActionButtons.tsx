@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Share, MessageSquare, DollarSign, Settings, ArrowRight } from 'lucide-react';
+import { Share, MessageSquare, DollarSign, Settings, ArrowRight, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -37,6 +37,10 @@ const ActionButtons: React.FC = () => {
     navigate('/results/negotiation');
   };
 
+  const handleSeeCompleteIssuesList = () => {
+    navigate('/results/issues');
+  };
+
   return (
     <div className="w-full py-8">
       {/* Header */}
@@ -51,11 +55,11 @@ const ActionButtons: React.FC = () => {
       </div>
       
       <div className="space-y-8">
-        {/* Step 1: Understanding Foundation */}
+        {/* Step 1: Understanding Property Condition */}
         <div>
           <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
             <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">1</span>
-            Start Here: Build Your Foundation Knowledge
+            Start Here: Understand Your Property Condition In Detail
           </h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-3">
@@ -75,8 +79,32 @@ const ActionButtons: React.FC = () => {
 
             <div className="space-y-3">
               <Button 
-                onClick={handleUnderstandServiceCosts}
+                onClick={handleSeeCompleteIssuesList}
                 variant="green"
+                size="lg"
+                className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
+              >
+                <FileText className="h-5 w-5" />
+                See The Complete Issues List
+              </Button>
+              <p className="text-sm text-gray-600 text-center leading-relaxed">
+                <strong>Then:</strong> Review every identified issue with detailed locations, priorities, and estimated repair costs
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Step 2: Service Providers & Negotiation */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
+            Take Action: Identify Service Providers and Negotiate
+          </h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <Button 
+                onClick={handleUnderstandServiceCosts}
+                variant="green-dark"
                 size="lg"
                 className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
               >
@@ -84,23 +112,14 @@ const ActionButtons: React.FC = () => {
                 Understand Property Service Costs
               </Button>
               <p className="text-sm text-gray-600 text-center leading-relaxed">
-                <strong>Then:</strong> Explore monthly service provider costs and connect with qualified contractors for ongoing maintenance
+                <strong>Armed with knowledge:</strong> Explore monthly service provider costs and connect with qualified contractors for ongoing maintenance
               </p>
             </div>
-          </div>
-        </div>
 
-        {/* Step 2: Action & Sharing */}
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
-            Take Action: Negotiate & Share
-          </h3>
-          <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-3">
               <Button 
                 onClick={handleGetNegotiationAdvice}
-                variant="green-dark"
+                variant="green"
                 size="lg"
                 className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
               >
@@ -108,22 +127,7 @@ const ActionButtons: React.FC = () => {
                 Get Negotiation Strategy
               </Button>
               <p className="text-sm text-gray-600 text-center leading-relaxed">
-                <strong>Armed with knowledge:</strong> Receive strategic guidance on how to use your inspection findings in purchase negotiations
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <Button 
-                onClick={handleShareAccess}
-                variant="green"
-                size="lg"
-                className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
-              >
-                <Share className="h-5 w-5" />
-                Share Your Report
-              </Button>
-              <p className="text-sm text-gray-600 text-center leading-relaxed">
-                <strong>Keep everyone informed:</strong> Share this comprehensive analysis with your agent, family, or trusted advisors
+                <strong>Take action:</strong> Receive strategic guidance on how to use your inspection findings in purchase negotiations
               </p>
             </div>
           </div>
