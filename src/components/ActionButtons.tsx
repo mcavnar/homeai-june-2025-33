@@ -85,7 +85,7 @@ const ActionButtons: React.FC = () => {
                 className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
               >
                 <FileText className="h-5 w-5" />
-                See The Complete Issues List
+                Understand Complete Issues List
               </Button>
               <p className="text-sm text-gray-600 text-center leading-relaxed">
                 <strong>Then:</strong> Review every identified issue with detailed locations, priorities, and estimated repair costs
@@ -109,7 +109,7 @@ const ActionButtons: React.FC = () => {
                 className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
               >
                 <DollarSign className="h-5 w-5" />
-                Understand Property Service Costs
+                See Property Service Costs
               </Button>
               <p className="text-sm text-gray-600 text-center leading-relaxed">
                 <strong>Armed with knowledge:</strong> Explore monthly service provider costs and connect with qualified contractors for ongoing maintenance
