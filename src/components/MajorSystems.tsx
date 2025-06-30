@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -152,17 +151,6 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
                 {formatCurrency(system.replacementCost.min)} - {formatCurrency(system.replacementCost.max)}
               </span>
             </div>
-          </div>
-        )}
-
-        {/* Maintenance Timeline */}
-        {system.maintenanceCosts && (
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold text-gray-900">Maintenance Timeline</h4>
-            {getMaintenanceProgressBar(
-              (system.maintenanceCosts.fiveYear.min + system.maintenanceCosts.fiveYear.max) / 2,
-              (system.maintenanceCosts.tenYear.min + system.maintenanceCosts.tenYear.max) / 2
-            )}
           </div>
         )}
 
