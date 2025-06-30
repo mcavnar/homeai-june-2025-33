@@ -260,7 +260,7 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
 
             <Button 
               onClick={exportToCSV}
-              variant="outline"
+              variant="green"
               size="sm"
               className="flex items-center gap-2"
               disabled={filteredIssues.length === 0}
