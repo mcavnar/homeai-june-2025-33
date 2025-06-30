@@ -85,7 +85,6 @@ const ServiceProviders = () => {
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Provider Overview</h1>
-        <p className="text-gray-600">We've analyzed your property and recommend the following service types. We've pre-populated the list with estimated costs for your area. You can add your own service providers or request information about existing providers from the seller.</p>
       </div>
 
       <CostSummaryCards costSummary={costSummary} />
