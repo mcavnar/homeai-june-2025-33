@@ -90,8 +90,8 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             </div>
           </div>
           
-          {/* Main Metric Section - Increased Height for Better Spacing */}
-          <div className="px-4 sm:px-6 pb-4 h-40 flex flex-col justify-center items-center">
+          {/* Main Metric Section - Increased Height from h-40 to h-48 */}
+          <div className="px-4 sm:px-6 pb-4 h-48 flex flex-col justify-center items-center">
             <div className={`text-5xl font-bold ${getScoreColor(conditionResult.score)} mb-2`}>
               {conditionResult.score}
             </div>
@@ -107,7 +107,7 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           {/* Visual Separator */}
           <div className="border-t border-gray-100 mx-4 sm:mx-6"></div>
           
-          {/* Context Bullets Section - Increased Top Padding */}
+          {/* Context Bullets Section */}
           <div className="p-4 sm:p-6 pt-6 h-24 flex items-start">
             <ul className="text-xs text-gray-600 space-y-1 w-full break-words">
               <li>• Repair costs vs. property value</li>
@@ -129,8 +129,8 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             </div>
           </div>
           
-          {/* Main Metric Section - Increased Height for Better Spacing */}
-          <div className="px-4 sm:px-6 pb-4 h-40 flex flex-col justify-center items-center">
+          {/* Main Metric Section - Increased Height from h-40 to h-48 */}
+          <div className="px-4 sm:px-6 pb-4 h-48 flex flex-col justify-center items-center">
             <div className="text-4xl font-bold text-red-600 mb-2">
               {formatCurrency(totalRepairCost)}
             </div>
@@ -142,7 +142,7 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           {/* Visual Separator */}
           <div className="border-t border-gray-100 mx-4 sm:mx-6"></div>
           
-          {/* Context Bullets Section - Increased Top Padding */}
+          {/* Context Bullets Section */}
           <div className="p-4 sm:p-6 pt-6 h-24 flex items-start">
             <ul className="text-xs text-gray-600 space-y-1 w-full break-words">
               <li>• Labor and material estimates</li>
@@ -164,16 +164,16 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             </div>
           </div>
           
-          {/* Main Metric Section - Increased Height with Better Chart Sizing */}
-          <div className="px-4 sm:px-6 pb-4 h-40 flex flex-col justify-center items-center">
+          {/* Main Metric Section - Increased Height from h-40 to h-48 with Chart Buffer */}
+          <div className="px-4 sm:px-6 pb-4 h-48 flex flex-col justify-center items-center">
             <div className="text-4xl font-bold text-gray-900 mb-2">
               {totalIssues}
             </div>
             <div className="text-sm text-gray-600 mb-2">Total issues</div>
             
-            {/* Bar Chart - Proper Height for Visibility */}
+            {/* Bar Chart - Proper Height for Visibility with Buffer */}
             {chartData.length > 0 && (
-              <div className="h-16 w-full">
+              <div className="h-16 w-full mb-2">
                 <ChartContainer config={chartConfig}>
                   <BarChart data={chartData} margin={{ top: 2, right: 5, left: 5, bottom: 12 }}>
                     <XAxis 
@@ -201,7 +201,7 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           {/* Visual Separator */}
           <div className="border-t border-gray-100 mx-4 sm:mx-6"></div>
           
-          {/* Context Bullets Section - Increased Top Padding */}
+          {/* Context Bullets Section */}
           <div className="p-4 sm:p-6 pt-6 h-24 flex items-start">
             <ul className="text-xs text-gray-600 space-y-1 w-full break-words">
               <li>• High: Safety & structural issues</li>
