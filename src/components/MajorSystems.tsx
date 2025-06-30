@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -27,23 +28,23 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
   const getConditionColor = (condition: string) => {
     const lowerCondition = condition.toLowerCase();
     if (lowerCondition.includes('good') || lowerCondition.includes('excellent')) {
-      return 'bg-green-100 text-green-800 border-green-200';
+      return 'bg-green-50 text-green-700 border-green-200';
     } else if (lowerCondition.includes('fair') || lowerCondition.includes('satisfactory')) {
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      return 'bg-yellow-50 text-yellow-700 border-yellow-200';
     } else if (lowerCondition.includes('poor') || lowerCondition.includes('immediate')) {
-      return 'bg-red-100 text-red-800 border-red-200';
+      return 'bg-red-50 text-red-700 border-red-200';
     }
-    return 'bg-gray-100 text-gray-800 border-gray-200';
+    return 'bg-gray-50 text-gray-700 border-gray-200';
   };
 
   const getUrgencyColor = (yearsLeft: string) => {
     const years = parseInt(yearsLeft);
     if (years <= 0) {
-      return 'bg-red-100 text-red-800 border-red-200';
+      return 'bg-red-50 text-red-700 border-red-200';
     } else if (years <= 3) {
-      return 'bg-orange-100 text-orange-800 border-orange-200';
+      return 'bg-orange-50 text-orange-700 border-orange-200';
     }
-    return 'bg-green-100 text-green-800 border-green-200';
+    return 'bg-green-50 text-green-700 border-green-200';
   };
 
   const parseYearsLeft = (yearsLeft: string | undefined) => {
@@ -137,34 +138,52 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
           </div>
         </CardHeader>
         
-        <CardContent className="space-y-3">
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Brand:</span>
-              <span className="text-sm font-medium text-gray-900">{system.brand || 'N/A'}</span>
+        <CardContent className="space-y-4">
+          {/* Two-column layout for main details */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Left column */}
+            <div className="space-y-3">
+              <div>
+                <span className="text-sm text-gray-600">Brand:</span>
+                <div className="text-sm font-medium text-gray-900">{system.brand || 'N/A'}</div>
+              </div>
+              <div>
+                <span className="text-sm text-gray-600">Type:</span>
+                <div className="text-sm font-medium text-gray-900">{system.type || 'N/A'}</div>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Type:</span>
-              <span className="text-sm font-medium text-gray-900">{system.type || 'N/A'}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Age:</span>
-              <span className="text-sm font-medium text-gray-900">{system.age || 'N/A'}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Years Left:</span>
-              <div className="flex flex-wrap gap-2 justify-end">
-                {yearsLeftData.map((unit, index) => (
-                  <span 
-                    key={index}
-                    className={`${getUrgencyColor(unit.value)} px-3 py-1 text-xs font-medium rounded-full border`}
-                  >
-                    {unit.label && `${unit.label}: `}{unit.value} years
-                  </span>
-                ))}
+            
+            {/* Right column */}
+            <div className="space-y-3">
+              <div>
+                <span className="text-sm text-gray-600">Age:</span>
+                <div className="text-sm font-medium text-gray-900">{system.age || 'N/A'}</div>
+              </div>
+              <div>
+                <span className="text-sm text-gray-600">Years Left:</span>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {yearsLeftData.map((unit, index) => (
+                    <span 
+                      key={index}
+                      className={`${getUrgencyColor(unit.value)} px-2 py-1 text-xs font-medium rounded border`}
+                    >
+                      {unit.label && `${unit.label}: `}{unit.value} years
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
+
+          {/* Replacement cost section */}
+          {system.replacementCost && (
+            <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+              <span className="text-sm text-gray-600">Replacement Cost:</span>
+              <span className="text-sm font-medium text-gray-900">
+                {formatCurrency(system.replacementCost.min)} - {formatCurrency(system.replacementCost.max)}
+              </span>
+            </div>
+          )}
 
           <Collapsible>
             <CollapsibleTrigger asChild>
@@ -178,15 +197,6 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
                 <div>
                   <h4 className="text-sm font-medium text-gray-900 mb-2">Summary</h4>
                   <p className="text-sm text-gray-600">{system.summary}</p>
-                </div>
-              )}
-              
-              {system.replacementCost && (
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Replacement Cost</h4>
-                  <p className="text-sm text-gray-600">
-                    {formatCurrency(system.replacementCost.min)} - {formatCurrency(system.replacementCost.max)}
-                  </p>
                 </div>
               )}
 
