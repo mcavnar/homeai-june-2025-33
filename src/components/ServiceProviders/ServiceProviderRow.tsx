@@ -3,7 +3,14 @@ import React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Phone, Star, ExternalLink, ChevronDown } from 'lucide-react';
+import { Phone, Star, ChevronDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { formatCurrency } from '@/utils/formatters';
 
 interface ServiceProvider {
@@ -24,44 +31,20 @@ interface ServiceProviderRowProps {
 }
 
 const ServiceProviderRow: React.FC<ServiceProviderRowProps> = ({ provider }) => {
-  const getServiceTypeColor = (serviceType: string) => {
-    switch (serviceType) {
-      case "Lawn Care":
-        return "bg-green-100 text-green-800";
-      case "House Cleaning":
-        return "bg-purple-100 text-purple-800";
-      case "Electrical":
-        return "bg-yellow-100 text-yellow-800";
-      case "Plumbing":
-        return "bg-cyan-100 text-cyan-800";
-      case "HVAC":
-        return "bg-blue-100 text-blue-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
   return (
     <TableRow className="hover:bg-gray-50">
       <TableCell>
-        <Badge className={getServiceTypeColor(provider.serviceType)}>
+        <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
           {provider.serviceType}
         </Badge>
       </TableCell>
       <TableCell>
         <div>
           <div className="font-medium text-gray-900">{provider.company}</div>
-          <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
-            <div className="flex items-center gap-1">
-              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-              <span>{provider.rating}</span>
-              <span>({provider.reviews} reviews)</span>
-            </div>
-            <span>•</span>
-            <div className="flex items-center gap-1">
-              <MapPin className="h-3 w-3" />
-              <span>{provider.distance}</span>
-            </div>
+          <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
+            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+            <span>{provider.rating}</span>
+            <span>({provider.reviews} reviews)</span>
           </div>
         </div>
       </TableCell>
@@ -89,10 +72,44 @@ const ServiceProviderRow: React.FC<ServiceProviderRowProps> = ({ provider }) => 
             <Phone className="h-3 w-3 mr-1" />
             Call
           </Button>
-          <Button variant="outline" size="sm" className="hover:bg-gray-50">
-            <ExternalLink className="h-3 w-3 mr-1" />
-            Details
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="hover:bg-gray-50">
+                Details
+                <ChevronDown className="h-3 w-3 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64 bg-white border shadow-lg">
+              <DropdownMenuItem className="flex-col items-start p-3">
+                <div className="font-medium text-gray-900 mb-1">Contact Information</div>
+                <div className="text-sm text-gray-600">Phone: {provider.phone}</div>
+                <div className="text-sm text-gray-600">Distance: {provider.distance}</div>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="flex-col items-start p-3">
+                <div className="font-medium text-gray-900 mb-1">Service Details</div>
+                <div className="text-sm text-gray-600">Service Type: {provider.serviceType}</div>
+                <div className="text-sm text-gray-600">Frequency: {provider.frequency}</div>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="flex-col items-start p-3">
+                <div className="font-medium text-gray-900 mb-1">Pricing</div>
+                <div className="text-sm text-gray-600">
+                  Monthly: {provider.monthlyCost > 0 ? formatCurrency(provider.monthlyCost) : 'As needed'}
+                </div>
+                <div className="text-sm text-gray-600">Annual: {formatCurrency(provider.annualCost)}</div>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="flex-col items-start p-3">
+                <div className="font-medium text-gray-900 mb-1">Reviews</div>
+                <div className="flex items-center gap-1 text-sm text-gray-600">
+                  <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                  <span>{provider.rating} out of 5</span>
+                </div>
+                <div className="text-sm text-gray-600">{provider.reviews} customer reviews</div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </TableCell>
     </TableRow>
