@@ -51,6 +51,7 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
       icon={AlertTriangle}
       title="Issues Found"
       bulletPoints={bulletPoints}
+      bulletHeadline="Issue Priority Definition"
     >
       <div className="text-4xl font-bold text-gray-900 mb-2">
         {totalIssues}
