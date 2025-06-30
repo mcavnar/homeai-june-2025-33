@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,7 +35,7 @@ const ServiceProviders = () => {
   };
 
   const serviceCosts = calculateServiceCosts();
-  const address = propertyData?.address || analysis.propertyInfo?.address || 'Property Address';
+  const address = analysis.propertyInfo?.address || 'Property Address';
 
   // Sample service providers based on common home service needs
   const serviceProviders = [
