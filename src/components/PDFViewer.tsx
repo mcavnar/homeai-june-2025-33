@@ -1,30 +1,56 @@
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Input } from '@/components/ui/input';
 import { 
   ChevronLeft, 
   ChevronRight, 
   ZoomIn, 
   ZoomOut, 
   Maximize2,
-  RotateCcw
+  RotateCcw,
+  Search,
+  X,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react';
 import { pdfjsLib } from '@/utils/pdfConfig';
+import { usePDFSearch } from '@/hooks/usePDFSearch';
 
 interface PDFViewerProps {
   pdfArrayBuffer: ArrayBuffer;
+  initialSearchQuery?: string;
 }
 
-const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
+const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSearchQuery }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const highlightCanvasRef = useRef<HTMLCanvasElement>(null);
   const [pdf, setPdf] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [scale, setScale] = useState(1.2);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  const [showSearch, setShowSearch] = useState(false);
+
+  const {
+    searchQuery,
+    matches,
+    currentMatchIndex,
+    isSearching,
+    handleSearch,
+    goToNextMatch,
+    goToPrevMatch,
+    clearSearch,
+    getCurrentMatch,
+    totalMatches
+  } = usePDFSearch(pdf);
+
+  useImperativeHandle(ref, () => ({
+    search: handleSearch,
+    clearSearch
+  }));
 
   useEffect(() => {
     const loadPDF = async () => {
@@ -67,6 +93,17 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
+        // Clear and set up highlight canvas
+        if (highlightCanvasRef.current) {
+          const highlightCanvas = highlightCanvasRef.current;
+          highlightCanvas.height = viewport.height;
+          highlightCanvas.width = viewport.width;
+          const highlightContext = highlightCanvas.getContext('2d');
+          if (highlightContext) {
+            highlightContext.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height);
+          }
+        }
+
         const renderContext = {
           canvasContext: context,
           viewport: viewport,
@@ -74,6 +111,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
 
         await page.render(renderContext).promise;
         console.log('PDFViewer: Page rendered successfully');
+        
+        // Render search highlights after page is rendered
+        renderSearchHighlights(viewport);
       } catch (err) {
         console.error('PDFViewer: Error rendering page:', err);
         setError('Failed to render PDF page');
@@ -82,6 +122,58 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
 
     renderPage();
   }, [pdf, currentPage, scale]);
+
+  const renderSearchHighlights = (viewport: any) => {
+    if (!highlightCanvasRef.current || matches.length === 0) return;
+
+    const highlightCanvas = highlightCanvasRef.current;
+    const highlightContext = highlightCanvas.getContext('2d');
+    if (!highlightContext) return;
+
+    highlightContext.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height);
+
+    // Filter matches for current page
+    const currentPageMatches = matches.filter(match => match.pageNumber === currentPage);
+    
+    currentPageMatches.forEach((match, index) => {
+      const isCurrentMatch = matches.indexOf(match) === currentMatchIndex;
+      
+      // Transform coordinates to canvas coordinates
+      const [x, y] = viewport.convertToViewportPoint(match.x, match.y);
+      const width = match.width * scale;
+      const height = match.height * scale;
+
+      // Set highlight style
+      highlightContext.fillStyle = isCurrentMatch ? 'rgba(255, 165, 0, 0.4)' : 'rgba(255, 255, 0, 0.3)';
+      highlightContext.fillRect(x, viewport.height - y - height, width, height);
+      
+      if (isCurrentMatch) {
+        highlightContext.strokeStyle = 'orange';
+        highlightContext.lineWidth = 2;
+        highlightContext.strokeRect(x, viewport.height - y - height, width, height);
+      }
+    });
+  };
+
+  // Auto-navigate to current match page
+  useEffect(() => {
+    const currentMatch = getCurrentMatch();
+    if (currentMatch && currentMatch.pageNumber !== currentPage) {
+      setCurrentPage(currentMatch.pageNumber);
+    }
+  }, [currentMatchIndex, getCurrentMatch, currentPage]);
+
+  // Re-render highlights when matches or current match changes
+  useEffect(() => {
+    if (pdf && canvasRef.current) {
+      const renderHighlights = async () => {
+        const page = await pdf.getPage(currentPage);
+        const viewport = page.getViewport({ scale });
+        renderSearchHighlights(viewport);
+      };
+      renderHighlights();
+    }
+  }, [matches, currentMatchIndex, currentPage, scale, pdf]);
 
   const goToPrevPage = () => {
     if (currentPage > 1) {
@@ -110,7 +202,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
   const fitToWidth = () => {
     if (canvasRef.current) {
       const containerWidth = canvasRef.current.parentElement?.clientWidth || 800;
-      setScale((containerWidth - 40) / 612); // 612 is standard PDF width in points, minus padding
+      setScale((containerWidth - 40) / 612);
+    }
+  };
+
+  const toggleSearch = () => {
+    setShowSearch(!showSearch);
+    if (showSearch) {
+      clearSearch();
     }
   };
 
@@ -139,6 +238,15 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
       </Card>
     );
   }
+
+  // Handle initial search query
+  useEffect(() => {
+    if (initialSearchQuery && pdf) {
+      console.log('PDFViewer: Setting initial search query:', initialSearchQuery);
+      setShowSearch(true);
+      handleSearch(initialSearchQuery);
+    }
+  }, [initialSearchQuery, pdf, handleSearch]);
 
   return (
     <div className="w-full bg-white rounded-lg shadow-sm border">
@@ -169,6 +277,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
         </div>
         
         <div className="flex items-center gap-2">
+          <Button 
+            variant={showSearch ? "default" : "outline"} 
+            size="sm" 
+            onClick={toggleSearch}
+          >
+            <Search className="h-4 w-4" />
+          </Button>
           <Button variant="outline" size="sm" onClick={zoomOut}>
             <ZoomOut className="h-4 w-4" />
           </Button>
@@ -187,18 +302,84 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfArrayBuffer }) => {
         </div>
       </div>
 
+      {/* Search Bar */}
+      {showSearch && (
+        <div className="p-4 border-b bg-blue-50">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search in PDF..."
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="pl-10 pr-10"
+              />
+              {searchQuery && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearSearch}
+                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+            
+            {totalMatches > 0 && (
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <span>
+                  {currentMatchIndex + 1} of {totalMatches}
+                </span>
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToPrevMatch}
+                    disabled={totalMatches === 0}
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToNextMatch}
+                    disabled={totalMatches === 0}
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            {isSearching && (
+              <div className="text-sm text-gray-600">Searching...</div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* PDF Content */}
       <ScrollArea className="h-[700px] w-full">
         <div className="flex justify-center p-6 bg-gray-100 min-h-full">
-          <canvas
-            ref={canvasRef}
-            className="border shadow-lg bg-white"
-            style={{ maxWidth: '100%', height: 'auto' }}
-          />
+          <div className="relative">
+            <canvas
+              ref={canvasRef}
+              className="border shadow-lg bg-white"
+              style={{ maxWidth: '100%', height: 'auto' }}
+            />
+            <canvas
+              ref={highlightCanvasRef}
+              className="absolute top-0 left-0 pointer-events-none"
+              style={{ maxWidth: '100%', height: 'auto' }}
+            />
+          </div>
         </div>
       </ScrollArea>
     </div>
   );
-};
+});
+
+PDFViewer.displayName = 'PDFViewer';
 
 export default PDFViewer;

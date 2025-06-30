@@ -19,6 +19,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { InspectionIssue } from '@/types/inspection';
 import { formatCurrency } from '@/utils/formatters';
+import { generateIssueSearchQuery } from '@/utils/pdfIssueSearch';
 
 interface DetailedFindingsProps {
   issues: InspectionIssue[];
@@ -87,10 +88,21 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
   }, [issues]);
 
   const handleSeeInReport = (issue: InspectionIssue) => {
-    navigate('/results/report');
+    // Generate search terms for this specific issue
+    const searchQuery = generateIssueSearchQuery(issue);
+    
+    // Navigate to the report with search context
+    navigate('/results/report', { 
+      state: { 
+        searchQuery,
+        issueDescription: issue.description,
+        issueLocation: issue.location
+      }
+    });
+    
     toast({
       title: "Navigated to Inspection Report",
-      description: `Look for: "${issue.description}" in the ${issue.location} section`,
+      description: `Searching for: "${issue.description}" in the ${issue.location} section`,
     });
   };
 
