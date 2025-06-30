@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { 
@@ -33,6 +34,7 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const [showSearch, setShowSearch] = useState(false);
+  const [pageRendered, setPageRendered] = useState(false);
 
   const {
     searchQuery,
@@ -50,17 +52,26 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
   useImperativeHandle(ref, () => ({
     search: handleSearch,
     clearSearch
-  }));
+  }), [handleSearch, clearSearch]);
 
+  // Load PDF
   useEffect(() => {
     const loadPDF = async () => {
+      if (!pdfArrayBuffer || pdfArrayBuffer.byteLength === 0) {
+        console.error('PDFViewer: Invalid or empty ArrayBuffer provided');
+        setError('Invalid PDF data provided');
+        setLoading(false);
+        return;
+      }
+
       try {
         console.log('PDFViewer: Loading PDF from ArrayBuffer, size:', pdfArrayBuffer.byteLength);
         setLoading(true);
+        setError('');
+        
         const loadedPdf = await pdfjsLib.getDocument({ data: pdfArrayBuffer }).promise;
         setPdf(loadedPdf);
         setTotalPages(loadedPdf.numPages);
-        setError('');
         console.log('PDFViewer: PDF loaded successfully, pages:', loadedPdf.numPages);
       } catch (err) {
         console.error('PDFViewer: Error loading PDF:', err);
@@ -70,30 +81,29 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
       }
     };
 
-    if (pdfArrayBuffer && pdfArrayBuffer.byteLength > 0) {
-      loadPDF();
-    } else {
-      console.error('PDFViewer: Invalid or empty ArrayBuffer provided');
-      setError('Invalid PDF data provided');
-      setLoading(false);
-    }
+    loadPDF();
   }, [pdfArrayBuffer]);
 
+  // Render page
   useEffect(() => {
     const renderPage = async () => {
       if (!pdf || !canvasRef.current) return;
 
       try {
         console.log('PDFViewer: Rendering page', currentPage);
+        setPageRendered(false);
+        
         const page = await pdf.getPage(currentPage);
         const viewport = page.getViewport({ scale });
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
 
+        if (!context) return;
+
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
-        // Clear and set up highlight canvas
+        // Clear highlight canvas
         if (highlightCanvasRef.current) {
           const highlightCanvas = highlightCanvasRef.current;
           highlightCanvas.height = viewport.height;
@@ -110,10 +120,8 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
         };
 
         await page.render(renderContext).promise;
+        setPageRendered(true);
         console.log('PDFViewer: Page rendered successfully');
-        
-        // Render search highlights after page is rendered
-        renderSearchHighlights(viewport);
       } catch (err) {
         console.error('PDFViewer: Error rendering page:', err);
         setError('Failed to render PDF page');
@@ -123,37 +131,49 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
     renderPage();
   }, [pdf, currentPage, scale]);
 
-  const renderSearchHighlights = (viewport: any) => {
-    if (!highlightCanvasRef.current || matches.length === 0) return;
+  // Render search highlights after page is rendered
+  const renderSearchHighlights = useCallback(async () => {
+    if (!pdf || !highlightCanvasRef.current || !pageRendered || matches.length === 0) return;
 
-    const highlightCanvas = highlightCanvasRef.current;
-    const highlightContext = highlightCanvas.getContext('2d');
-    if (!highlightContext) return;
-
-    highlightContext.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height);
-
-    // Filter matches for current page
-    const currentPageMatches = matches.filter(match => match.pageNumber === currentPage);
-    
-    currentPageMatches.forEach((match, index) => {
-      const isCurrentMatch = matches.indexOf(match) === currentMatchIndex;
+    try {
+      const page = await pdf.getPage(currentPage);
+      const viewport = page.getViewport({ scale });
+      const highlightCanvas = highlightCanvasRef.current;
+      const highlightContext = highlightCanvas.getContext('2d');
       
-      // Transform coordinates to canvas coordinates
-      const [x, y] = viewport.convertToViewportPoint(match.x, match.y);
-      const width = match.width * scale;
-      const height = match.height * scale;
+      if (!highlightContext) return;
 
-      // Set highlight style
-      highlightContext.fillStyle = isCurrentMatch ? 'rgba(255, 165, 0, 0.4)' : 'rgba(255, 255, 0, 0.3)';
-      highlightContext.fillRect(x, viewport.height - y - height, width, height);
+      highlightContext.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height);
+
+      const currentPageMatches = matches.filter(match => match.pageNumber === currentPage);
       
-      if (isCurrentMatch) {
-        highlightContext.strokeStyle = 'orange';
-        highlightContext.lineWidth = 2;
-        highlightContext.strokeRect(x, viewport.height - y - height, width, height);
-      }
-    });
-  };
+      currentPageMatches.forEach((match) => {
+        const isCurrentMatch = matches.indexOf(match) === currentMatchIndex;
+        
+        const [x, y] = viewport.convertToViewportPoint(match.x, match.y);
+        const width = match.width * scale;
+        const height = match.height * scale;
+
+        highlightContext.fillStyle = isCurrentMatch ? 'rgba(255, 165, 0, 0.4)' : 'rgba(255, 255, 0, 0.3)';
+        highlightContext.fillRect(x, viewport.height - y - height, width, height);
+        
+        if (isCurrentMatch) {
+          highlightContext.strokeStyle = 'orange';
+          highlightContext.lineWidth = 2;
+          highlightContext.strokeRect(x, viewport.height - y - height, width, height);
+        }
+      });
+    } catch (error) {
+      console.error('Error rendering highlights:', error);
+    }
+  }, [pdf, currentPage, scale, pageRendered, matches, currentMatchIndex]);
+
+  // Render highlights when dependencies change
+  useEffect(() => {
+    if (pageRendered) {
+      renderSearchHighlights();
+    }
+  }, [renderSearchHighlights, pageRendered]);
 
   // Auto-navigate to current match page
   useEffect(() => {
@@ -163,17 +183,14 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
     }
   }, [currentMatchIndex, getCurrentMatch, currentPage]);
 
-  // Re-render highlights when matches or current match changes
+  // Handle initial search query
   useEffect(() => {
-    if (pdf && canvasRef.current) {
-      const renderHighlights = async () => {
-        const page = await pdf.getPage(currentPage);
-        const viewport = page.getViewport({ scale });
-        renderSearchHighlights(viewport);
-      };
-      renderHighlights();
+    if (initialSearchQuery && pdf && !showSearch) {
+      console.log('PDFViewer: Setting initial search query:', initialSearchQuery);
+      setShowSearch(true);
+      handleSearch(initialSearchQuery);
     }
-  }, [matches, currentMatchIndex, currentPage, scale, pdf]);
+  }, [initialSearchQuery, pdf, handleSearch, showSearch]);
 
   const goToPrevPage = () => {
     if (currentPage > 1) {
@@ -238,15 +255,6 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
       </Card>
     );
   }
-
-  // Handle initial search query
-  useEffect(() => {
-    if (initialSearchQuery && pdf) {
-      console.log('PDFViewer: Setting initial search query:', initialSearchQuery);
-      setShowSearch(true);
-      handleSearch(initialSearchQuery);
-    }
-  }, [initialSearchQuery, pdf, handleSearch]);
 
   return (
     <div className="w-full bg-white rounded-lg shadow-sm border">

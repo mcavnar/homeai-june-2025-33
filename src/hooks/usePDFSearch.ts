@@ -24,14 +24,16 @@ export const usePDFSearch = (pdf: any) => {
   const [isSearching, setIsSearching] = useState(false);
   const [pageTextContent, setPageTextContent] = useState<Map<number, PageTextContent>>(new Map());
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const textExtractionRef = useRef(false);
 
-  // Extract text content from all pages when PDF loads
+  // Extract text content from all pages when PDF loads - only once
   useEffect(() => {
+    if (!pdf || textExtractionRef.current) return;
+
     const extractAllText = async () => {
-      if (!pdf) return;
-      
-      console.log('Extracting text from all PDF pages for search...');
-      const textContentMap = new Map<number, PageTextContent>();
+      console.log('Starting text extraction for search...');
+      textExtractionRef.current = true;
+      const textContentMap = new Map<PageTextContent>();
       
       try {
         for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
@@ -54,11 +56,12 @@ export const usePDFSearch = (pdf: any) => {
         console.log('Text extraction complete for', pdf.numPages, 'pages');
       } catch (error) {
         console.error('Error extracting text for search:', error);
+        textExtractionRef.current = false;
       }
     };
 
     extractAllText();
-  }, [pdf]);
+  }, [pdf?.numPages]); // Only depend on numPages to avoid loops
 
   // Debounced search function
   const performSearch = useCallback(async (query: string) => {
@@ -76,13 +79,11 @@ export const usePDFSearch = (pdf: any) => {
       for (const [pageNum, content] of pageTextContent.entries()) {
         const { textItems, fullText } = content;
         
-        // Find all occurrences in the page text
         let searchIndex = 0;
         while (true) {
           const matchIndex = fullText.indexOf(searchTerm, searchIndex);
           if (matchIndex === -1) break;
 
-          // Find the corresponding text item and position
           let currentTextLength = 0;
           for (const item of textItems) {
             const itemText = item.str.toLowerCase();
@@ -90,7 +91,6 @@ export const usePDFSearch = (pdf: any) => {
             const itemEnd = currentTextLength + itemText.length;
 
             if (matchIndex >= itemStart && matchIndex < itemEnd) {
-              // Found the text item containing our match
               foundMatches.push({
                 pageNumber: pageNum,
                 textIndex: matchIndex,
@@ -102,7 +102,7 @@ export const usePDFSearch = (pdf: any) => {
               });
               break;
             }
-            currentTextLength += itemText.length + 1; // +1 for space
+            currentTextLength += itemText.length + 1;
           }
 
           searchIndex = matchIndex + 1;
@@ -119,7 +119,6 @@ export const usePDFSearch = (pdf: any) => {
     }
   }, [pageTextContent]);
 
-  // Handle search input with debouncing
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
     
@@ -156,6 +155,15 @@ export const usePDFSearch = (pdf: any) => {
   const getCurrentMatch = useCallback(() => {
     return currentMatchIndex >= 0 ? matches[currentMatchIndex] : null;
   }, [matches, currentMatchIndex]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return {
     searchQuery,

@@ -25,17 +25,6 @@ const InspectionReport = () => {
   console.log('InspectionReport - pdfArrayBuffer:', pdfArrayBuffer ? 'Available' : 'Not available');
   console.log('InspectionReport - search context:', locationState);
 
-  // Auto-trigger search when component mounts with search context
-  useEffect(() => {
-    if (locationState?.searchQuery && pdfViewerRef.current) {
-      // Small delay to ensure PDF is loaded
-      setTimeout(() => {
-        console.log('Auto-triggering search for:', locationState.searchQuery);
-        // The search will be handled by the PDFViewer component
-      }, 1000);
-    }
-  }, [locationState?.searchQuery]);
-
   if (!pdfArrayBuffer) {
     return (
       <Card>
@@ -47,6 +36,9 @@ const InspectionReport = () => {
         </CardHeader>
         <CardContent className="text-center py-12">
           <p className="text-gray-500">Original PDF is not available for viewing.</p>
+          <p className="text-gray-400 text-sm mt-2">
+            Please upload an inspection report to view it here.
+          </p>
         </CardContent>
       </Card>
     );
