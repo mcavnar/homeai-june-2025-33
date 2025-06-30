@@ -39,80 +39,107 @@ const ActionButtons: React.FC = () => {
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full border-2 border-green-100 bg-gradient-to-br from-green-50 to-emerald-50">
       <CardHeader className="text-center pb-4">
         <CardTitle className="flex items-center justify-center gap-2 text-2xl font-bold text-gray-900">
           <ArrowRight className="h-6 w-6 text-green-500" />
-          Next Steps
+          Your Next Steps
         </CardTitle>
-        <p className="text-gray-600 mt-2">
-          Choose your next action to make the most of your inspection report
+        <p className="text-gray-700 mt-2 text-lg">
+          Follow this recommended path to maximize the value of your inspection report
         </p>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Share Action */}
-          <div className="space-y-3">
-            <Button 
-              onClick={handleShareAccess}
-              variant="green"
-              size="lg"
-              className="w-full flex items-center gap-2 px-6 py-3"
-            >
-              <Share className="h-5 w-5" />
-              Share Report
-            </Button>
-            <p className="text-sm text-gray-600 text-center">
-              Share this inspection summary with your agent, family, or advisors
-            </p>
-          </div>
+      <CardContent className="space-y-8">
+        {/* Step 1 & 2: Foundation Understanding */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">1</span>
+            Start Here: Understand Your Property
+          </h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <Button 
+                onClick={handleUnderstandKeySystems}
+                variant="green-dark"
+                size="lg"
+                className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
+              >
+                <Settings className="h-5 w-5" />
+                Learn About Key Systems
+              </Button>
+              <p className="text-sm text-gray-600 text-center leading-relaxed">
+                <strong>Recommended first step:</strong> Understand what major systems (HVAC, electrical, plumbing) mean for your home's condition and future maintenance
+              </p>
+            </div>
 
-          {/* Negotiation Advice Action */}
-          <div className="space-y-3">
-            <Button 
-              onClick={handleGetNegotiationAdvice}
-              variant="green-dark"
-              size="lg"
-              className="w-full flex items-center gap-2 px-6 py-3"
-            >
-              <MessageSquare className="h-5 w-5" />
-              Get Negotiation Advice
-            </Button>
-            <p className="text-sm text-gray-600 text-center">
-              Receive strategic guidance for purchase negotiations
-            </p>
+            <div className="space-y-3">
+              <Button 
+                onClick={handleUnderstandServiceCosts}
+                variant="green"
+                size="lg"
+                className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
+              >
+                <DollarSign className="h-5 w-5" />
+                Explore Repair Costs
+              </Button>
+              <p className="text-sm text-gray-600 text-center leading-relaxed">
+                <strong>Next:</strong> Get detailed cost breakdowns and connect with qualified contractors to understand your investment needs
+              </p>
+            </div>
           </div>
+        </div>
 
-          {/* Service Costs Action */}
-          <div className="space-y-3">
-            <Button 
-              onClick={handleUnderstandServiceCosts}
-              variant="green"
-              size="lg"
-              className="w-full flex items-center gap-2 px-6 py-3"
-            >
-              <DollarSign className="h-5 w-5" />
-              See Service Costs
-            </Button>
-            <p className="text-sm text-gray-600 text-center">
-              Get detailed cost estimates and find qualified contractors
-            </p>
+        {/* Step 3 & 4: Action & Sharing */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
+            Take Action: Negotiate & Share
+          </h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <Button 
+                onClick={handleGetNegotiationAdvice}
+                variant="green-dark"
+                size="lg"
+                className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
+              >
+                <MessageSquare className="h-5 w-5" />
+                Get Negotiation Strategy
+              </Button>
+              <p className="text-sm text-gray-600 text-center leading-relaxed">
+                <strong>Armed with knowledge:</strong> Receive strategic guidance on how to use your inspection findings in purchase negotiations
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <Button 
+                onClick={handleShareAccess}
+                variant="green"
+                size="lg"
+                className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
+              >
+                <Share className="h-5 w-5" />
+                Share Your Report
+              </Button>
+              <p className="text-sm text-gray-600 text-center leading-relaxed">
+                <strong>Keep everyone informed:</strong> Share this comprehensive analysis with your agent, family, or trusted advisors
+              </p>
+            </div>
           </div>
+        </div>
 
-          {/* Key Systems Action */}
-          <div className="space-y-3">
-            <Button 
-              onClick={handleUnderstandKeySystems}
-              variant="green"
-              size="lg"
-              className="w-full flex items-center gap-2 px-6 py-3"
-            >
-              <Settings className="h-5 w-5" />
-              Understand Key Systems
-            </Button>
-            <p className="text-sm text-gray-600 text-center">
-              Learn about major home systems and their condition
-            </p>
+        {/* Helpful tip */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+          <div className="flex items-start gap-3">
+            <div className="bg-blue-500 rounded-full p-1 mt-0.5">
+              <ArrowRight className="h-3 w-3 text-white" />
+            </div>
+            <div>
+              <p className="text-sm text-blue-800 font-medium">💡 Pro Tip</p>
+              <p className="text-sm text-blue-700 mt-1">
+                Following this sequence helps you make informed decisions. Understanding your systems and costs first gives you confidence when negotiating and sharing insights with others.
+              </p>
+            </div>
           </div>
         </div>
       </CardContent>
