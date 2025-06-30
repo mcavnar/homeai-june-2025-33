@@ -123,7 +123,7 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
     
     return (
       <Card key={systemName} className="bg-white border border-gray-200">
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {getSystemIcon(systemName)}
@@ -137,27 +137,31 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
           </div>
         </CardHeader>
         
-        <CardContent className="space-y-3">
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Brand:</span>
-              <span className="text-sm font-medium text-gray-900">{system.brand || 'N/A'}</span>
+        <CardContent className="space-y-4">
+          {/* Grid layout for main information */}
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4 p-4 bg-gray-50 rounded-lg">
+            {/* First row: Brand and Type */}
+            <div className="space-y-1">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Brand</span>
+              <div className="text-sm font-medium text-gray-900">{system.brand || 'N/A'}</div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Type:</span>
-              <span className="text-sm font-medium text-gray-900">{system.type || 'N/A'}</span>
+            <div className="space-y-1">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Type</span>
+              <div className="text-sm font-medium text-gray-900">{system.type || 'N/A'}</div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Age:</span>
-              <span className="text-sm font-medium text-gray-900">{system.age || 'N/A'}</span>
+            
+            {/* Second row: Age and Years Left */}
+            <div className="space-y-1">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Age</span>
+              <div className="text-sm font-medium text-gray-900">{system.age || 'N/A'}</div>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Years Left:</span>
-              <div className="flex flex-wrap gap-2 justify-end">
+            <div className="space-y-1">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Years Left</span>
+              <div className="flex flex-wrap gap-1">
                 {yearsLeftData.map((unit, index) => (
                   <span 
                     key={index}
-                    className={`${getUrgencyColor(unit.value)} px-3 py-1 text-xs font-medium rounded-full border`}
+                    className={`${getUrgencyColor(unit.value)} px-2 py-1 text-xs font-medium rounded-md border`}
                   >
                     {unit.label && `${unit.label}: `}{unit.value} years
                   </span>
@@ -168,12 +172,12 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
 
           <Collapsible>
             <CollapsibleTrigger asChild>
-              <Button variant="outline" className="w-full mt-3 justify-between">
+              <Button variant="outline" className="w-full justify-between">
                 More Details
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-3 mt-3 pt-3 border-t border-gray-200">
+            <CollapsibleContent className="space-y-4 mt-4 pt-4 border-t border-gray-200">
               {system.summary && (
                 <div>
                   <h4 className="text-sm font-medium text-gray-900 mb-2">Summary</h4>
