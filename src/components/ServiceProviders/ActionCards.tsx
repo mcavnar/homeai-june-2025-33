@@ -25,7 +25,8 @@ const ActionCards: React.FC = () => {
                   Generate a shareable form link to send to the seller or their agent. This will allow them to provide detailed information about all current service providers for this property.
                 </p>
                 <Button 
-                  className="bg-green-500 hover:bg-green-600 text-white"
+                  variant="default"
+                  size="lg"
                   onClick={() => setIsFormModalOpen(true)}
                 >
                   <FileText className="mr-2 h-4 w-4" />

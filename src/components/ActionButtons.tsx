@@ -37,24 +37,27 @@ const ActionButtons: React.FC = () => {
     <div className="grid grid-cols-3 gap-4">
       <Button 
         onClick={handleShareAccess}
+        variant="green"
         size="lg"
-        className="flex items-center gap-2 px-6 py-3 font-semibold bg-green-400 hover:bg-green-500 text-white border-2 border-green-500 hover:border-green-600 shadow-lg hover:shadow-xl transition-all duration-200"
+        className="flex items-center gap-2 px-6 py-3"
       >
         <Share className="h-5 w-5" />
         Share
       </Button>
       <Button 
         onClick={handleUnderstandServiceCosts}
+        variant="green"
         size="lg"
-        className="flex items-center gap-2 px-6 py-3 font-semibold bg-green-400 hover:bg-green-500 text-white border-2 border-green-500 hover:border-green-600 shadow-lg hover:shadow-xl transition-all duration-200"
+        className="flex items-center gap-2 px-6 py-3"
       >
         <DollarSign className="h-5 w-5" />
         See Service Costs
       </Button>
       <Button 
         onClick={handleGetNegotiationAdvice}
+        variant="green-dark"
         size="lg"
-        className="flex items-center gap-2 px-6 py-3 font-semibold bg-green-500 hover:bg-green-600 text-white border-2 border-green-600 hover:border-green-700 shadow-lg hover:shadow-xl transition-all duration-200"
+        className="flex items-center gap-2 px-6 py-3"
       >
         <MessageSquare className="h-5 w-5" />
         Get Negotiation Advice

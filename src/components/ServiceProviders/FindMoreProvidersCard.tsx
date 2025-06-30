@@ -12,7 +12,7 @@ const FindMoreProvidersCard: React.FC = () => {
           <p className="text-blue-700 mb-4">
             We can help you find additional qualified contractors in your area.
           </p>
-          <Button className="bg-green-400 hover:bg-green-500 text-white shadow-lg hover:shadow-xl transition-all duration-200">
+          <Button variant="default" size="lg">
             Find More Providers
           </Button>
         </div>
