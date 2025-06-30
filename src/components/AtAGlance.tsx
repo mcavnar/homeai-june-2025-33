@@ -169,13 +169,13 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             <div className="text-4xl font-bold text-gray-900 mb-2">
               {totalIssues}
             </div>
-            <div className="text-sm text-gray-600 mb-4">Total issues</div>
+            <div className="text-sm text-gray-600 mb-2">Total issues</div>
             
-            {/* Bar Chart - Reduced Height for Better Proportions */}
+            {/* Bar Chart - Reduced Height to Prevent Overflow */}
             {chartData.length > 0 && (
-              <div className="h-12 w-full">
+              <div className="h-8 w-full overflow-hidden">
                 <ChartContainer config={chartConfig}>
-                  <BarChart data={chartData} margin={{ top: 0, right: 5, left: 5, bottom: 10 }}>
+                  <BarChart data={chartData} margin={{ top: 0, right: 5, left: 5, bottom: 0 }}>
                     <XAxis 
                       dataKey="priority" 
                       tick={{ fontSize: 9 }}
