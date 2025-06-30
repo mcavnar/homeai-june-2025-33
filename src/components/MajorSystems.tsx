@@ -2,7 +2,9 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Home, Zap, Droplets, Wind, Building } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Home, Zap, Droplets, Wind, Building, ChevronDown } from 'lucide-react';
 import { MajorSystems as MajorSystemsType } from '@/types/inspection';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -99,6 +101,78 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
             </Badge>
           </div>
         </div>
+
+        <Collapsible>
+          <CollapsibleTrigger asChild>
+            <Button variant="outline" className="w-full mt-3 justify-between">
+              More Details
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-3 mt-3 pt-3 border-t border-gray-200">
+            {system.summary && (
+              <div>
+                <h4 className="text-sm font-medium text-gray-900 mb-2">Summary</h4>
+                <p className="text-sm text-gray-600">{system.summary}</p>
+              </div>
+            )}
+            
+            {system.replacementCost && (
+              <div>
+                <h4 className="text-sm font-medium text-gray-900 mb-2">Replacement Cost</h4>
+                <p className="text-sm text-gray-600">
+                  {formatCurrency(system.replacementCost.min)} - {formatCurrency(system.replacementCost.max)}
+                </p>
+              </div>
+            )}
+
+            {system.maintenanceCosts && (
+              <div>
+                <h4 className="text-sm font-medium text-gray-900 mb-2">Maintenance Costs</h4>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">5-Year:</span>
+                    <span className="text-gray-900">
+                      {formatCurrency(system.maintenanceCosts.fiveYear.min)} - {formatCurrency(system.maintenanceCosts.fiveYear.max)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">10-Year:</span>
+                    <span className="text-gray-900">
+                      {formatCurrency(system.maintenanceCosts.tenYear.min)} - {formatCurrency(system.maintenanceCosts.tenYear.max)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {system.anticipatedRepairs && (
+              <div>
+                <h4 className="text-sm font-medium text-gray-900 mb-2">Anticipated Repairs</h4>
+                {system.anticipatedRepairs.fiveYear && system.anticipatedRepairs.fiveYear.length > 0 && (
+                  <div className="mb-2">
+                    <span className="text-xs font-medium text-gray-700">5-Year:</span>
+                    <ul className="text-sm text-gray-600 ml-2 list-disc list-inside">
+                      {system.anticipatedRepairs.fiveYear.map((repair: string, index: number) => (
+                        <li key={index}>{repair}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {system.anticipatedRepairs.tenYear && system.anticipatedRepairs.tenYear.length > 0 && (
+                  <div>
+                    <span className="text-xs font-medium text-gray-700">10-Year:</span>
+                    <ul className="text-sm text-gray-600 ml-2 list-disc list-inside">
+                      {system.anticipatedRepairs.tenYear.map((repair: string, index: number) => (
+                        <li key={index}>{repair}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </CollapsibleContent>
+        </Collapsible>
       </CardContent>
     </Card>
   );
