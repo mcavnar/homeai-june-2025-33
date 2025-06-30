@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronUp, Home, Zap, Droplets, Wind, Building } from 'lucide-react';
+import { Home, Zap, Droplets, Wind, Building, Thermometer } from 'lucide-react';
 import { MajorSystems as MajorSystemsType } from '@/types/inspection';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -12,8 +12,6 @@ interface MajorSystemsProps {
 }
 
 const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
-  const [expandedSystems, setExpandedSystems] = useState<Record<string, boolean>>({});
-
   const getSystemIcon = (systemName: string) => {
     const iconProps = { className: "h-6 w-6" };
     switch (systemName.toLowerCase()) {
@@ -22,6 +20,7 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
       case 'plumbing': return <Droplets {...iconProps} />;
       case 'hvac': return <Wind {...iconProps} />;
       case 'foundation': return <Building {...iconProps} />;
+      case 'water heater': return <Thermometer {...iconProps} />;
       default: return <Home {...iconProps} />;
     }
   };
@@ -38,241 +37,178 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
     return 'bg-gray-100 text-gray-800 border-gray-200';
   };
 
-  const getConditionCardBorder = (condition: string) => {
+  const getConditionBadgeColor = (condition: string) => {
     const lowerCondition = condition.toLowerCase();
     if (lowerCondition.includes('good') || lowerCondition.includes('excellent')) {
-      return 'border-l-green-500';
+      return 'bg-green-500 text-white';
     } else if (lowerCondition.includes('fair') || lowerCondition.includes('satisfactory')) {
-      return 'border-l-yellow-500';
+      return 'bg-yellow-500 text-white';
     } else if (lowerCondition.includes('poor') || lowerCondition.includes('immediate')) {
-      return 'border-l-red-500';
+      return 'bg-red-500 text-white';
     }
-    return 'border-l-gray-500';
+    return 'bg-gray-500 text-white';
   };
 
-  const getCostSeverity = (cost: number) => {
-    if (cost < 1000) return 'low';
-    if (cost < 5000) return 'medium';
-    return 'high';
-  };
-
-  const getCostSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'low': return 'bg-green-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'high': return 'bg-red-500';
-      default: return 'bg-gray-500';
+  const getYearsLeftColor = (yearsLeft: string) => {
+    const years = parseInt(yearsLeft);
+    if (years <= 0) {
+      return 'text-red-600';
+    } else if (years <= 3) {
+      return 'text-orange-600';
     }
+    return 'text-green-600';
   };
 
-  const toggleExpanded = (systemName: string) => {
-    setExpandedSystems(prev => ({
-      ...prev,
-      [systemName]: !prev[systemName]
-    }));
+  const getYearsLeftIcon = (yearsLeft: string) => {
+    const years = parseInt(yearsLeft);
+    if (years <= 0) {
+      return '⚠️';
+    } else if (years <= 3) {
+      return '⚠️';
+    }
+    return '✅';
   };
 
-  const getMaintenanceProgressBar = (fiveYear: number, tenYear: number) => {
-    const maxCost = Math.max(fiveYear, tenYear, 5000);
-    const fiveYearPercent = (fiveYear / maxCost) * 100;
-    const tenYearPercent = (tenYear / maxCost) * 100;
+  // Calculate total maintenance costs
+  const calculateTotalMaintenanceCosts = () => {
+    let fiveYearTotal = 0;
+    let tenYearTotal = 0;
 
-    return (
-      <div className="space-y-2">
-        <div className="flex justify-between text-xs text-gray-600">
-          <span>5-Year Cost</span>
-          <span>{formatCurrency(fiveYear)}</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            className={`h-2 rounded-full ${getCostSeverityColor(getCostSeverity(fiveYear))}`}
-            style={{ width: `${Math.min(fiveYearPercent, 100)}%` }}
-          />
-        </div>
-        
-        <div className="flex justify-between text-xs text-gray-600 mt-3">
-          <span>10-Year Cost</span>
-          <span>{formatCurrency(tenYear)}</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            className={`h-2 rounded-full ${getCostSeverityColor(getCostSeverity(tenYear))}`}
-            style={{ width: `${Math.min(tenYearPercent, 100)}%` }}
-          />
-        </div>
-      </div>
-    );
+    Object.values(systems).forEach(system => {
+      if (system?.maintenanceCosts) {
+        fiveYearTotal += (system.maintenanceCosts.fiveYear.min + system.maintenanceCosts.fiveYear.max) / 2;
+        tenYearTotal += (system.maintenanceCosts.tenYear.min + system.maintenanceCosts.tenYear.max) / 2;
+      }
+    });
+
+    return { fiveYear: fiveYearTotal, tenYear: tenYearTotal };
   };
 
-  const renderSystemCard = (systemName: string, system: any) => (
-    <Card key={systemName} className={`border-l-4 ${getConditionCardBorder(system.condition)} hover:shadow-lg transition-all duration-200`}>
-      <CardHeader className="pb-4">
+  const totalCosts = calculateTotalMaintenanceCosts();
+
+  const renderSystemCard = (systemName: string, system: any, displayName?: string) => (
+    <Card key={systemName} className="bg-white hover:shadow-md transition-shadow">
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {getSystemIcon(systemName)}
-            <div>
-              <CardTitle className="text-xl font-bold text-gray-900 capitalize">
-                {systemName}
-              </CardTitle>
-              <div className="flex items-center gap-2 mt-1">
-                {system.age && (
-                  <Badge variant="outline" className="text-xs">
-                    {system.age}
-                  </Badge>
-                )}
-                {system.yearsLeft && (
-                  <Badge variant="outline" className="text-xs">
-                    {system.yearsLeft} left
-                  </Badge>
-                )}
-              </div>
-            </div>
+            <CardTitle className="text-lg font-semibold text-gray-900">
+              {displayName || systemName.charAt(0).toUpperCase() + systemName.slice(1)} System
+            </CardTitle>
           </div>
-          <Badge className={`${getConditionColor(system.condition)} font-semibold px-3 py-1`}>
+          <Badge className={`${getConditionBadgeColor(system.condition)} font-medium px-3 py-1 rounded-full`}>
             {system.condition}
           </Badge>
         </div>
       </CardHeader>
       
       <CardContent className="space-y-4">
-        {/* Quick Status */}
-        <div className="bg-gray-50 rounded-lg p-3">
-          <p className="text-sm text-gray-700 font-medium">
-            {system.summary.split('.')[0]}.
-          </p>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <span className="text-sm text-gray-600 font-medium">Brand:</span>
+            <p className="text-sm font-semibold text-gray-900">{system.brand || 'N/A'}</p>
+          </div>
+          <div>
+            <span className="text-sm text-gray-600 font-medium">Type:</span>
+            <p className="text-sm font-semibold text-gray-900">{system.type || 'N/A'}</p>
+          </div>
         </div>
 
-        {/* Replacement Cost - Prominent Display */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <span className="text-sm text-gray-600 font-medium">Age:</span>
+            <p className="text-sm font-semibold text-gray-900">{system.age || 'N/A'}</p>
+          </div>
+          <div>
+            <span className="text-sm text-gray-600 font-medium">Years Left:</span>
+            <p className={`text-sm font-semibold flex items-center gap-1 ${getYearsLeftColor(system.yearsLeft || '0')}`}>
+              <span>{getYearsLeftIcon(system.yearsLeft || '0')}</span>
+              {system.yearsLeft || '0 years'}
+            </p>
+          </div>
+        </div>
+
         {system.replacementCost && (
-          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-            <h4 className="text-sm font-semibold text-blue-900 mb-2">Replacement Cost</h4>
-            <div className="text-center">
-              <span className="text-2xl font-bold text-blue-900">
-                {formatCurrency(system.replacementCost.min)} - {formatCurrency(system.replacementCost.max)}
-              </span>
-            </div>
+          <div className="pt-3 border-t border-gray-100">
+            <span className="text-sm text-gray-600 font-medium">Replacement Cost:</span>
+            <p className="text-lg font-bold text-green-600">
+              {formatCurrency(system.replacementCost.min)} - {formatCurrency(system.replacementCost.max)}
+            </p>
           </div>
         )}
 
-        {/* Expandable Details */}
-        <Collapsible 
-          open={expandedSystems[systemName]} 
-          onOpenChange={() => toggleExpanded(systemName)}
-        >
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" className="w-full justify-between p-2 h-auto">
-              <span className="text-sm font-medium">View Details</span>
-              {expandedSystems[systemName] ? 
-                <ChevronUp className="h-4 w-4" /> : 
-                <ChevronDown className="h-4 w-4" />
-              }
+        <div className="pt-2">
+          {system.yearsLeft && parseInt(system.yearsLeft) <= 0 ? (
+            <Button className="w-full bg-red-500 hover:bg-red-600 text-white">
+              Replace Now
             </Button>
-          </CollapsibleTrigger>
-          
-          <CollapsibleContent className="space-y-4 pt-3">
-            {/* Full Summary */}
-            <div className="text-sm text-gray-700 leading-relaxed">
-              {system.summary}
-            </div>
-
-            {/* System Details */}
-            {(system.brand || system.type) && (
-              <div className="bg-gray-50 rounded-lg p-3 space-y-2">
-                <h5 className="font-medium text-gray-900 text-sm">System Details</h5>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  {system.brand && (
-                    <div>
-                      <span className="text-gray-600">Brand:</span>
-                      <span className="ml-2 font-medium">{system.brand}</span>
-                    </div>
-                  )}
-                  {system.type && (
-                    <div>
-                      <span className="text-gray-600">Type:</span>
-                      <span className="ml-2 font-medium">{system.type}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Detailed Maintenance Costs */}
-            {system.maintenanceCosts && (
-              <div className="space-y-3">
-                <h5 className="font-medium text-gray-900 text-sm">Detailed Maintenance Costs</h5>
-                
-                <div className="space-y-3">
-                  <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-200">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-yellow-900">Next 5 Years</span>
-                      <span className="text-sm font-semibold text-yellow-900">
-                        {formatCurrency(system.maintenanceCosts.fiveYear.min)} - {formatCurrency(system.maintenanceCosts.fiveYear.max)}
-                      </span>
-                    </div>
-                    {system.anticipatedRepairs?.fiveYear && system.anticipatedRepairs.fiveYear.length > 0 && (
-                      <ul className="text-xs text-yellow-800 space-y-1">
-                        {system.anticipatedRepairs.fiveYear.map((repair, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <span className="mt-1">•</span>
-                            <span>{repair}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-
-                  <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-orange-900">Next 10 Years</span>
-                      <span className="text-sm font-semibold text-orange-900">
-                        {formatCurrency(system.maintenanceCosts.tenYear.min)} - {formatCurrency(system.maintenanceCosts.tenYear.max)}
-                      </span>
-                    </div>
-                    {system.anticipatedRepairs?.tenYear && system.anticipatedRepairs.tenYear.length > 0 && (
-                      <ul className="text-xs text-orange-800 space-y-1">
-                        {system.anticipatedRepairs.tenYear.map((repair, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <span className="mt-1">•</span>
-                            <span>{repair}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-          </CollapsibleContent>
-        </Collapsible>
+          ) : (
+            <Button variant="outline" className="w-full">
+              Future Planning
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
 
-  // Define the priority order for the 2x2 grid
-  const prioritySystems = ['roof', 'electrical', 'plumbing', 'hvac'];
-  const gridSystems = prioritySystems.filter(systemName => systems[systemName]);
+  // Define the priority order for the main systems
+  const prioritySystems = ['hvac', 'plumbing', 'roof', 'electrical'];
+  const mainSystems = prioritySystems.filter(systemName => systems[systemName]);
   const foundationSystem = systems.foundation;
-  
-  // Get any remaining systems that aren't in the priority list or foundation
-  const otherSystems = Object.entries(systems).filter(([systemName, system]) => 
-    system && !prioritySystems.includes(systemName) && systemName !== 'foundation'
-  );
 
-  if (gridSystems.length === 0 && !foundationSystem && otherSystems.length === 0) {
+  if (mainSystems.length === 0 && !foundationSystem) {
     return null;
   }
 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-3">Major Systems Assessment</h2>
-        <p className="text-gray-600 text-lg">Quick overview of your property's key systems</p>
+        <h2 className="text-3xl font-bold text-gray-900 mb-3">Key Systems</h2>
       </div>
       
-      {/* 2x2 Grid for priority systems */}
-      {gridSystems.length > 0 && (
+      {/* Projection Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="border-l-4 border-l-yellow-500 bg-yellow-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="text-lg font-semibold text-yellow-800">5-Year Projection</h3>
+              <span className="text-gray-400">ⓘ</span>
+            </div>
+            <div className="text-3xl font-bold text-yellow-800 mb-2">
+              {formatCurrency(totalCosts.fiveYear)}
+            </div>
+            <p className="text-sm text-gray-600">
+              Estimated maintenance costs for systems needing attention within 5 years
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-orange-500 bg-orange-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="text-lg font-semibold text-orange-800">10-Year Projection</h3>
+              <span className="text-gray-400">ⓘ</span>
+            </div>
+            <div className="text-3xl font-bold text-orange-800 mb-2">
+              {formatCurrency(totalCosts.tenYear)}
+            </div>
+            <p className="text-sm text-gray-600">
+              Estimated maintenance costs for systems needing attention within 10 years
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Systems - 2x2 Grid */}
+      {mainSystems.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {gridSystems.map(systemName => renderSystemCard(systemName, systems[systemName]))}
+          {mainSystems.map(systemName => {
+            const displayName = systemName === 'plumbing' ? 'Water Heater' : 
+                              systemName === 'electrical' ? 'Electrical Panel' : 
+                              systemName.charAt(0).toUpperCase() + systemName.slice(1);
+            return renderSystemCard(systemName, systems[systemName], displayName);
+          })}
         </div>
       )}
 
@@ -280,13 +216,6 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
       {foundationSystem && (
         <div>
           {renderSystemCard('foundation', foundationSystem)}
-        </div>
-      )}
-
-      {/* Any other systems */}
-      {otherSystems.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {otherSystems.map(([systemName, system]) => renderSystemCard(systemName, system))}
         </div>
       )}
     </div>
