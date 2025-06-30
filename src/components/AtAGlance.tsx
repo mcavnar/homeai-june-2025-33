@@ -90,8 +90,8 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             </div>
           </div>
           
-          {/* Main Metric Section - Fixed Height for Alignment */}
-          <div className="px-6 pb-4 h-32 flex flex-col justify-center items-center">
+          {/* Main Metric Section - Increased Height for Better Spacing */}
+          <div className="px-6 pb-4 h-40 flex flex-col justify-center items-center">
             <div className={`text-5xl font-bold ${getScoreColor(conditionResult.score)} mb-2`}>
               {conditionResult.score}
             </div>
@@ -107,8 +107,8 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           {/* Visual Separator */}
           <div className="border-t border-gray-100 mx-6"></div>
           
-          {/* Context Bullets Section - Fixed Height */}
-          <div className="p-6 pt-4 h-24 flex items-start">
+          {/* Context Bullets Section - Increased Top Padding */}
+          <div className="p-6 pt-6 h-24 flex items-start">
             <ul className="text-xs text-gray-600 space-y-1 w-full">
               <li>• Factors in repair costs vs. property value</li>
               <li>• Compares to similar properties in area</li>
@@ -129,8 +129,8 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             </div>
           </div>
           
-          {/* Main Metric Section - Fixed Height for Alignment */}
-          <div className="px-6 pb-4 h-32 flex flex-col justify-center items-center">
+          {/* Main Metric Section - Increased Height for Better Spacing */}
+          <div className="px-6 pb-4 h-40 flex flex-col justify-center items-center">
             <div className="text-4xl font-bold text-red-600 mb-2">
               {formatCurrency(totalRepairCost)}
             </div>
@@ -142,8 +142,8 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           {/* Visual Separator */}
           <div className="border-t border-gray-100 mx-6"></div>
           
-          {/* Context Bullets Section - Fixed Height */}
-          <div className="p-6 pt-4 h-24 flex items-start">
+          {/* Context Bullets Section - Increased Top Padding */}
+          <div className="p-6 pt-6 h-24 flex items-start">
             <ul className="text-xs text-gray-600 space-y-1 w-full">
               <li>• Includes labor and material estimates</li>
               <li>• Based on current market rates</li>
@@ -164,16 +164,16 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             </div>
           </div>
           
-          {/* Main Metric Section - Fixed Height for Alignment */}
-          <div className="px-6 pb-4 h-32 flex flex-col justify-center items-center">
+          {/* Main Metric Section - Increased Height with Better Chart Sizing */}
+          <div className="px-6 pb-4 h-40 flex flex-col justify-center items-center">
             <div className="text-4xl font-bold text-gray-900 mb-2">
               {totalIssues}
             </div>
-            <div className="text-sm text-gray-600 mb-3">Total issues</div>
+            <div className="text-sm text-gray-600 mb-4">Total issues</div>
             
-            {/* Bar Chart - Consistent Height */}
+            {/* Bar Chart - Reduced Height for Better Proportions */}
             {chartData.length > 0 && (
-              <div className="h-16 w-full">
+              <div className="h-12 w-full">
                 <ChartContainer config={chartConfig}>
                   <BarChart data={chartData} margin={{ top: 0, right: 5, left: 5, bottom: 10 }}>
                     <XAxis 
@@ -201,8 +201,8 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
           {/* Visual Separator */}
           <div className="border-t border-gray-100 mx-6"></div>
           
-          {/* Context Bullets Section - Fixed Height */}
-          <div className="p-6 pt-4 h-24 flex items-start">
+          {/* Context Bullets Section - Increased Top Padding */}
+          <div className="p-6 pt-6 h-24 flex items-start">
             <ul className="text-xs text-gray-600 space-y-1 w-full">
               <li>• High: Safety hazards & structural concerns</li>
               <li>• Medium: Systems needing attention soon</li>
