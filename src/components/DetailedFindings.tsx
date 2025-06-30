@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { MapPin, Filter, Download, FileText, Search } from 'lucide-react';
+import { MapPin, Filter, Download, FileText, Search, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { useToast } from '@/hooks/use-toast';
 import { InspectionIssue } from '@/types/inspection';
 import { formatCurrency } from '@/utils/formatters';
@@ -24,6 +29,7 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [priceFilter, setPriceFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -143,32 +149,39 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
         <CardTitle>Detailed Issues List</CardTitle>
         <CardDescription>All identified issues with location and estimated repair costs</CardDescription>
         
-        {/* Explanatory Information */}
-        <div className="bg-blue-50 rounded-lg p-4 mt-4 space-y-3">
-          <h4 className="font-semibold text-blue-900 text-sm">How We Analyze Your Inspection Report:</h4>
+        {/* Collapsible Analysis Information */}
+        <Collapsible open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen}>
+          <CollapsibleTrigger className="flex items-center justify-between w-full mt-4 p-3 text-left border rounded-lg hover:bg-gray-50 transition-colors">
+            <h4 className="font-semibold text-blue-900 text-sm">How Do We Analyze Your Issues?</h4>
+            <ChevronDown className={`h-4 w-4 text-blue-900 transition-transform duration-200 ${isAnalysisOpen ? 'transform rotate-180' : ''}`} />
+          </CollapsibleTrigger>
           
-          <div className="space-y-3 text-sm text-blue-800">
-            <div>
-              <span className="font-medium">• Priority Classification:</span>
-              <span className="ml-1">Issues are ranked based on safety impact, potential for damage progression, and urgency of repair needs</span>
+          <CollapsibleContent className="mt-2">
+            <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+              <div className="space-y-3 text-sm text-blue-800">
+                <div>
+                  <span className="font-medium">• Priority Classification:</span>
+                  <span className="ml-1">Issues are ranked based on safety impact, potential for damage progression, and urgency of repair needs</span>
+                </div>
+                
+                <div>
+                  <span className="font-medium">• Cost Estimation:</span>
+                  <span className="ml-1">Repair costs are estimated using current market rates, material costs, labor requirements, and regional pricing data</span>
+                </div>
+                
+                <div>
+                  <span className="font-medium">• Original Report Reference:</span>
+                  <span className="ml-1">Click "See in Report" on any item to view the original inspector's detailed findings and photos in the full PDF report</span>
+                </div>
+                
+                <div>
+                  <span className="font-medium">• Professional Validation:</span>
+                  <span className="ml-1">While our analysis provides helpful estimates, always consult qualified contractors for final pricing and repair specifications</span>
+                </div>
+              </div>
             </div>
-            
-            <div>
-              <span className="font-medium">• Cost Estimation:</span>
-              <span className="ml-1">Repair costs are estimated using current market rates, material costs, labor requirements, and regional pricing data</span>
-            </div>
-            
-            <div>
-              <span className="font-medium">• Original Report Reference:</span>
-              <span className="ml-1">Click "See in Report" on any item to view the original inspector's detailed findings and photos in the full PDF report</span>
-            </div>
-            
-            <div>
-              <span className="font-medium">• Professional Validation:</span>
-              <span className="ml-1">While our analysis provides helpful estimates, always consult qualified contractors for final pricing and repair specifications</span>
-            </div>
-          </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
       </CardHeader>
       <CardContent>
         {/* Filter Bar */}
