@@ -31,15 +31,16 @@ const Synopsis = () => {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="text-center">
+      <div className="text-left">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Synopsis</h1>
-        <div className="text-gray-600 space-y-1">
-          {displayAddress && (
-            <p className="text-lg">{displayAddress}</p>
-          )}
-          {analysis.propertyInfo?.inspectionDate && (
-            <p className="text-sm">Inspection Date: {analysis.propertyInfo.inspectionDate}</p>
-          )}
+        <div className="text-gray-600 text-lg">
+          {displayAddress && analysis.propertyInfo?.inspectionDate ? (
+            <p>{displayAddress} • Inspection Date: {analysis.propertyInfo.inspectionDate}</p>
+          ) : displayAddress ? (
+            <p>{displayAddress}</p>
+          ) : analysis.propertyInfo?.inspectionDate ? (
+            <p>Inspection Date: {analysis.propertyInfo.inspectionDate}</p>
+          ) : null}
         </div>
       </div>
 

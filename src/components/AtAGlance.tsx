@@ -3,6 +3,8 @@ import React from 'react';
 import { TrendingUp, AlertTriangle, Wrench } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { HomeInspectionAnalysis } from '@/types/inspection';
 import { RedfinPropertyData } from '@/types/redfin';
 import { calculateConditionScore } from '@/utils/conditionScore';
@@ -24,6 +26,31 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
     high: analysis.issues?.filter(issue => issue.priority === 'high').length || 0,
     medium: analysis.issues?.filter(issue => issue.priority === 'medium').length || 0,
     low: analysis.issues?.filter(issue => issue.priority === 'low').length || 0,
+  };
+
+  // Prepare data for bar chart
+  const chartData = [
+    {
+      priority: 'High',
+      count: issueCounts.immediate + issueCounts.high,
+      fill: '#ef4444'
+    },
+    {
+      priority: 'Medium',
+      count: issueCounts.medium,
+      fill: '#eab308'
+    },
+    {
+      priority: 'Low',
+      count: issueCounts.low,
+      fill: '#3b82f6'
+    }
+  ].filter(item => item.count > 0);
+
+  const chartConfig = {
+    count: {
+      label: "Issues",
+    },
   };
 
   const getRatingColor = (rating: string) => {
@@ -66,10 +93,13 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             <div className="text-sm text-gray-600 mb-3">out of 10</div>
             <Badge 
               variant="outline" 
-              className={`text-sm px-3 py-1 font-medium ${getRatingColor(conditionResult.rating)}`}
+              className={`text-sm px-3 py-1 font-medium mb-3 ${getRatingColor(conditionResult.rating)}`}
             >
               {conditionResult.rating}
             </Badge>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Based on repair costs, issue severity, and market comparables
+            </p>
           </div>
 
           {/* Center: Total Repair Costs */}
@@ -81,9 +111,12 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             <div className="text-4xl font-bold text-red-600 mb-2">
               {formatCurrency(totalRepairCost)}
             </div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 mb-3">
               Estimated maximum cost
             </div>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              High-end estimates for professional repairs of all identified issues
+            </p>
           </div>
 
           {/* Right: Issues Breakdown */}
@@ -97,67 +130,35 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             </div>
             <div className="text-sm text-gray-600 mb-4">Total issues</div>
             
-            {/* Priority Bars */}
-            <div className="space-y-2">
-              {(issueCounts.immediate > 0 || issueCounts.high > 0) && (
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-red-700 font-medium">
-                    {issueCounts.immediate > 0 ? 'Immediate' : 'High'} Priority
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-red-500 rounded-full" 
-                        style={{ 
-                          width: `${Math.max(10, ((issueCounts.immediate + issueCounts.high) / totalIssues) * 100)}%` 
-                        }}
-                      />
-                    </div>
-                    <span className="text-gray-700 font-medium w-6 text-right">
-                      {issueCounts.immediate + issueCounts.high}
-                    </span>
-                  </div>
-                </div>
-              )}
-              
-              {issueCounts.medium > 0 && (
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-yellow-700 font-medium">Medium Priority</span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-yellow-500 rounded-full" 
-                        style={{ 
-                          width: `${Math.max(10, (issueCounts.medium / totalIssues) * 100)}%` 
-                        }}
-                      />
-                    </div>
-                    <span className="text-gray-700 font-medium w-6 text-right">
-                      {issueCounts.medium}
-                    </span>
-                  </div>
-                </div>
-              )}
-              
-              {issueCounts.low > 0 && (
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-orange-700 font-medium">Low Priority</span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-orange-500 rounded-full" 
-                        style={{ 
-                          width: `${Math.max(10, (issueCounts.low / totalIssues) * 100)}%` 
-                        }}
-                      />
-                    </div>
-                    <span className="text-gray-700 font-medium w-6 text-right">
-                      {issueCounts.low}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* Bar Chart */}
+            {chartData.length > 0 && (
+              <div className="h-32 mb-3">
+                <ChartContainer config={chartConfig}>
+                  <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
+                    <XAxis 
+                      dataKey="priority" 
+                      tick={{ fontSize: 11 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis hide />
+                    <ChartTooltip 
+                      content={<ChartTooltipContent />}
+                      cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
+                    />
+                    <Bar 
+                      dataKey="count" 
+                      radius={[2, 2, 0, 0]}
+                      stroke="none"
+                    />
+                  </BarChart>
+                </ChartContainer>
+              </div>
+            )}
+            
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Categorized by urgency and safety impact for repair prioritization
+            </p>
           </div>
         </div>
       </CardContent>
