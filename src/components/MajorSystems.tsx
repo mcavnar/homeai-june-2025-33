@@ -46,6 +46,61 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
     return 'bg-green-100 text-green-800 border-green-200';
   };
 
+  const parseYearsLeft = (yearsLeft: string | undefined) => {
+    if (!yearsLeft) return [{ label: 'N/A', value: '0' }];
+    
+    // Check if it contains multiple units (look for patterns like "Unit 1: X years, Unit 2: Y years" or "5 years / 8 years")
+    if (yearsLeft.includes('Unit') || yearsLeft.includes('/') || yearsLeft.includes(',')) {
+      const units = [];
+      
+      // Handle "Unit 1: X years, Unit 2: Y years" format
+      if (yearsLeft.includes('Unit')) {
+        const unitMatches = yearsLeft.match(/Unit\s*(\d+):\s*(\d+)\s*years?/gi);
+        if (unitMatches) {
+          unitMatches.forEach(match => {
+            const unitMatch = match.match(/Unit\s*(\d+):\s*(\d+)/i);
+            if (unitMatch) {
+              units.push({
+                label: `Unit ${unitMatch[1]}`,
+                value: unitMatch[2]
+              });
+            }
+          });
+        }
+      }
+      // Handle "X years / Y years" or "X / Y" format
+      else if (yearsLeft.includes('/')) {
+        const parts = yearsLeft.split('/').map(part => part.trim().replace(/\s*years?\s*/i, ''));
+        parts.forEach((part, index) => {
+          if (part && !isNaN(parseInt(part))) {
+            units.push({
+              label: `Unit ${index + 1}`,
+              value: part
+            });
+          }
+        });
+      }
+      // Handle comma-separated format
+      else if (yearsLeft.includes(',')) {
+        const parts = yearsLeft.split(',').map(part => part.trim().replace(/\s*years?\s*/i, ''));
+        parts.forEach((part, index) => {
+          if (part && !isNaN(parseInt(part))) {
+            units.push({
+              label: `Unit ${index + 1}`,
+              value: part
+            });
+          }
+        });
+      }
+      
+      return units.length > 0 ? units : [{ label: 'N/A', value: '0' }];
+    }
+    
+    // Single unit
+    const numericValue = yearsLeft.replace(/\s*years?\s*/i, '').trim();
+    return [{ label: '', value: numericValue }];
+  };
+
   // Calculate total maintenance costs
   const calculateTotalMaintenanceCosts = () => {
     let fiveYearTotal = 0;
@@ -63,118 +118,129 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
 
   const totalCosts = calculateTotalMaintenanceCosts();
 
-  const renderSystemCard = (systemName: string, system: any, displayName?: string) => (
-    <Card key={systemName} className="bg-white border border-gray-200">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {getSystemIcon(systemName)}
-            <CardTitle className="text-lg font-semibold text-gray-900">
-              {displayName || systemName.charAt(0).toUpperCase() + systemName.slice(1)}
-            </CardTitle>
-          </div>
-          <span className={`${getConditionColor(system.condition)} px-3 py-1 text-xs font-medium rounded-full border`}>
-            {system.condition}
-          </span>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="space-y-3">
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <span className="text-sm text-gray-600">Brand:</span>
-            <span className="text-sm font-medium text-gray-900">{system.brand || 'N/A'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-gray-600">Type:</span>
-            <span className="text-sm font-medium text-gray-900">{system.type || 'N/A'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-gray-600">Age:</span>
-            <span className="text-sm font-medium text-gray-900">{system.age || 'N/A'}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Years Left:</span>
-            <span className={`${getUrgencyColor(system.yearsLeft || '0')} px-3 py-1 text-xs font-medium rounded-full border`}>
-              {system.yearsLeft || '0'} years
+  const renderSystemCard = (systemName: string, system: any, displayName?: string) => {
+    const yearsLeftData = parseYearsLeft(system.yearsLeft);
+    
+    return (
+      <Card key={systemName} className="bg-white border border-gray-200">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {getSystemIcon(systemName)}
+              <CardTitle className="text-lg font-semibold text-gray-900">
+                {displayName || systemName.charAt(0).toUpperCase() + systemName.slice(1)}
+              </CardTitle>
+            </div>
+            <span className={`${getConditionColor(system.condition)} px-3 py-1 text-xs font-medium rounded-full border`}>
+              {system.condition}
             </span>
           </div>
-        </div>
-
-        <Collapsible>
-          <CollapsibleTrigger asChild>
-            <Button variant="outline" className="w-full mt-3 justify-between">
-              More Details
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-3 mt-3 pt-3 border-t border-gray-200">
-            {system.summary && (
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Summary</h4>
-                <p className="text-sm text-gray-600">{system.summary}</p>
+        </CardHeader>
+        
+        <CardContent className="space-y-3">
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-600">Brand:</span>
+              <span className="text-sm font-medium text-gray-900">{system.brand || 'N/A'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-600">Type:</span>
+              <span className="text-sm font-medium text-gray-900">{system.type || 'N/A'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-600">Age:</span>
+              <span className="text-sm font-medium text-gray-900">{system.age || 'N/A'}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Years Left:</span>
+              <div className="flex flex-wrap gap-2 justify-end">
+                {yearsLeftData.map((unit, index) => (
+                  <span 
+                    key={index}
+                    className={`${getUrgencyColor(unit.value)} px-3 py-1 text-xs font-medium rounded-full border`}
+                  >
+                    {unit.label && `${unit.label}: `}{unit.value} years
+                  </span>
+                ))}
               </div>
-            )}
-            
-            {system.replacementCost && (
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Replacement Cost</h4>
-                <p className="text-sm text-gray-600">
-                  {formatCurrency(system.replacementCost.min)} - {formatCurrency(system.replacementCost.max)}
-                </p>
-              </div>
-            )}
+            </div>
+          </div>
 
-            {system.maintenanceCosts && (
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Maintenance Costs</h4>
-                <div className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">5-Year:</span>
-                    <span className="text-gray-900">
-                      {formatCurrency(system.maintenanceCosts.fiveYear.min)} - {formatCurrency(system.maintenanceCosts.fiveYear.max)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">10-Year:</span>
-                    <span className="text-gray-900">
-                      {formatCurrency(system.maintenanceCosts.tenYear.min)} - {formatCurrency(system.maintenanceCosts.tenYear.max)}
-                    </span>
+          <Collapsible>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="w-full mt-3 justify-between">
+                More Details
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-3 mt-3 pt-3 border-t border-gray-200">
+              {system.summary && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Summary</h4>
+                  <p className="text-sm text-gray-600">{system.summary}</p>
+                </div>
+              )}
+              
+              {system.replacementCost && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Replacement Cost</h4>
+                  <p className="text-sm text-gray-600">
+                    {formatCurrency(system.replacementCost.min)} - {formatCurrency(system.replacementCost.max)}
+                  </p>
+                </div>
+              )}
+
+              {system.maintenanceCosts && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Maintenance Costs</h4>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">5-Year:</span>
+                      <span className="text-gray-900">
+                        {formatCurrency(system.maintenanceCosts.fiveYear.min)} - {formatCurrency(system.maintenanceCosts.fiveYear.max)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">10-Year:</span>
+                      <span className="text-gray-900">
+                        {formatCurrency(system.maintenanceCosts.tenYear.min)} - {formatCurrency(system.maintenanceCosts.tenYear.max)}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {system.anticipatedRepairs && (
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Anticipated Repairs</h4>
-                {system.anticipatedRepairs.fiveYear && system.anticipatedRepairs.fiveYear.length > 0 && (
-                  <div className="mb-2">
-                    <span className="text-xs font-medium text-gray-700">5-Year:</span>
-                    <ul className="text-sm text-gray-600 ml-2 list-disc list-inside">
-                      {system.anticipatedRepairs.fiveYear.map((repair: string, index: number) => (
-                        <li key={index}>{repair}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {system.anticipatedRepairs.tenYear && system.anticipatedRepairs.tenYear.length > 0 && (
-                  <div>
-                    <span className="text-xs font-medium text-gray-700">10-Year:</span>
-                    <ul className="text-sm text-gray-600 ml-2 list-disc list-inside">
-                      {system.anticipatedRepairs.tenYear.map((repair: string, index: number) => (
-                        <li key={index}>{repair}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
-          </CollapsibleContent>
-        </Collapsible>
-      </CardContent>
-    </Card>
-  );
+              {system.anticipatedRepairs && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Anticipated Repairs</h4>
+                  {system.anticipatedRepairs.fiveYear && system.anticipatedRepairs.fiveYear.length > 0 && (
+                    <div className="mb-2">
+                      <span className="text-xs font-medium text-gray-700">5-Year:</span>
+                      <ul className="text-sm text-gray-600 ml-2 list-disc list-inside">
+                        {system.anticipatedRepairs.fiveYear.map((repair: string, index: number) => (
+                          <li key={index}>{repair}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {system.anticipatedRepairs.tenYear && system.anticipatedRepairs.tenYear.length > 0 && (
+                    <div>
+                      <span className="text-xs font-medium text-gray-700">10-Year:</span>
+                      <ul className="text-sm text-gray-600 ml-2 list-disc list-inside">
+                        {system.anticipatedRepairs.tenYear.map((repair: string, index: number) => (
+                          <li key={index}>{repair}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CollapsibleContent>
+          </Collapsible>
+        </CardContent>
+      </Card>
+    );
+  };
 
   // Define the priority order for the main systems
   const prioritySystems = ['roof', 'electrical', 'plumbing', 'hvac'];
