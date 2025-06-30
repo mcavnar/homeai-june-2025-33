@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -121,7 +120,8 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
 
   const renderSystemCard = (systemName: string, system: any, displayName?: string) => {
     const yearsLeftData = parseYearsLeft(system.yearsLeft);
-    const shouldShowBrand = systemName !== 'roof' && systemName !== 'electrical';
+    const shouldShowBrand = systemName !== 'roof' && systemName !== 'electrical' && systemName !== 'foundation';
+    const isFoundation = systemName === 'foundation';
     
     return (
       <Card key={systemName} className="bg-white border border-gray-200">
@@ -141,8 +141,39 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
         
         <CardContent className="space-y-4">
           {/* Grid layout for main information */}
-          <div className={`grid gap-x-6 gap-y-4 p-4 bg-gray-50 rounded-lg ${shouldShowBrand ? 'grid-cols-2' : 'grid-cols-2'}`}>
-            {shouldShowBrand ? (
+          <div className={`grid gap-x-6 gap-y-4 p-4 bg-gray-50 rounded-lg ${
+            isFoundation 
+              ? 'grid-cols-3' 
+              : shouldShowBrand 
+                ? 'grid-cols-2' 
+                : 'grid-cols-2'
+          }`}>
+            {isFoundation ? (
+              <>
+                {/* Foundation: Single row with three columns */}
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Type</span>
+                  <div className="text-sm font-medium text-gray-900">{system.type || 'N/A'}</div>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Age</span>
+                  <div className="text-sm font-medium text-gray-900">{system.age || 'N/A'}</div>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Years Left</span>
+                  <div className="flex flex-wrap gap-1">
+                    {yearsLeftData.map((unit, index) => (
+                      <span 
+                        key={index}
+                        className={`${getUrgencyColor(unit.value)} px-2 py-1 text-xs font-medium rounded-md border`}
+                      >
+                        {unit.label && `${unit.label}: `}{unit.value} years
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : shouldShowBrand ? (
               <>
                 {/* First row: Brand and Type */}
                 <div className="space-y-1">
