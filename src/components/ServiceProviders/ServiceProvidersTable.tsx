@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Star } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -16,6 +16,7 @@ interface ServiceProvider {
   serviceType: string;
   company: string;
   frequency: string;
+  rating: number;
   monthlyCost: number;
   annualCost: number;
 }
@@ -42,6 +43,24 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
     setOpenDetails(openDetails === providerId ? null : providerId);
   };
 
+  const renderStars = (rating: number) => {
+    return (
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            className={`h-4 w-4 ${
+              star <= rating
+                ? 'fill-yellow-400 text-yellow-400'
+                : 'fill-gray-200 text-gray-200'
+            }`}
+          />
+        ))}
+        <span className="ml-1 text-sm text-gray-600">({rating.toFixed(1)})</span>
+      </div>
+    );
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -54,6 +73,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
               <TableHead className="text-gray-500 font-medium">Service Type</TableHead>
               <TableHead className="text-gray-500 font-medium">Company</TableHead>
               <TableHead className="text-gray-500 font-medium">Frequency</TableHead>
+              <TableHead className="text-gray-500 font-medium">Rating</TableHead>
               <TableHead className="text-gray-500 font-medium text-right">Monthly Cost</TableHead>
               <TableHead className="text-gray-500 font-medium text-right">Annual Cost</TableHead>
             </TableRow>
@@ -87,6 +107,9 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
                     </div>
                   </TableCell>
                   <TableCell className="text-gray-700">{provider.frequency}</TableCell>
+                  <TableCell>
+                    {renderStars(provider.rating)}
+                  </TableCell>
                   <TableCell className="text-right font-semibold text-green-600">
                     {provider.monthlyCost > 0 ? formatCurrency(provider.monthlyCost) : '-'}
                   </TableCell>
@@ -96,7 +119,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
                 </TableRow>
                 
                 <TableRow>
-                  <TableCell colSpan={5} className="p-0">
+                  <TableCell colSpan={6} className="p-0">
                     <Collapsible open={openDetails === provider.id}>
                       <CollapsibleContent className="bg-gray-50 border-t">
                         <div className="p-6 space-y-4">

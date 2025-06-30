@@ -38,13 +38,14 @@ const ServiceProviders = () => {
 
   const costSummary = calculateCostSummary();
 
-  // Mock service providers data
+  // Mock service providers data with ratings
   const serviceProviders = [
     {
       id: 1,
       serviceType: "Lawn Care",
       company: "PerfectLawn Care",
       frequency: "Weekly",
+      rating: 4.5,
       monthlyCost: 80,
       annualCost: 4160,
     },
@@ -53,6 +54,7 @@ const ServiceProviders = () => {
       serviceType: "House Cleaning",
       company: "Spotless Home Cleaning",
       frequency: "Bi-weekly",
+      rating: 4.8,
       monthlyCost: 125,
       annualCost: 3250,
     },
@@ -61,6 +63,7 @@ const ServiceProviders = () => {
       serviceType: "Plumbing",
       company: "AquaFlow Plumbing",
       frequency: "As-needed",
+      rating: 4.2,
       monthlyCost: 0,
       annualCost: 1200,
     },
@@ -69,6 +72,7 @@ const ServiceProviders = () => {
       serviceType: "HVAC",
       company: "Climate Control Experts",
       frequency: "Quarterly",
+      rating: 4.6,
       monthlyCost: 100,
       annualCost: 1200,
     },
@@ -77,6 +81,7 @@ const ServiceProviders = () => {
       serviceType: "Electrical",
       company: "Elite Electrical Solutions",
       frequency: "As-needed",
+      rating: 4.3,
       monthlyCost: 0,
       annualCost: 800,
     },
