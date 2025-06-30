@@ -53,10 +53,8 @@ const Synopsis = () => {
         </div>
       </div>
 
-      {/* Centered Action Buttons */}
-      <div className="flex justify-center">
-        <ActionButtons />
-      </div>
+      {/* Next Steps Action Buttons */}
+      <ActionButtons />
 
       {/* Most Expensive Issues Section */}
       {analysis.issues && analysis.issues.length > 0 && (
