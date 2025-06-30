@@ -2,8 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Home, Zap, Droplets, Wind, Building, Thermometer } from 'lucide-react';
+import { Home, Zap, Droplets, Wind, Building } from 'lucide-react';
 import { MajorSystems as MajorSystemsType } from '@/types/inspection';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -13,31 +12,18 @@ interface MajorSystemsProps {
 
 const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
   const getSystemIcon = (systemName: string) => {
-    const iconProps = { className: "h-6 w-6" };
+    const iconProps = { className: "h-5 w-5" };
     switch (systemName.toLowerCase()) {
       case 'roof': return <Home {...iconProps} />;
       case 'electrical': return <Zap {...iconProps} />;
       case 'plumbing': return <Droplets {...iconProps} />;
       case 'hvac': return <Wind {...iconProps} />;
       case 'foundation': return <Building {...iconProps} />;
-      case 'water heater': return <Thermometer {...iconProps} />;
       default: return <Home {...iconProps} />;
     }
   };
 
   const getConditionColor = (condition: string) => {
-    const lowerCondition = condition.toLowerCase();
-    if (lowerCondition.includes('good') || lowerCondition.includes('excellent')) {
-      return 'bg-green-100 text-green-800 border-green-200';
-    } else if (lowerCondition.includes('fair') || lowerCondition.includes('satisfactory')) {
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    } else if (lowerCondition.includes('poor') || lowerCondition.includes('immediate')) {
-      return 'bg-red-100 text-red-800 border-red-200';
-    }
-    return 'bg-gray-100 text-gray-800 border-gray-200';
-  };
-
-  const getConditionBadgeColor = (condition: string) => {
     const lowerCondition = condition.toLowerCase();
     if (lowerCondition.includes('good') || lowerCondition.includes('excellent')) {
       return 'bg-green-500 text-white';
@@ -49,24 +35,14 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
     return 'bg-gray-500 text-white';
   };
 
-  const getYearsLeftColor = (yearsLeft: string) => {
+  const getUrgencyColor = (yearsLeft: string) => {
     const years = parseInt(yearsLeft);
     if (years <= 0) {
-      return 'text-red-600';
+      return 'bg-red-500 text-white';
     } else if (years <= 3) {
-      return 'text-orange-600';
+      return 'bg-orange-500 text-white';
     }
-    return 'text-green-600';
-  };
-
-  const getYearsLeftIcon = (yearsLeft: string) => {
-    const years = parseInt(yearsLeft);
-    if (years <= 0) {
-      return '⚠️';
-    } else if (years <= 3) {
-      return '⚠️';
-    }
-    return '✅';
+    return 'bg-green-500 text-white';
   };
 
   // Calculate total maintenance costs
@@ -87,73 +63,48 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
   const totalCosts = calculateTotalMaintenanceCosts();
 
   const renderSystemCard = (systemName: string, system: any, displayName?: string) => (
-    <Card key={systemName} className="bg-white hover:shadow-md transition-shadow">
+    <Card key={systemName} className="bg-white border border-gray-200">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {getSystemIcon(systemName)}
             <CardTitle className="text-lg font-semibold text-gray-900">
-              {displayName || systemName.charAt(0).toUpperCase() + systemName.slice(1)} System
+              {displayName || systemName.charAt(0).toUpperCase() + systemName.slice(1)}
             </CardTitle>
           </div>
-          <Badge className={`${getConditionBadgeColor(system.condition)} font-medium px-3 py-1 rounded-full`}>
+          <Badge className={`${getConditionColor(system.condition)} px-2 py-1 text-xs font-medium rounded`}>
             {system.condition}
           </Badge>
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <span className="text-sm text-gray-600 font-medium">Brand:</span>
-            <p className="text-sm font-semibold text-gray-900">{system.brand || 'N/A'}</p>
+      <CardContent className="space-y-3">
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <span className="text-sm text-gray-600">Brand:</span>
+            <span className="text-sm font-medium text-gray-900">{system.brand || 'N/A'}</span>
           </div>
-          <div>
-            <span className="text-sm text-gray-600 font-medium">Type:</span>
-            <p className="text-sm font-semibold text-gray-900">{system.type || 'N/A'}</p>
+          <div className="flex justify-between">
+            <span className="text-sm text-gray-600">Type:</span>
+            <span className="text-sm font-medium text-gray-900">{system.type || 'N/A'}</span>
           </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <span className="text-sm text-gray-600 font-medium">Age:</span>
-            <p className="text-sm font-semibold text-gray-900">{system.age || 'N/A'}</p>
+          <div className="flex justify-between">
+            <span className="text-sm text-gray-600">Age:</span>
+            <span className="text-sm font-medium text-gray-900">{system.age || 'N/A'}</span>
           </div>
-          <div>
-            <span className="text-sm text-gray-600 font-medium">Years Left:</span>
-            <p className={`text-sm font-semibold flex items-center gap-1 ${getYearsLeftColor(system.yearsLeft || '0')}`}>
-              <span>{getYearsLeftIcon(system.yearsLeft || '0')}</span>
-              {system.yearsLeft || '0 years'}
-            </p>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Years Left:</span>
+            <Badge className={`${getUrgencyColor(system.yearsLeft || '0')} px-2 py-1 text-xs font-medium rounded`}>
+              {system.yearsLeft || '0'} years
+            </Badge>
           </div>
-        </div>
-
-        {system.replacementCost && (
-          <div className="pt-3 border-t border-gray-100">
-            <span className="text-sm text-gray-600 font-medium">Replacement Cost:</span>
-            <p className="text-lg font-bold text-green-600">
-              {formatCurrency(system.replacementCost.min)} - {formatCurrency(system.replacementCost.max)}
-            </p>
-          </div>
-        )}
-
-        <div className="pt-2">
-          {system.yearsLeft && parseInt(system.yearsLeft) <= 0 ? (
-            <Button className="w-full bg-red-500 hover:bg-red-600 text-white">
-              Replace Now
-            </Button>
-          ) : (
-            <Button variant="outline" className="w-full">
-              Future Planning
-            </Button>
-          )}
         </div>
       </CardContent>
     </Card>
   );
 
   // Define the priority order for the main systems
-  const prioritySystems = ['hvac', 'plumbing', 'roof', 'electrical'];
+  const prioritySystems = ['roof', 'electrical', 'plumbing', 'hvac'];
   const mainSystems = prioritySystems.filter(systemName => systems[systemName]);
   const foundationSystem = systems.foundation;
 
@@ -168,44 +119,43 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
       </div>
       
       {/* Projection Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border-l-4 border-l-yellow-500 bg-yellow-50">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <Card className="bg-blue-50 border border-blue-200">
           <CardContent className="pt-6">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-lg font-semibold text-yellow-800">5-Year Projection</h3>
-              <span className="text-gray-400">ⓘ</span>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">5 Year Projection</h3>
+              <div className="text-3xl font-bold text-blue-900 mb-2">
+                {formatCurrency(totalCosts.fiveYear)}
+              </div>
+              <p className="text-sm text-blue-700">
+                Estimated maintenance costs for systems needing attention within 5 years
+              </p>
             </div>
-            <div className="text-3xl font-bold text-yellow-800 mb-2">
-              {formatCurrency(totalCosts.fiveYear)}
-            </div>
-            <p className="text-sm text-gray-600">
-              Estimated maintenance costs for systems needing attention within 5 years
-            </p>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-orange-500 bg-orange-50">
+        <Card className="bg-orange-50 border border-orange-200">
           <CardContent className="pt-6">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-lg font-semibold text-orange-800">10-Year Projection</h3>
-              <span className="text-gray-400">ⓘ</span>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-orange-800 mb-2">10 Year Projection</h3>
+              <div className="text-3xl font-bold text-orange-900 mb-2">
+                {formatCurrency(totalCosts.tenYear)}
+              </div>
+              <p className="text-sm text-orange-700">
+                Estimated maintenance costs for systems needing attention within 10 years
+              </p>
             </div>
-            <div className="text-3xl font-bold text-orange-800 mb-2">
-              {formatCurrency(totalCosts.tenYear)}
-            </div>
-            <p className="text-sm text-gray-600">
-              Estimated maintenance costs for systems needing attention within 10 years
-            </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Main Systems - 2x2 Grid */}
       {mainSystems.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {mainSystems.map(systemName => {
-            const displayName = systemName === 'plumbing' ? 'Water Heater' : 
-                              systemName === 'electrical' ? 'Electrical Panel' : 
+            const displayName = systemName === 'plumbing' ? 'Plumbing' : 
+                              systemName === 'electrical' ? 'Electrical' : 
+                              systemName === 'hvac' ? 'HVAC' :
                               systemName.charAt(0).toUpperCase() + systemName.slice(1);
             return renderSystemCard(systemName, systems[systemName], displayName);
           })}
@@ -215,7 +165,7 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
       {/* Foundation system - full page width */}
       {foundationSystem && (
         <div>
-          {renderSystemCard('foundation', foundationSystem)}
+          {renderSystemCard('foundation', foundationSystem, 'Foundation')}
         </div>
       )}
     </div>
