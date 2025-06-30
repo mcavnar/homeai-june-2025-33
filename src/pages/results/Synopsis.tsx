@@ -1,14 +1,13 @@
 
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
-import PropertyInfo from '@/components/PropertyInfo';
-import ConditionScore from '@/components/ConditionScore';
-import CostSummary from '@/components/CostSummary';
+import AtAGlance from '@/components/AtAGlance';
 import ActionButtons from '@/components/ActionButtons';
 import MostExpensiveIssues from '@/components/MostExpensiveIssues';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Loader2 } from 'lucide-react';
+import { cleanAddressForDisplay } from '@/utils/addressUtils';
 
 interface SynopsisContextType {
   analysis: any;
@@ -25,33 +24,29 @@ const Synopsis = () => {
     propertyError,
   } = useOutletContext<SynopsisContextType>();
 
+  const displayAddress = analysis.propertyInfo?.address 
+    ? cleanAddressForDisplay(analysis.propertyInfo.address) 
+    : undefined;
+
   return (
     <div className="space-y-6">
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Left Column */}
-        <div className="space-y-6">
-          {analysis.propertyInfo && (
-            <PropertyInfo 
-              address={analysis.propertyInfo.address}
-              inspectionDate={analysis.propertyInfo.inspectionDate}
-            />
+      {/* Page Header */}
+      <div className="text-center">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Synopsis</h1>
+        <div className="text-gray-600 space-y-1">
+          {displayAddress && (
+            <p className="text-lg">{displayAddress}</p>
           )}
-          
-          {analysis && propertyData && (
-            <ConditionScore analysis={analysis} propertyData={propertyData} />
-          )}
-        </div>
-
-        {/* Right Column */}
-        <div className="space-y-6">
-          {analysis.costSummary && (
-            <CostSummary 
-              costSummary={analysis.costSummary} 
-              issues={analysis.issues || []}
-            />
+          {analysis.propertyInfo?.inspectionDate && (
+            <p className="text-sm">Inspection Date: {analysis.propertyInfo.inspectionDate}</p>
           )}
         </div>
       </div>
+
+      {/* At a Glance Section */}
+      {analysis && propertyData && (
+        <AtAGlance analysis={analysis} propertyData={propertyData} />
+      )}
 
       {/* Next Steps Action Buttons */}
       <ActionButtons />
