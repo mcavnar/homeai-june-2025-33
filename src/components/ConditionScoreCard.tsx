@@ -38,9 +38,10 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
   };
 
   const bulletPoints = [
-    'Repair costs vs. property value',
-    'Compares to similar area properties',
-    'Age and maintenance history'
+    'Repair costs analyzed against property value and national benchmarks',
+    'Issue count compared to typical home inspection findings (20+ issues trigger penalties)',
+    'Market performance factors including days on market and sale-to-list ratios',
+    'Property size and features measured against neighborhood averages'
   ];
 
   return (

@@ -8,13 +8,15 @@ interface MetricCardProps {
   title: string;
   children: React.ReactNode;
   bulletPoints: string[];
+  bulletHeadline?: string;
 }
 
 const MetricCard: React.FC<MetricCardProps> = ({ 
   icon: Icon, 
   title, 
   children, 
-  bulletPoints 
+  bulletPoints,
+  bulletHeadline = "How this conclusion was reached:"
 }) => {
   return (
     <Card className="border-indigo-200">
@@ -36,7 +38,8 @@ const MetricCard: React.FC<MetricCardProps> = ({
         <div className="border-t border-gray-100 mx-4 sm:mx-6"></div>
         
         {/* Context Bullets Section - Responsive and Overflow Protected */}
-        <div className="p-3 sm:p-6 pt-6 min-h-24 flex items-start overflow-hidden">
+        <div className="p-3 sm:p-6 pt-6 min-h-24 flex flex-col items-start overflow-hidden">
+          <h4 className="text-xs font-semibold text-gray-700 mb-2">{bulletHeadline}</h4>
           <ul className="text-[10px] sm:text-xs text-gray-600 space-y-1 w-full break-words leading-tight">
             {bulletPoints.map((point, index) => (
               <li key={index}>• {point}</li>
