@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -43,20 +42,11 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
     setOpenDetails(openDetails === providerId ? null : providerId);
   };
 
-  const renderStars = (rating: number) => {
+  const renderRating = (rating: number) => {
     return (
       <div className="flex items-center gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            className={`h-4 w-4 ${
-              star <= rating
-                ? 'fill-yellow-400 text-yellow-400'
-                : 'fill-gray-200 text-gray-200'
-            }`}
-          />
-        ))}
-        <span className="ml-1 text-sm text-gray-600">({rating.toFixed(1)})</span>
+        <span className="font-medium text-gray-900">{rating.toFixed(1)}</span>
+        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
       </div>
     );
   };
@@ -108,7 +98,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
                   </TableCell>
                   <TableCell className="text-gray-700">{provider.frequency}</TableCell>
                   <TableCell>
-                    {renderStars(provider.rating)}
+                    {renderRating(provider.rating)}
                   </TableCell>
                   <TableCell className="text-right font-semibold text-green-600">
                     {provider.monthlyCost > 0 ? formatCurrency(provider.monthlyCost) : '-'}
