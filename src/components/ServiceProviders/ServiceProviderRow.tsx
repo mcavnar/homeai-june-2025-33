@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Phone, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { formatCurrency } from '@/utils/formatters';
@@ -31,12 +33,14 @@ const ServiceProviderRow: React.FC<ServiceProviderRowProps> = ({ provider }) => 
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
-    phoneNumber: provider.phone,
-    price: provider.monthlyCost > 0 ? provider.monthlyCost.toString() : '',
-    website: '',
-    email: '',
+    serviceType: provider.serviceType,
     companyName: provider.company,
-    mainContact: '',
+    contactPerson: '',
+    phoneNumber: provider.phone,
+    email: '',
+    serviceFrequency: provider.frequency,
+    monthlyCost: provider.monthlyCost > 0 ? provider.monthlyCost.toString() : '',
+    annualCost: provider.annualCost.toString(),
     notes: ''
   });
 
@@ -51,9 +55,32 @@ const ServiceProviderRow: React.FC<ServiceProviderRowProps> = ({ provider }) => 
     console.log('Saving provider details:', formData);
     toast({
       title: "Details Saved",
-      description: "Provider information has been updated successfully.",
+      description: "Service provider information has been updated successfully.",
     });
   };
+
+  const serviceTypes = [
+    "Lawn Care",
+    "House Cleaning",
+    "Plumbing",
+    "HVAC",
+    "Electrical",
+    "Roofing",
+    "Painting",
+    "Pest Control",
+    "Pool Maintenance",
+    "Landscaping"
+  ];
+
+  const frequencies = [
+    "Weekly",
+    "Bi-weekly",
+    "Monthly",
+    "Quarterly",
+    "Semi-annually",
+    "Annually",
+    "As-needed"
+  ];
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -114,18 +141,50 @@ const ServiceProviderRow: React.FC<ServiceProviderRowProps> = ({ provider }) => 
       <CollapsibleContent asChild>
         <TableRow>
           <TableCell colSpan={6} className="bg-gray-50 border-t">
-            <div className="p-6 space-y-4">
-              <h3 className="font-semibold text-gray-900 mb-4">Provider Details</h3>
+            <div className="p-6 space-y-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Service Provider Information</h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor={`serviceType-${provider.id}`} className="text-sm font-medium text-gray-700">
+                    Service Type <span className="text-red-500">*</span>
+                  </Label>
+                  <Select value={formData.serviceType} onValueChange={(value) => handleInputChange('serviceType', value)}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select service type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                      {serviceTypes.map((type) => (
+                        <SelectItem key={type} value={type} className="hover:bg-gray-100">
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div>
                   <Label htmlFor={`companyName-${provider.id}`} className="text-sm font-medium text-gray-700">
-                    Company Name
+                    Company Name <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id={`companyName-${provider.id}`}
                     value={formData.companyName}
                     onChange={(e) => handleInputChange('companyName', e.target.value)}
+                    placeholder="Enter company name"
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor={`contactPerson-${provider.id}`} className="text-sm font-medium text-gray-700">
+                    Contact Person
+                  </Label>
+                  <Input
+                    id={`contactPerson-${provider.id}`}
+                    value={formData.contactPerson}
+                    onChange={(e) => handleInputChange('contactPerson', e.target.value)}
+                    placeholder="Enter contact person name"
                     className="mt-1"
                   />
                 </div>
@@ -138,6 +197,7 @@ const ServiceProviderRow: React.FC<ServiceProviderRowProps> = ({ provider }) => 
                     id={`phoneNumber-${provider.id}`}
                     value={formData.phoneNumber}
                     onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                    placeholder="(555) 123-4567"
                     className="mt-1"
                   />
                 </div>
@@ -151,44 +211,51 @@ const ServiceProviderRow: React.FC<ServiceProviderRowProps> = ({ provider }) => 
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
+                    placeholder="Enter email address"
                     className="mt-1"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor={`website-${provider.id}`} className="text-sm font-medium text-gray-700">
-                    Website
+                  <Label htmlFor={`serviceFrequency-${provider.id}`} className="text-sm font-medium text-gray-700">
+                    Service Frequency
+                  </Label>
+                  <Select value={formData.serviceFrequency} onValueChange={(value) => handleInputChange('serviceFrequency', value)}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select frequency" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                      {frequencies.map((freq) => (
+                        <SelectItem key={freq} value={freq} className="hover:bg-gray-100">
+                          {freq}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor={`monthlyCost-${provider.id}`} className="text-sm font-medium text-gray-700">
+                    Monthly Cost
                   </Label>
                   <Input
-                    id={`website-${provider.id}`}
-                    value={formData.website}
-                    onChange={(e) => handleInputChange('website', e.target.value)}
-                    placeholder="https://"
+                    id={`monthlyCost-${provider.id}`}
+                    value={formData.monthlyCost}
+                    onChange={(e) => handleInputChange('monthlyCost', e.target.value)}
+                    placeholder="$0.00"
                     className="mt-1"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor={`price-${provider.id}`} className="text-sm font-medium text-gray-700">
-                    Price
+                  <Label htmlFor={`annualCost-${provider.id}`} className="text-sm font-medium text-gray-700">
+                    Annual Cost
                   </Label>
                   <Input
-                    id={`price-${provider.id}`}
-                    value={formData.price}
-                    onChange={(e) => handleInputChange('price', e.target.value)}
-                    placeholder="Enter price"
-                    className="mt-1"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor={`mainContact-${provider.id}`} className="text-sm font-medium text-gray-700">
-                    Main Contact
-                  </Label>
-                  <Input
-                    id={`mainContact-${provider.id}`}
-                    value={formData.mainContact}
-                    onChange={(e) => handleInputChange('mainContact', e.target.value)}
+                    id={`annualCost-${provider.id}`}
+                    value={formData.annualCost}
+                    onChange={(e) => handleInputChange('annualCost', e.target.value)}
+                    placeholder="$0.00"
                     className="mt-1"
                   />
                 </div>
@@ -196,21 +263,22 @@ const ServiceProviderRow: React.FC<ServiceProviderRowProps> = ({ provider }) => 
 
               <div>
                 <Label htmlFor={`notes-${provider.id}`} className="text-sm font-medium text-gray-700">
-                  Notes
+                  Additional Notes
                 </Label>
-                <textarea
+                <Textarea
                   id={`notes-${provider.id}`}
                   value={formData.notes}
                   onChange={(e) => handleInputChange('notes', e.target.value)}
-                  className="mt-1 w-full min-h-[80px] px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  placeholder="Add any additional notes..."
+                  placeholder="Enter any additional notes or comments about this service provider..."
+                  className="mt-1"
+                  rows={4}
                 />
               </div>
 
               <div className="flex justify-end pt-4">
                 <Button 
                   onClick={handleSaveDetails}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6"
                   size="sm"
                 >
                   Save Details
