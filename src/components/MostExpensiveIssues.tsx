@@ -1,7 +1,8 @@
-
 import React from 'react';
 import { MapPin } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { InspectionIssue } from '@/types/inspection';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -10,6 +11,8 @@ interface MostExpensiveIssuesProps {
 }
 
 const MostExpensiveIssues: React.FC<MostExpensiveIssuesProps> = ({ issues }) => {
+  const navigate = useNavigate();
+
   // Filter issues that cost $1000+ or get top 3 most expensive
   const getTopIssues = () => {
     // Sort all issues by max cost descending
@@ -47,16 +50,31 @@ const MostExpensiveIssues: React.FC<MostExpensiveIssuesProps> = ({ issues }) => 
     );
   };
 
+  const handleCompleteListClick = () => {
+    navigate('/results/issues');
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Most Expensive Issues</CardTitle>
-        <CardDescription>
-          {hasHighCostIssues 
-            ? `All issues with repair costs of $1,000 or more (${topIssues.length} found)`
-            : `Top 3 most expensive issues from this inspection`
-          }
-        </CardDescription>
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle>Most Expensive Issues</CardTitle>
+            <CardDescription>
+              {hasHighCostIssues 
+                ? `All issues with repair costs of $1,000 or more (${topIssues.length} found)`
+                : `Top 3 most expensive issues from this inspection`
+              }
+            </CardDescription>
+          </div>
+          <Button 
+            onClick={handleCompleteListClick}
+            variant="outline"
+            size="sm"
+          >
+            Complete Issues List
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
