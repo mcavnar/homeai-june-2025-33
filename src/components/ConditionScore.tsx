@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { TrendingUp, Info } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HomeInspectionAnalysis } from '@/types/inspection';
@@ -48,9 +47,6 @@ const ConditionScore: React.FC<ConditionScoreProps> = ({ analysis, propertyData 
             <TrendingUp className="h-5 w-5" />
             Property Condition Score
           </CardTitle>
-          <CardDescription>
-            Overall assessment based on repair costs, issue count, and market factors
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between mb-6">
