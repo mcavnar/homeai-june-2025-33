@@ -27,17 +27,6 @@ interface ServiceProvidersTableProps {
 const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers }) => {
   const [openDetails, setOpenDetails] = useState<number | null>(null);
 
-  const getServiceTypeBadgeColor = (serviceType: string) => {
-    const colors: { [key: string]: string } = {
-      'Lawn Care': 'bg-pink-100 text-pink-800 border-pink-200',
-      'House Cleaning': 'bg-blue-100 text-blue-800 border-blue-200',
-      'Plumbing': 'bg-green-100 text-green-800 border-green-200',
-      'HVAC': 'bg-purple-100 text-purple-800 border-purple-200',
-      'Electrical': 'bg-orange-100 text-orange-800 border-orange-200',
-    };
-    return colors[serviceType] || 'bg-gray-100 text-gray-800 border-gray-200';
-  };
-
   const toggleDetails = (providerId: number) => {
     setOpenDetails(openDetails === providerId ? null : providerId);
   };
@@ -75,7 +64,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
                   <TableCell>
                     <Badge 
                       variant="outline" 
-                      className={`${getServiceTypeBadgeColor(provider.serviceType)} border rounded-full px-3 py-1`}
+                      className="border-gray-300 text-black bg-white rounded-full px-3 py-1"
                     >
                       {provider.serviceType}
                     </Badge>
