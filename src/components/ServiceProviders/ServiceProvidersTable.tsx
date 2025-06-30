@@ -19,7 +19,7 @@ interface ServiceProvider {
   serviceType: string;
   company: string;
   frequency: string;
-  rating: number;
+  rating?: number; // Made optional to support placeholder providers
   monthlyCost: number;
   annualCost: number;
   contact?: string;
@@ -100,6 +100,18 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
       </div>
     );
+  };
+
+  // Helper function to determine if a provider is a placeholder (no rating)
+  const isPlaceholderProvider = (provider: ServiceProvider) => {
+    return provider.rating === undefined || provider.rating === null;
+  };
+
+  // Helper function to format cost with "Est." for placeholders
+  const formatProviderCost = (cost: number, isPlaceholder: boolean) => {
+    if (cost === 0) return '-';
+    const formattedCost = formatCurrency(cost);
+    return isPlaceholder ? `Est. ${formattedCost}` : formattedCost;
   };
 
   return (
@@ -268,7 +280,6 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
               <TableHead className="text-gray-500 font-medium">Service Type</TableHead>
               <TableHead className="text-gray-500 font-medium">Company</TableHead>
               <TableHead className="text-gray-500 font-medium">Frequency</TableHead>
-              <TableHead className="text-gray-500 font-medium">Rating</TableHead>
               <TableHead className="text-gray-500 font-medium text-right">Monthly Cost</TableHead>
               <TableHead className="text-gray-500 font-medium text-right">Annual Cost</TableHead>
             </TableRow>
@@ -302,19 +313,16 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
                     </div>
                   </TableCell>
                   <TableCell className="text-gray-700">{provider.frequency}</TableCell>
-                  <TableCell>
-                    {renderRating(provider.rating)}
+                  <TableCell className="text-right font-semibold text-green-600">
+                    {formatProviderCost(provider.monthlyCost, isPlaceholderProvider(provider))}
                   </TableCell>
                   <TableCell className="text-right font-semibold text-green-600">
-                    {provider.monthlyCost > 0 ? formatCurrency(provider.monthlyCost) : '-'}
-                  </TableCell>
-                  <TableCell className="text-right font-semibold text-green-600">
-                    {formatCurrency(provider.annualCost)}
+                    {formatProviderCost(provider.annualCost, isPlaceholderProvider(provider))}
                   </TableCell>
                 </TableRow>
                 
                 <TableRow>
-                  <TableCell colSpan={6} className="p-0">
+                  <TableCell colSpan={5} className="p-0">
                     <Collapsible open={openDetails === provider.id}>
                       <CollapsibleContent className="bg-gray-50 border-t">
                         <div className="p-6 space-y-4">
