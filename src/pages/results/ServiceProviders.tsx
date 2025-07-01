@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import CostSummaryCards from '@/components/ServiceProviders/CostSummaryCards';
@@ -42,7 +43,7 @@ const ServiceProviders = () => {
     {
       id: 1,
       serviceType: "Lawn Care",
-      company: "Average Lawn Care In Your Area",
+      company: "",
       frequency: "Weekly",
       monthlyCost: 80,
       annualCost: 4160,
@@ -50,7 +51,7 @@ const ServiceProviders = () => {
     {
       id: 2,
       serviceType: "House Cleaning",
-      company: "Typical House Cleaning Service",
+      company: "",
       frequency: "Bi-weekly",
       monthlyCost: 125,
       annualCost: 3250,
@@ -58,7 +59,7 @@ const ServiceProviders = () => {
     {
       id: 3,
       serviceType: "Plumbing",
-      company: "Local Plumbing Professional",
+      company: "",
       frequency: "As-needed",
       monthlyCost: 0,
       annualCost: 1200,
@@ -66,7 +67,7 @@ const ServiceProviders = () => {
     {
       id: 4,
       serviceType: "HVAC",
-      company: "Area HVAC Maintenance Service",
+      company: "",
       frequency: "Quarterly",
       monthlyCost: 100,
       annualCost: 1200,
@@ -74,7 +75,7 @@ const ServiceProviders = () => {
     {
       id: 5,
       serviceType: "Electrical",
-      company: "Regional Electrical Contractor",
+      company: "",
       frequency: "As-needed",
       monthlyCost: 0,
       annualCost: 800,
