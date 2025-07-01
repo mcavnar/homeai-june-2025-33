@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { MapPin, Filter, Download, FileText, Search, ChevronDown } from 'lucide-react';
+import { MapPin, Filter, Download, FileText, Search, ChevronDown, Quote } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -31,8 +31,19 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
   const [priceFilter, setPriceFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
+  const [expandedQuotes, setExpandedQuotes] = useState<Set<number>>(new Set());
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const toggleQuoteExpansion = (index: number) => {
+    const newExpanded = new Set(expandedQuotes);
+    if (newExpanded.has(index)) {
+      newExpanded.delete(index);
+    } else {
+      newExpanded.add(index);
+    }
+    setExpandedQuotes(newExpanded);
+  };
 
   const filteredIssues = useMemo(() => {
     if (!issues || issues.length === 0) return [];
@@ -319,10 +330,38 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
                   </div>
                 </div>
                 <h4 className="font-semibold text-gray-900 mb-1">{issue.description}</h4>
-                <p className="text-sm text-gray-600 flex items-center gap-1">
+                <p className="text-sm text-gray-600 flex items-center gap-1 mb-3">
                   <MapPin className="h-3 w-3" />
                   {issue.location}
                 </p>
+
+                {/* Source Quote Section */}
+                {issue.sourceQuote && (
+                  <Collapsible 
+                    open={expandedQuotes.has(index)} 
+                    onOpenChange={() => toggleQuoteExpansion(index)}
+                  >
+                    <CollapsibleTrigger className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                      <Quote className="h-4 w-4" />
+                      <span>View Source Quote</span>
+                      <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${expandedQuotes.has(index) ? 'transform rotate-180' : ''}`} />
+                    </CollapsibleTrigger>
+                    
+                    <CollapsibleContent className="mt-3">
+                      <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                        <div className="flex items-start gap-2">
+                          <Quote className="h-4 w-4 text-blue-600 mt-1 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium text-blue-900 mb-1">Original Inspector's Notes:</p>
+                            <p className="text-sm text-blue-800 italic leading-relaxed">
+                              "{issue.sourceQuote}"
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
               </div>
             ))}
           </div>

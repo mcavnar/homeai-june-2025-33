@@ -7,6 +7,7 @@ export interface InspectionIssue {
     max: number;
   };
   category: string;
+  sourceQuote?: string;
 }
 
 export interface MajorSystem {
