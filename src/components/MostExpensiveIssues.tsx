@@ -1,7 +1,8 @@
-
 import React from 'react';
-import { MapPin } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { MapPin, FileText, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { InspectionIssue } from '@/types/inspection';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -10,6 +11,8 @@ interface MostExpensiveIssuesProps {
 }
 
 const MostExpensiveIssues: React.FC<MostExpensiveIssuesProps> = ({ issues }) => {
+  const navigate = useNavigate();
+
   // Filter issues that cost $1000+ or get top 3 most expensive
   const getTopIssues = () => {
     // Sort all issues by max cost descending
@@ -47,6 +50,10 @@ const MostExpensiveIssues: React.FC<MostExpensiveIssuesProps> = ({ issues }) => 
     );
   };
 
+  const handleViewAllIssues = () => {
+    navigate('/results/issues');
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -82,6 +89,23 @@ const MostExpensiveIssues: React.FC<MostExpensiveIssuesProps> = ({ issues }) => 
               </p>
             </div>
           ))}
+        </div>
+
+        {/* Contextual CTA within the card */}
+        <div className="mt-6 pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-600">Ready to see every issue found in your inspection?</p>
+            <Button 
+              onClick={handleViewAllIssues}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 ml-4"
+            >
+              <FileText className="h-4 w-4" />
+              View Complete Issues List
+              <ArrowRight className="h-3 w-3" />
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
