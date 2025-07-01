@@ -32,10 +32,10 @@ const ActionCards: React.FC = () => {
         <Card className="border-gray-200 h-full">
           <CardContent className="p-6 flex flex-col h-full">
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Need More Options?
+              Get Our Recommended Providers
             </h3>
             <p className="text-gray-600 mb-4 flex-grow">
-              We can help you find additional qualified contractors in your area.
+              We use our database of the most qualified providers in your area to find the right options for you.
             </p>
             <Button variant="default" size="lg" className="w-full">
               Find More Providers
