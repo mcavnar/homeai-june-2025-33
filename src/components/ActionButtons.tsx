@@ -47,7 +47,7 @@ const ActionButtons: React.FC = () => {
       <div className="text-center pb-4">
         <h2 className="flex items-center justify-center gap-2 text-2xl font-bold text-gray-900">
           <ArrowRight className="h-6 w-6 text-green-500" />
-          Your Next Steps
+          Next Steps
         </h2>
         <p className="text-gray-700 mt-2 text-lg">
           Follow this recommended path to maximize the value of your inspection report
@@ -68,6 +68,7 @@ const ActionButtons: React.FC = () => {
                 size="lg"
                 className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
               >
+                <span className="bg-white text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-1">1</span>
                 <FileText className="h-5 w-5" />
                 Review Complete Issues List
               </Button>
@@ -83,6 +84,7 @@ const ActionButtons: React.FC = () => {
                 size="lg"
                 className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
               >
+                <span className="bg-white text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-1">2</span>
                 <Settings className="h-5 w-5" />
                 Learn About Key Systems
               </Button>
@@ -106,6 +108,7 @@ const ActionButtons: React.FC = () => {
                 size="lg"
                 className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
               >
+                <span className="bg-white text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-1">3</span>
                 <DollarSign className="h-5 w-5" />
                 See Property Service Costs
               </Button>
@@ -121,6 +124,7 @@ const ActionButtons: React.FC = () => {
                 size="lg"
                 className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
               >
+                <span className="bg-white text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-1">4</span>
                 <MessageSquare className="h-5 w-5" />
                 Get Negotiation Strategy
               </Button>
