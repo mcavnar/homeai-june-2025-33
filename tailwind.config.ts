@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -84,11 +85,40 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'timeline-draw': {
+					from: {
+						width: '0%'
+					},
+					to: {
+						width: '100%'
+					}
+				},
+				'step-appear': {
+					from: {
+						opacity: '0',
+						transform: 'scale(0.8) translateY(10px)'
+					},
+					to: {
+						opacity: '1',
+						transform: 'scale(1) translateY(0)'
+					}
+				},
+				'card-hover': {
+					from: {
+						transform: 'translateY(0) scale(1)'
+					},
+					to: {
+						transform: 'translateY(-8px) scale(1.02)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'timeline-draw': 'timeline-draw 1.5s ease-out',
+				'step-appear': 'step-appear 0.6s ease-out',
+				'card-hover': 'card-hover 0.3s ease-out'
 			}
 		}
 	},

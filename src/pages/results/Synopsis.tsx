@@ -2,7 +2,7 @@
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import AtAGlance from '@/components/AtAGlance';
-import ActionButtons from '@/components/ActionButtons';
+import ModernStepper from '@/components/ModernStepper';
 import MostExpensiveIssues from '@/components/MostExpensiveIssues';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -49,8 +49,8 @@ const Synopsis = () => {
         <AtAGlance analysis={analysis} propertyData={propertyData} />
       )}
 
-      {/* Next Steps Action Buttons */}
-      <ActionButtons />
+      {/* Modern Stepper Next Steps */}
+      <ModernStepper />
 
       {/* Most Expensive Issues Section */}
       {analysis.issues && analysis.issues.length > 0 && (
