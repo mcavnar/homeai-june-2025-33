@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { MapPin, Filter, Download, FileText, Search, ChevronDown, Quote } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -346,7 +345,7 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
                   >
                     <CollapsibleTrigger className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 transition-colors">
                       <Quote className="h-4 w-4" />
-                      <span>View Source Quote</span>
+                      <span>View Inspector's Notes</span>
                       <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${expandedQuotes.has(index) ? 'transform rotate-180' : ''}`} />
                     </CollapsibleTrigger>
                     
