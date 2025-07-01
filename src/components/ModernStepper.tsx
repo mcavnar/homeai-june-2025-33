@@ -55,11 +55,11 @@ const ModernStepper: React.FC = () => {
   ];
 
   return (
-    <div className="w-full py-12">
+    <div className="w-full py-8">
       {/* Header */}
-      <div className="text-center pb-12">
+      <div className="text-center pb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
-          Your Next Steps
+          Next Steps
         </h2>
         <p className="text-gray-700 text-lg max-w-2xl mx-auto">
           Follow this recommended path to maximize the value of your inspection report
