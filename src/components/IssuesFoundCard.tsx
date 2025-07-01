@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import MetricCard from './MetricCard';
 import { InspectionIssue } from '@/types/inspection';
 
@@ -40,52 +41,62 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
 
   const maxCount = Math.max(...chartData.map(d => d.count), 1);
 
-  const bulletPoints = [
-    'High: Safety & structural issues',
-    'Medium: Systems needing attention',
-    'Low: Cosmetic & maintenance'
-  ];
-
   return (
     <MetricCard
       icon={AlertTriangle}
       title="Issues Found"
-      bulletPoints={bulletPoints}
-      bulletHeadline="Issue Priority Definition"
+      showBullets={false}
     >
-      <div className="text-4xl font-bold text-gray-900 mb-2">
-        {totalIssues}
-      </div>
-      <div className="text-sm text-gray-600 mb-6">Total issues</div>
-      
-      {/* Compact Bar Chart with Numbers on Bars */}
-      {chartData.length > 0 && (
-        <div className="flex gap-2 items-end justify-center w-full h-8">
-          {chartData.map((item, index) => (
-            <div 
-              key={index} 
-              className="flex flex-col items-center gap-1 group cursor-default"
-              title={`${item.priority} Priority: ${item.count} issue${item.count > 1 ? 's' : ''}`}
-            >
-              <div 
-                className="rounded-t-sm min-h-[8px] transition-all duration-200 hover:opacity-80 group-hover:shadow-sm relative flex items-center justify-center" 
-                style={{ 
-                  backgroundColor: item.color, 
-                  width: '32px',
-                  height: `${Math.max(8, (item.count / maxCount) * 24)}px`
-                }}
-              >
-                <span className="text-xs font-bold text-white drop-shadow-sm">
-                  {item.count}
-                </span>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="cursor-help text-center">
+              <div className="text-4xl font-bold text-gray-900 mb-2">
+                {totalIssues}
               </div>
-              <span className="text-xs text-gray-500 font-medium group-hover:text-gray-700 transition-colors">
-                {item.priority}
-              </span>
+              <div className="text-sm text-gray-600 mb-6">Total issues</div>
+              
+              {/* Compact Bar Chart with Numbers on Bars */}
+              {chartData.length > 0 && (
+                <div className="flex gap-2 items-end justify-center w-full h-8">
+                  {chartData.map((item, index) => (
+                    <div 
+                      key={index} 
+                      className="flex flex-col items-center gap-1 group cursor-default"
+                    >
+                      <div 
+                        className="rounded-t-sm min-h-[8px] transition-all duration-200 hover:opacity-80 group-hover:shadow-sm relative flex items-center justify-center" 
+                        style={{ 
+                          backgroundColor: item.color, 
+                          width: '32px',
+                          height: `${Math.max(8, (item.count / maxCount) * 24)}px`
+                        }}
+                      >
+                        <span className="text-xs font-bold text-white drop-shadow-sm">
+                          {item.count}
+                        </span>
+                      </div>
+                      <span className="text-xs text-gray-500 font-medium group-hover:text-gray-700 transition-colors">
+                        {item.priority}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          ))}
-        </div>
-      )}
+          </TooltipTrigger>
+          <TooltipContent className="max-w-xs">
+            <div className="space-y-2">
+              <h4 className="font-semibold text-sm">Issue Priority Definition</h4>
+              <div className="text-xs space-y-1">
+                <div><strong>High:</strong> Safety & structural issues</div>
+                <div><strong>Medium:</strong> Systems needing attention</div>
+                <div><strong>Low:</strong> Cosmetic & maintenance</div>
+              </div>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </MetricCard>
   );
 };

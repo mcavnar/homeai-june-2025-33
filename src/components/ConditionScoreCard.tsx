@@ -38,17 +38,11 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
     }
   };
 
-  const bulletPoints = [
-    'Repair costs analyzed against property value and national benchmarks',
-    'Issue count compared to typical home inspection findings (20+ issues trigger penalties)'
-  ];
-
   return (
     <MetricCard
       icon={TrendingUp}
       title="Condition Score"
-      bulletPoints={bulletPoints}
-      bulletHeadline="Scoring Methodology"
+      showBullets={false}
     >
       <HoverCard>
         <HoverCardTrigger asChild>

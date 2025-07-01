@@ -15,12 +15,6 @@ const RepairCostsCard: React.FC<RepairCostsCardProps> = ({
   totalRepairCost,
   analysis 
 }) => {
-  const bulletPoints = [
-    'Labor and material estimates updated weekly for local markets',
-    'Current market rates drawn from a database of millions of contractor bids',
-    'Costs will vary by contractor but represent average prices in the property\'s area'
-  ];
-
   // Calculate costs by priority
   const getCostBreakdown = () => {
     if (!analysis?.costSummary) return null;
@@ -43,8 +37,7 @@ const RepairCostsCard: React.FC<RepairCostsCardProps> = ({
     <MetricCard
       icon={Wrench}
       title="Total Repair Costs"
-      bulletPoints={bulletPoints}
-      bulletHeadline="Cost Factors Considered"
+      showBullets={false}
     >
       <HoverCard>
         <HoverCardTrigger asChild>
