@@ -65,8 +65,8 @@ const ActionButtons: React.FC = () => {
               <Button 
                 onClick={handleSeeCompleteIssuesList}
                 variant="green-dark"
-                size="lg"
-                className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
+                size="default"
+                className="w-full flex items-center gap-2 px-4 py-2 font-semibold"
               >
                 <span className="bg-white text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-1">1</span>
                 <FileText className="h-5 w-5" />
@@ -81,8 +81,8 @@ const ActionButtons: React.FC = () => {
               <Button 
                 onClick={handleUnderstandKeySystems}
                 variant="green-dark"
-                size="lg"
-                className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
+                size="default"
+                className="w-full flex items-center gap-2 px-4 py-2 font-semibold"
               >
                 <span className="bg-white text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-1">2</span>
                 <Settings className="h-5 w-5" />
@@ -105,8 +105,8 @@ const ActionButtons: React.FC = () => {
               <Button 
                 onClick={handleUnderstandServiceCosts}
                 variant="green-dark"
-                size="lg"
-                className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
+                size="default"
+                className="w-full flex items-center gap-2 px-4 py-2 font-semibold"
               >
                 <span className="bg-white text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-1">3</span>
                 <DollarSign className="h-5 w-5" />
@@ -121,8 +121,8 @@ const ActionButtons: React.FC = () => {
               <Button 
                 onClick={handleGetNegotiationAdvice}
                 variant="green-dark"
-                size="lg"
-                className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
+                size="default"
+                className="w-full flex items-center gap-2 px-4 py-2 font-semibold"
               >
                 <span className="bg-white text-green-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-1">4</span>
                 <MessageSquare className="h-5 w-5" />
