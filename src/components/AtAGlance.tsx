@@ -24,7 +24,8 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
       />
       
       <RepairCostsCard 
-        totalRepairCost={totalRepairCost} 
+        totalRepairCost={totalRepairCost}
+        analysis={analysis}
       />
       
       <IssuesFoundCard 

@@ -2,6 +2,7 @@
 import React from 'react';
 import { TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import MetricCard from './MetricCard';
 
 interface ConditionScoreCardProps {
@@ -39,8 +40,7 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
 
   const bulletPoints = [
     'Repair costs analyzed against property value and national benchmarks',
-    'Issue count compared to typical home inspection findings (20+ issues trigger penalties)',
-    'Property size and features measured against neighborhood averages'
+    'Issue count compared to typical home inspection findings (20+ issues trigger penalties)'
   ];
 
   return (
@@ -50,16 +50,48 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
       bulletPoints={bulletPoints}
       bulletHeadline="Scoring Methodology"
     >
-      <div className={`text-5xl font-bold ${getScoreColor(score)} mb-2`}>
-        {score}
-      </div>
-      <div className="text-sm text-gray-600 mb-3">out of 10</div>
-      <Badge 
-        variant="outline" 
-        className={`text-sm px-3 py-1 font-medium ${getRatingColor(rating)}`}
-      >
-        {rating}
-      </Badge>
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <div className="cursor-help">
+            <div className={`text-5xl font-bold ${getScoreColor(score)} mb-2`}>
+              {score}
+            </div>
+            <div className="text-sm text-gray-600 mb-3">out of 10</div>
+            <Badge 
+              variant="outline" 
+              className={`text-sm px-3 py-1 font-medium ${getRatingColor(rating)}`}
+            >
+              {rating}
+            </Badge>
+          </div>
+        </HoverCardTrigger>
+        <HoverCardContent className="w-80">
+          <div className="space-y-3">
+            <h4 className="font-semibold text-gray-900">Detailed Scoring Breakdown</h4>
+            <div className="text-sm text-gray-700 space-y-2">
+              <div>
+                <strong>Repair Cost Analysis:</strong> Compares repair costs per square foot, percentage of property value, and cost per bedroom against national averages
+              </div>
+              <div>
+                <strong>Issue Count Impact:</strong> Properties with 20+ issues receive penalties, with increasing severity for 30+ and 40+ issues
+              </div>
+              <div>
+                <strong>Score Calculation:</strong> Starts at 100 points, subtracts penalties for repair severity and issue count, then converts to 0-10 scale
+              </div>
+              <div className="pt-2 border-t">
+                <strong>Rating Scale:</strong>
+                <div className="mt-1 text-xs space-y-1">
+                  <div>9.2+ = Excellent</div>
+                  <div>8.0+ = Very Good</div>
+                  <div>6.5+ = Good</div>
+                  <div>5.5+ = Fair</div>
+                  <div>Below 5.5 = Poor</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </HoverCardContent>
+      </HoverCard>
     </MetricCard>
   );
 };
