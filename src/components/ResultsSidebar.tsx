@@ -28,11 +28,6 @@ const navigationItems = [
     icon: FileText,
   },
   {
-    title: 'Service Providers',
-    url: '/results/providers',
-    icon: Users,
-  },
-  {
     title: 'Issues List',
     url: '/results/issues',
     icon: AlertTriangle,
@@ -41,6 +36,11 @@ const navigationItems = [
     title: 'Key Systems',
     url: '/results/systems',
     icon: Settings,
+  },
+  {
+    title: 'Service Providers',
+    url: '/results/providers',
+    icon: Users,
   },
   {
     title: 'Negotiation',
