@@ -1,10 +1,9 @@
 
 import React from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
-import { DollarSign, MessageSquare } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 import AtAGlance from '@/components/AtAGlance';
+import ActionButtons from '@/components/ActionButtons';
 import MostExpensiveIssues from '@/components/MostExpensiveIssues';
-import ContextualCTA from '@/components/ContextualCTA';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Loader2 } from 'lucide-react';
@@ -18,7 +17,6 @@ interface SynopsisContextType {
 }
 
 const Synopsis = () => {
-  const navigate = useNavigate();
   const {
     analysis,
     propertyData,
@@ -29,14 +27,6 @@ const Synopsis = () => {
   const displayAddress = analysis.propertyInfo?.address 
     ? cleanAddressForDisplay(analysis.propertyInfo.address) 
     : undefined;
-
-  const handleServiceProviders = () => {
-    navigate('/results/providers');
-  };
-
-  const handleNegotiation = () => {
-    navigate('/results/negotiation');
-  };
 
   return (
     <div className="space-y-6">
@@ -54,33 +44,18 @@ const Synopsis = () => {
         </div>
       </div>
 
-      {/* At a Glance Section with integrated CTA */}
+      {/* At a Glance Section */}
       {analysis && propertyData && (
         <AtAGlance analysis={analysis} propertyData={propertyData} />
       )}
 
-      {/* Most Expensive Issues Section with integrated CTA */}
+      {/* Next Steps Action Buttons */}
+      <ActionButtons />
+
+      {/* Most Expensive Issues Section */}
       {analysis.issues && analysis.issues.length > 0 && (
         <MostExpensiveIssues issues={analysis.issues} />
       )}
-
-      {/* Service Providers CTA */}
-      <ContextualCTA
-        text="Need help addressing these issues? Find qualified contractors and understand ongoing costs."
-        buttonText="Explore Service Providers"
-        onClick={handleServiceProviders}
-        icon={DollarSign}
-        variant="subtle"
-      />
-
-      {/* Negotiation Strategy CTA */}
-      <ContextualCTA
-        text="Ready to use these findings in your purchase negotiations?"
-        buttonText="Get Negotiation Strategy"
-        onClick={handleNegotiation}
-        icon={MessageSquare}
-        variant="prominent"
-      />
 
       {/* Property Loading State */}
       {isLoadingProperty && (
