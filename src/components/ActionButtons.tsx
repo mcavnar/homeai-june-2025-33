@@ -63,6 +63,21 @@ const ActionButtons: React.FC = () => {
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-3">
               <Button 
+                onClick={handleSeeCompleteIssuesList}
+                variant="green-dark"
+                size="lg"
+                className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
+              >
+                <FileText className="h-5 w-5" />
+                Review Complete Issues List
+              </Button>
+              <p className="text-sm text-gray-600 text-center leading-relaxed">
+                <strong>Start here:</strong> Review every identified issue with detailed locations, priorities, and estimated repair costs
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <Button 
                 onClick={handleUnderstandKeySystems}
                 variant="green-dark"
                 size="lg"
@@ -72,22 +87,7 @@ const ActionButtons: React.FC = () => {
                 Learn About Key Systems
               </Button>
               <p className="text-sm text-gray-600 text-center leading-relaxed">
-                <strong>Start here:</strong> Understand what major systems (HVAC, electrical, plumbing) mean for your home's condition and safety
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <Button 
-                onClick={handleSeeCompleteIssuesList}
-                variant="green-dark"
-                size="lg"
-                className="w-full flex items-center gap-2 px-6 py-3 font-semibold"
-              >
-                <FileText className="h-5 w-5" />
-                Understand Complete Issues List
-              </Button>
-              <p className="text-sm text-gray-600 text-center leading-relaxed">
-                <strong>Then:</strong> Review every identified issue with detailed locations, priorities, and estimated repair costs
+                <strong>Then:</strong> Understand what major systems (HVAC, electrical, plumbing) mean for your home's condition and safety
               </p>
             </div>
           </div>
