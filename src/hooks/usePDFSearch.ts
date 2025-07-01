@@ -1,17 +1,20 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { normalizeTextForSearch, findNormalizedIndex } from '@/utils/textNormalization';
+import { normalizeTextForSearch } from '@/utils/textNormalization';
+import { performMultiStrategySearch, FlexibleMatch } from '@/utils/flexibleSearch';
 
 interface SearchMatch {
   pageNumber: number;
   textIndex: number;
   text: string;
+  strategy?: 'exact' | 'normalized' | 'flexible';
+  confidence?: number;
 }
 
 interface PageTextContent {
   pageNumber: number;
   textItems: any[];
   fullText: string;
-  normalizedText: string; // Add normalized version
+  normalizedText: string;
 }
 
 export const usePDFSearch = (pdf: any) => {
@@ -61,7 +64,7 @@ export const usePDFSearch = (pdf: any) => {
     extractAllText();
   }, [pdf?.numPages]);
 
-  // Enhanced search function with normalization
+  // Enhanced search function with multi-strategy approach
   const performSearch = useCallback(async (query: string) => {
     if (!query.trim() || pageTextContent.size === 0) {
       setMatches([]);
@@ -70,33 +73,46 @@ export const usePDFSearch = (pdf: any) => {
     }
 
     setIsSearching(true);
-    const normalizedSearchTerm = normalizeTextForSearch(query);
     const foundMatches: SearchMatch[] = [];
 
     try {
+      console.log(`Starting multi-strategy search for: "${query}"`);
+      
       for (const [pageNum, content] of pageTextContent.entries()) {
-        const { normalizedText } = content;
+        const pageMatches = performMultiStrategySearch(
+          content.fullText,
+          query,
+          pageNum
+        );
         
-        let searchIndex = 0;
-        while (true) {
-          const matchIndex = normalizedText.indexOf(normalizedSearchTerm, searchIndex);
-          if (matchIndex === -1) break;
-
-          foundMatches.push({
-            pageNumber: pageNum,
-            textIndex: matchIndex,
-            text: normalizedSearchTerm
-          });
-
-          searchIndex = matchIndex + 1;
+        // Convert FlexibleMatch to SearchMatch format
+        const convertedMatches = pageMatches.map((match: FlexibleMatch): SearchMatch => ({
+          pageNumber: match.pageNumber,
+          textIndex: match.textIndex,
+          text: match.text,
+          strategy: match.strategy,
+          confidence: match.confidence
+        }));
+        
+        foundMatches.push(...convertedMatches);
+        
+        if (pageMatches.length > 0) {
+          console.log(`Page ${pageNum}: Found ${pageMatches.length} matches using ${pageMatches[0].strategy} strategy`);
         }
       }
 
+      // Sort all matches by confidence
+      foundMatches.sort((a, b) => (b.confidence || 0) - (a.confidence || 0));
+
       setMatches(foundMatches);
       setCurrentMatchIndex(foundMatches.length > 0 ? 0 : -1);
-      console.log(`Found ${foundMatches.length} matches for "${query}" (normalized: "${normalizedSearchTerm}")`);
+      
+      console.log(`Multi-strategy search complete: ${foundMatches.length} total matches`);
+      if (foundMatches.length > 0) {
+        console.log(`Best match strategy: ${foundMatches[0].strategy}, confidence: ${foundMatches[0].confidence}`);
+      }
     } catch (error) {
-      console.error('Error performing search:', error);
+      console.error('Error performing multi-strategy search:', error);
     } finally {
       setIsSearching(false);
     }
