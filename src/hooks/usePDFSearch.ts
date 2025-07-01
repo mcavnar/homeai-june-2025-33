@@ -1,5 +1,5 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { normalizeTextForSearch, findNormalizedIndex } from '@/utils/textNormalization';
 
 interface SearchMatch {
   pageNumber: number;
@@ -11,6 +11,7 @@ interface PageTextContent {
   pageNumber: number;
   textItems: any[];
   fullText: string;
+  normalizedText: string; // Add normalized version
 }
 
 export const usePDFSearch = (pdf: any) => {
@@ -38,13 +39,14 @@ export const usePDFSearch = (pdf: any) => {
           
           const fullText = textContent.items
             .map((item: any) => item.str)
-            .join(' ')
-            .toLowerCase();
+            .join(' ');
           
+          // Store both original and normalized text
           textContentMap.set(pageNum, {
             pageNumber: pageNum,
             textItems: textContent.items,
-            fullText
+            fullText,
+            normalizedText: normalizeTextForSearch(fullText)
           });
         }
         
@@ -59,7 +61,7 @@ export const usePDFSearch = (pdf: any) => {
     extractAllText();
   }, [pdf?.numPages]);
 
-  // Simplified search function - no coordinates needed
+  // Enhanced search function with normalization
   const performSearch = useCallback(async (query: string) => {
     if (!query.trim() || pageTextContent.size === 0) {
       setMatches([]);
@@ -68,22 +70,22 @@ export const usePDFSearch = (pdf: any) => {
     }
 
     setIsSearching(true);
-    const searchTerm = query.toLowerCase().trim();
+    const normalizedSearchTerm = normalizeTextForSearch(query);
     const foundMatches: SearchMatch[] = [];
 
     try {
       for (const [pageNum, content] of pageTextContent.entries()) {
-        const { fullText } = content;
+        const { normalizedText } = content;
         
         let searchIndex = 0;
         while (true) {
-          const matchIndex = fullText.indexOf(searchTerm, searchIndex);
+          const matchIndex = normalizedText.indexOf(normalizedSearchTerm, searchIndex);
           if (matchIndex === -1) break;
 
           foundMatches.push({
             pageNumber: pageNum,
             textIndex: matchIndex,
-            text: searchTerm
+            text: normalizedSearchTerm
           });
 
           searchIndex = matchIndex + 1;
@@ -92,7 +94,7 @@ export const usePDFSearch = (pdf: any) => {
 
       setMatches(foundMatches);
       setCurrentMatchIndex(foundMatches.length > 0 ? 0 : -1);
-      console.log(`Found ${foundMatches.length} matches for "${query}"`);
+      console.log(`Found ${foundMatches.length} matches for "${query}" (normalized: "${normalizedSearchTerm}")`);
     } catch (error) {
       console.error('Error performing search:', error);
     } finally {
