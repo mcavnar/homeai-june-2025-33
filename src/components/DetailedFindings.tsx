@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { MapPin, Filter, Download, FileText, Search, ChevronDown, Quote } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -99,8 +100,8 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
   }, [issues]);
 
   const handleSeeInReport = (issue: InspectionIssue) => {
-    // Generate search terms for this specific issue
-    const searchQuery = generateIssueSearchQuery(issue);
+    // Use source quote if available, otherwise fall back to generated search query
+    const searchQuery = issue.sourceQuote || generateIssueSearchQuery(issue);
     
     // Navigate to the report with search context
     navigate('/results/report', { 
@@ -111,9 +112,11 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
       }
     });
     
+    // Update toast message based on search type
+    const searchType = issue.sourceQuote ? "inspector's original notes" : "issue details";
     toast({
       title: "Navigated to Inspection Report",
-      description: `Searching for: "${issue.description}" in the ${issue.location} section`,
+      description: `Searching for ${searchType} in the ${issue.location} section`,
     });
   };
 
