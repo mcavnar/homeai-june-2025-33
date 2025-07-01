@@ -57,9 +57,8 @@ const ActionButtons: React.FC = () => {
       <div className="space-y-8">
         {/* Step 1: Understanding Property Condition */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">1</span>
-            Start Here: Understand Your Property Condition In Detail
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Understand Your Property Condition In Detail
           </h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-3">
@@ -96,9 +95,8 @@ const ActionButtons: React.FC = () => {
 
         {/* Step 2: Service Providers & Negotiation */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
-            Take Action: Identify Service Providers and Negotiate
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Identify Service Providers and Negotiate with Seller
           </h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-3">
