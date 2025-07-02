@@ -90,22 +90,22 @@ const ModernStepper: React.FC = () => {
                 </div>
 
                 {/* Step Card */}
-                <div className={`bg-white rounded-lg border border-gray-200 p-6 shadow-sm transition-all duration-300 cursor-pointer ${
+                <div className={`bg-white rounded-lg border border-gray-200 p-6 shadow-sm transition-all duration-300 cursor-pointer h-80 flex flex-col justify-between ${
                   hoveredStep === step.id 
                     ? 'shadow-xl -translate-y-2 scale-105' 
                     : 'hover:shadow-lg hover:-translate-y-1'
                 }`}
                 onClick={step.onClick}>
-                  <div className="text-center mb-4">
-                    <step.icon className="h-8 w-8 mx-auto text-green-600 mb-2" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
-                    <p className="text-sm text-gray-600 mb-4 leading-relaxed">{step.description}</p>
+                  <div className="text-center">
+                    <step.icon className="h-8 w-8 mx-auto text-green-600 mb-3" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">{step.title}</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">{step.description}</p>
                   </div>
                   
                   <Button 
                     variant="green-dark"
                     size="default"
-                    className="w-full text-sm font-semibold"
+                    className="w-full text-sm font-semibold mt-4"
                   >
                     {step.action}
                   </Button>
@@ -137,20 +137,22 @@ const ModernStepper: React.FC = () => {
                 </div>
                 
                 {/* Step Content */}
-                <div className="flex-1 bg-white rounded-lg border border-gray-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
+                <div className="flex-1 bg-white rounded-lg border border-gray-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer min-h-[200px] flex flex-col justify-between"
                      onClick={step.onClick}>
-                  <div className="flex items-start gap-3 mb-4">
-                    <step.icon className="h-6 w-6 text-green-600 mt-1 flex-shrink-0" />
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
-                      <p className="text-sm text-gray-600 mb-4 leading-relaxed">{step.description}</p>
+                  <div>
+                    <div className="flex items-start gap-3 mb-4">
+                      <step.icon className="h-6 w-6 text-green-600 mt-1 flex-shrink-0" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">{step.description}</p>
+                      </div>
                     </div>
                   </div>
                   
                   <Button 
                     variant="green-dark"
                     size="default"
-                    className="w-full text-sm font-semibold"
+                    className="w-full text-sm font-semibold mt-4"
                   >
                     {step.action}
                   </Button>
