@@ -23,7 +23,7 @@ import {
 
 const navigationItems = [
   {
-    title: 'Synopsis',
+    title: 'Dashboard',
     url: '/results/synopsis',
     icon: FileText,
   },
