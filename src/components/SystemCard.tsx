@@ -205,7 +205,7 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
               </div>
             )}
 
-            {/* Roofing Expert Button - Only shows for roof systems */}
+            {/* Roofing Expert Button - Only shows for roof systems and always visible */}
             {isRoof && (
               <div className="pt-2">
                 <Button 
