@@ -1,11 +1,13 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Home, Zap, Droplets, Wind, Building, ChevronDown } from 'lucide-react';
+import { Home, Zap, Droplets, Wind, Building, ChevronDown, Calendar, CalendarClock } from 'lucide-react';
 import { MajorSystems as MajorSystemsType } from '@/types/inspection';
 import { formatCurrency } from '@/utils/formatters';
+import MetricCard from './MetricCard';
 
 interface MajorSystemsProps {
   systems: MajorSystemsType;
@@ -323,33 +325,37 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
     <div className="space-y-6">
       {/* Projection Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <Card className="bg-blue-50 border border-blue-200">
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <h3 className="text-lg font-semibold text-blue-800 mb-2">5 Year Projection</h3>
-              <div className="text-3xl font-bold text-blue-900 mb-2">
-                {formatCurrency(totalCosts.fiveYear)}
-              </div>
-              <p className="text-sm text-blue-700">
-                Estimated maintenance costs for systems needing attention within 5 years
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <MetricCard
+          icon={Calendar}
+          title="5 Year Projection"
+          showBullets={false}
+          gradientClass="bg-gradient-to-br from-blue-500 to-blue-600"
+          iconColor="text-blue-100"
+          textColor="text-white"
+        >
+          <div className="text-3xl font-bold mb-2">
+            {formatCurrency(totalCosts.fiveYear)}
+          </div>
+          <p className="text-sm text-blue-100">
+            Estimated maintenance costs for systems needing attention within 5 years
+          </p>
+        </MetricCard>
 
-        <Card className="bg-orange-50 border border-orange-200">
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <h3 className="text-lg font-semibold text-orange-800 mb-2">10 Year Projection</h3>
-              <div className="text-3xl font-bold text-orange-900 mb-2">
-                {formatCurrency(totalCosts.tenYear)}
-              </div>
-              <p className="text-sm text-orange-700">
-                Estimated maintenance costs for systems needing attention within 10 years
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <MetricCard
+          icon={CalendarClock}
+          title="10 Year Projection"
+          showBullets={false}
+          gradientClass="bg-gradient-to-br from-orange-500 to-orange-600"
+          iconColor="text-orange-100"
+          textColor="text-white"
+        >
+          <div className="text-3xl font-bold mb-2">
+            {formatCurrency(totalCosts.tenYear)}
+          </div>
+          <p className="text-sm text-orange-100">
+            Estimated maintenance costs for systems needing attention within 10 years
+          </p>
+        </MetricCard>
       </div>
 
       {/* Main Systems - 2x2 Grid */}
