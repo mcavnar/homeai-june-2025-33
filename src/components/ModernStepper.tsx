@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Share, Handshake, Users, Settings, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -29,7 +30,7 @@ const ModernStepper: React.FC = () => {
     },
     {
       id: 2,
-      title: "See Key Systems",
+      title: "Understand the condition and expected maintenance costs of the property's major systems.",
       description: "Understand the condition, safety and expected maintenance costs of the property's major systems (HVAC, electrical, plumbing, etc.).",
       action: "Key Systems",
       icon: Settings,
@@ -37,7 +38,7 @@ const ModernStepper: React.FC = () => {
     },
     {
       id: 3,
-      title: "See Service Providers",
+      title: "Get Service Providers",
       description: "Explore monthly service provider costs and connect with qualified contractors for ongoing maintenance",
       action: "Service Providers",
       icon: Users,
@@ -45,7 +46,7 @@ const ModernStepper: React.FC = () => {
     },
     {
       id: 4,
-      title: "Get Negotiation Advice",
+      title: "Negotiate Effectively",
       description: "Receive strategic guidance on how to use your inspection findings in purchase negotiations",
       action: "Negotiation",
       icon: Handshake,
