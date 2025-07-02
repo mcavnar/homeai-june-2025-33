@@ -1,7 +1,6 @@
-
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { InspectionIssue } from '@/types/inspection';
 import { generateIssueSearchQuery } from '@/utils/pdfIssueSearch';
@@ -145,55 +144,49 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <CardTitle>Detailed Issues List</CardTitle>
-            <CardDescription>All identified issues with location and estimated repair costs</CardDescription>
-          </div>
-        </div>
-        
+      <CardContent className="pt-6">
         <AnalysisInfoSection 
           isOpen={isAnalysisOpen}
           onToggle={setIsAnalysisOpen}
         />
-      </CardHeader>
-      <CardContent>
-        <IssueFilters
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          severityFilter={severityFilter}
-          setSeverityFilter={setSeverityFilter}
-          typeFilter={typeFilter}
-          setTypeFilter={setTypeFilter}
-          priceFilter={priceFilter}
-          setPriceFilter={setPriceFilter}
-          uniqueCategories={uniqueCategories}
-          onClearFilters={handleClearFilters}
-          onExportCSV={exportToCSV}
-          hasActiveFilters={hasActiveFilters}
-          filteredIssuesCount={filteredIssues.length}
-        />
+        
+        <div className="mt-6">
+          <IssueFilters
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            severityFilter={severityFilter}
+            setSeverityFilter={setSeverityFilter}
+            typeFilter={typeFilter}
+            setTypeFilter={setTypeFilter}
+            priceFilter={priceFilter}
+            setPriceFilter={setPriceFilter}
+            uniqueCategories={uniqueCategories}
+            onClearFilters={handleClearFilters}
+            onExportCSV={exportToCSV}
+            hasActiveFilters={hasActiveFilters}
+            filteredIssuesCount={filteredIssues.length}
+          />
 
-        {/* Results */}
-        {filteredIssues.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No issues match the selected filters.</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {filteredIssues.map((issue, index) => (
-              <IssueCard
-                key={index}
-                issue={issue}
-                index={index}
-                isQuoteExpanded={expandedQuotes.has(index)}
-                onToggleQuote={toggleQuoteExpansion}
-                onSeeInReport={handleSeeInReport}
-              />
-            ))}
-          </div>
-        )}
+          {/* Results */}
+          {filteredIssues.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">No issues match the selected filters.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredIssues.map((issue, index) => (
+                <IssueCard
+                  key={index}
+                  issue={issue}
+                  index={index}
+                  isQuoteExpanded={expandedQuotes.has(index)}
+                  onToggleQuote={toggleQuoteExpansion}
+                  onSeeInReport={handleSeeInReport}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
