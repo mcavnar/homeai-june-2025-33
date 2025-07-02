@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { Share, Handshake, Users, Settings, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -32,7 +30,7 @@ const ModernStepper: React.FC = () => {
     {
       id: 2,
       title: "See Key Systems",
-      description: "Understand the condition, safety and expected maintenance costs of the property's major systems (HVAC, electrical, plumbing, etc.).",
+      description: "Understand the condition and expected maintenance costs of the property's major systems.",
       action: "Key Systems",
       icon: Settings,
       onClick: () => navigate('/results/systems')
@@ -167,4 +165,3 @@ const ModernStepper: React.FC = () => {
 };
 
 export default ModernStepper;
-
