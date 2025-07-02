@@ -46,8 +46,7 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
       icon={AlertTriangle}
       title="Issues Found"
       showBullets={false}
-      gradientFrom="orange-500"
-      gradientTo="orange-600"
+      gradientClass="bg-gradient-to-br from-orange-500 to-orange-600"
       iconColor="text-orange-100"
       textColor="text-white"
     >

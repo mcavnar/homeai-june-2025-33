@@ -10,8 +10,7 @@ interface MetricCardProps {
   bulletPoints?: string[];
   bulletHeadline?: string;
   showBullets?: boolean;
-  gradientFrom?: string;
-  gradientTo?: string;
+  gradientClass?: string;
   iconColor?: string;
   textColor?: string;
 }
@@ -23,13 +22,10 @@ const MetricCard: React.FC<MetricCardProps> = ({
   bulletPoints = [],
   bulletHeadline = "How this conclusion was reached:",
   showBullets = true,
-  gradientFrom = "blue-500",
-  gradientTo = "blue-600",
+  gradientClass = "bg-gradient-to-br from-blue-500 to-blue-600",
   iconColor = "text-blue-100",
   textColor = "text-white"
 }) => {
-  const gradientClass = `bg-gradient-to-br from-${gradientFrom} to-${gradientTo}`;
-  
   return (
     <Card className={`${gradientClass} ${textColor} border-0`}>
       <CardContent className="p-6">
