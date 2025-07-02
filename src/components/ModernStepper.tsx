@@ -69,11 +69,6 @@ const ModernStepper: React.FC = () => {
       {/* Desktop Timeline */}
       <div className="hidden lg:block">
         <div className="relative">
-          {/* Timeline Line */}
-          <div className="absolute top-16 left-0 w-full h-1 bg-gray-200 rounded-full">
-            <div className="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full animate-timeline-draw"></div>
-          </div>
-
           {/* Steps */}
           <div className="grid grid-cols-4 gap-8">
             {steps.map((step, index) => (
