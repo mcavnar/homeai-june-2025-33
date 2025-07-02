@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Share, Handshake, Users, Settings, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,7 +22,7 @@ const ModernStepper: React.FC = () => {
     {
       id: 1,
       title: "Review Issue List",
-      description: "Review every identified issue with detailed locations, priorities, and estimated costs",
+      description: "Review every identified issue with detailed locations, priorities, and estimated repair costs",
       action: "Issues List",
       icon: AlertTriangle,
       onClick: () => navigate('/results/issues')
@@ -31,7 +30,7 @@ const ModernStepper: React.FC = () => {
     {
       id: 2,
       title: "See Key Systems",
-      description: "Understand the condition and expected maintenance costs of the property's major systems",
+      description: "Understand the condition and expected maintenance costs of the property's major systems.",
       action: "Key Systems",
       icon: Settings,
       onClick: () => navigate('/results/systems')
@@ -39,7 +38,7 @@ const ModernStepper: React.FC = () => {
     {
       id: 3,
       title: "Get Service Providers",
-      description: "Explore monthly service provider costs and connect with qualified area vendors",
+      description: "Explore monthly service provider costs and connect with qualified area vendors.",
       action: "Service Providers",
       icon: Users,
       onClick: () => navigate('/results/providers')
@@ -90,25 +89,23 @@ const ModernStepper: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Step Card - Fixed height for consistency */}
-                <div className={`bg-white rounded-lg border border-gray-200 p-6 shadow-sm transition-all duration-300 cursor-pointer h-64 flex flex-col ${
+                {/* Step Card */}
+                <div className={`bg-white rounded-lg border border-gray-200 p-6 shadow-sm transition-all duration-300 cursor-pointer ${
                   hoveredStep === step.id 
                     ? 'shadow-xl -translate-y-2 scale-105' 
                     : 'hover:shadow-lg hover:-translate-y-1'
                 }`}
                 onClick={step.onClick}>
-                  <div className="text-center mb-4 flex-1 flex flex-col justify-between">
-                    <div>
-                      <step.icon className="h-8 w-8 mx-auto text-green-600 mb-2" />
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
-                      <p className="text-sm text-gray-600 leading-relaxed">{step.description}</p>
-                    </div>
+                  <div className="text-center mb-4">
+                    <step.icon className="h-8 w-8 mx-auto text-green-600 mb-2" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
+                    <p className="text-sm text-gray-600 mb-4 leading-relaxed">{step.description}</p>
                   </div>
                   
                   <Button 
                     variant="green-dark"
                     size="default"
-                    className="w-full text-sm font-semibold mt-auto"
+                    className="w-full text-sm font-semibold"
                   >
                     {step.action}
                   </Button>
