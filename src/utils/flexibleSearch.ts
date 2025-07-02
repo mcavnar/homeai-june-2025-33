@@ -16,7 +16,7 @@ export interface SearchChunk {
 }
 
 /**
- * Split text into searchable chunks for flexible matching
+ * Split text into searchable chunks for flexible matching - more conservative approach
  */
 export const splitIntoSearchableChunks = (text: string): SearchChunk[] => {
   // Split into sentences first, then into word sequences
@@ -28,17 +28,21 @@ export const splitIntoSearchableChunks = (text: string): SearchChunk[] => {
   for (const sentence of sentences) {
     const words = sentence.trim().split(/\s+/).filter(w => w.length > 0);
     
-    // Create overlapping word sequences of different lengths
-    for (let length = 3; length <= Math.min(words.length, 8); length++) {
+    // Create longer word sequences for more precise matching
+    // Reduced flexibility - only create chunks of 5-10 words instead of 3-8
+    for (let length = 5; length <= Math.min(words.length, 10); length++) {
       for (let start = 0; start <= words.length - length; start++) {
         const chunkWords = words.slice(start, start + length);
         const chunkText = chunkWords.join(' ');
         
-        chunks.push({
-          text: chunkText,
-          words: chunkWords,
-          originalIndex: currentIndex + sentence.indexOf(chunkWords[0])
-        });
+        // Only create chunks that are substantial (at least 25 characters)
+        if (chunkText.length >= 25) {
+          chunks.push({
+            text: chunkText,
+            words: chunkWords,
+            originalIndex: currentIndex + sentence.indexOf(chunkWords[0])
+          });
+        }
       }
     }
     
@@ -49,7 +53,7 @@ export const splitIntoSearchableChunks = (text: string): SearchChunk[] => {
 };
 
 /**
- * Find flexible matches using word sequence matching
+ * Find flexible matches using word sequence matching - more conservative
  */
 export const findFlexibleMatches = (
   pageText: string, 
@@ -64,18 +68,20 @@ export const findFlexibleMatches = (
   for (const chunk of searchChunks) {
     const normalizedChunk = normalizeTextForSearch(chunk.text);
     
-    if (normalizedChunk.length < 10) continue; // Skip very short chunks
+    // Increased minimum length requirement for more precision
+    if (normalizedChunk.length < 25) continue;
     
     let searchIndex = 0;
     while (true) {
       const matchIndex = normalizedPageText.indexOf(normalizedChunk, searchIndex);
       if (matchIndex === -1) break;
       
-      // Calculate confidence based on chunk length and word count
-      const confidence = Math.min(
-        0.5 + (chunk.words.length * 0.1) + (normalizedChunk.length * 0.01),
-        1.0
-      );
+      // More conservative confidence calculation
+      const baseConfidence = 0.3; // Reduced base confidence
+      const lengthBonus = Math.min(normalizedChunk.length * 0.005, 0.3); // Reduced bonus
+      const wordCountBonus = Math.min(chunk.words.length * 0.05, 0.2); // Reduced bonus
+      
+      const confidence = baseConfidence + lengthBonus + wordCountBonus;
       
       matches.push({
         pageNumber,
@@ -89,27 +95,27 @@ export const findFlexibleMatches = (
     }
   }
   
-  // Sort by confidence and remove duplicates
+  // Sort by confidence and remove duplicates - higher threshold
   return matches
     .sort((a, b) => b.confidence - a.confidence)
     .filter((match, index, arr) => {
       // Remove matches that are too close to higher confidence matches
       return !arr.slice(0, index).some(prev => 
-        Math.abs(prev.textIndex - match.textIndex) < 20
+        Math.abs(prev.textIndex - match.textIndex) < 50 // Increased distance threshold
       );
     })
-    .slice(0, 5); // Keep top 5 matches per page
+    .slice(0, 3); // Reduced to top 3 matches per page
 };
 
 /**
- * Score match quality for ranking
+ * Score match quality for ranking - more conservative
  */
 export const scoreMatchQuality = (match: FlexibleMatch, originalQuery: string): number => {
   let score = match.confidence;
   
-  // Boost score for longer matches
-  if (match.text.length > 50) score += 0.2;
-  if (match.text.length > 100) score += 0.2;
+  // More conservative scoring
+  if (match.text.length > 100) score += 0.1; // Reduced bonus
+  if (match.text.length > 200) score += 0.1; // Reduced bonus
   
   // Boost score for matches that contain more words from original query
   const queryWords = normalizeTextForSearch(originalQuery).split(/\s+/);
@@ -118,13 +124,13 @@ export const scoreMatchQuality = (match: FlexibleMatch, originalQuery: string): 
     matchWords.some(mWord => mWord.includes(word) || word.includes(mWord))
   );
   const wordRatio = commonWords.length / queryWords.length;
-  score += wordRatio * 0.3;
+  score += wordRatio * 0.2; // Reduced bonus
   
   return Math.min(score, 1.0);
 };
 
 /**
- * Perform multi-strategy search
+ * Perform multi-strategy search with improved precision
  */
 export const performMultiStrategySearch = (
   pageText: string,
@@ -133,7 +139,7 @@ export const performMultiStrategySearch = (
 ): FlexibleMatch[] => {
   const allMatches: FlexibleMatch[] = [];
   
-  // Strategy 1: Exact match (case-insensitive)
+  // Strategy 1: Exact match (case-insensitive) - HIGHEST PRIORITY
   const lowerPageText = pageText.toLowerCase();
   const lowerQuery = searchQuery.toLowerCase();
   let exactIndex = lowerPageText.indexOf(lowerQuery);
@@ -146,27 +152,34 @@ export const performMultiStrategySearch = (
       strategy: 'exact',
       confidence: 1.0
     });
+    // If we have an exact match, return it immediately for source quotes
+    return allMatches;
   }
   
-  // Strategy 2: Normalized match (current approach)
+  // Strategy 2: Normalized match - SECOND PRIORITY
   const normalizedPageText = normalizeTextForSearch(pageText);
   const normalizedQuery = normalizeTextForSearch(searchQuery);
   let normalizedIndex = normalizedPageText.indexOf(normalizedQuery);
   
-  if (normalizedIndex !== -1 && !allMatches.length) {
+  if (normalizedIndex !== -1) {
     allMatches.push({
       pageNumber,
       textIndex: normalizedIndex,
       text: normalizedQuery,
       strategy: 'normalized',
-      confidence: 0.9
+      confidence: 0.95
     });
+    // If we have a normalized match, return it for source quotes
+    return allMatches;
   }
   
-  // Strategy 3: Flexible match (new approach)
-  if (!allMatches.length && searchQuery.length > 20) {
+  // Strategy 3: Flexible match - ONLY if no exact/normalized matches found
+  // AND only for longer queries (likely source quotes)
+  if (searchQuery.length > 30) {
     const flexibleMatches = findFlexibleMatches(pageText, searchQuery, pageNumber);
-    allMatches.push(...flexibleMatches);
+    // Apply higher confidence threshold for flexible matches
+    const qualityMatches = flexibleMatches.filter(match => match.confidence > 0.6);
+    allMatches.push(...qualityMatches);
   }
   
   // Score and sort all matches

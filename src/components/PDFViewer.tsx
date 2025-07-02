@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -33,6 +32,7 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const [showSearch, setShowSearch] = useState(false);
+  const [initialSearchExecuted, setInitialSearchExecuted] = useState(false);
 
   const {
     searchQuery,
@@ -82,6 +82,26 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
     loadPDF();
   }, [pdfArrayBuffer]);
 
+  // Handle initial search query - Fixed timing issue
+  useEffect(() => {
+    if (initialSearchQuery && pdf && !initialSearchExecuted) {
+      console.log('PDFViewer: Executing initial search for:', initialSearchQuery);
+      setShowSearch(true);
+      // Use setTimeout to ensure the search UI is ready
+      setTimeout(() => {
+        handleSearch(initialSearchQuery);
+        setInitialSearchExecuted(true);
+      }, 100);
+    }
+  }, [initialSearchQuery, pdf, handleSearch, initialSearchExecuted]);
+
+  // Reset initial search flag when initialSearchQuery changes
+  useEffect(() => {
+    if (initialSearchQuery) {
+      setInitialSearchExecuted(false);
+    }
+  }, [initialSearchQuery]);
+
   // Render page
   useEffect(() => {
     const renderPage = async () => {
@@ -123,15 +143,6 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
       setCurrentPage(currentMatch.pageNumber);
     }
   }, [currentMatchIndex, getCurrentMatch, currentPage]);
-
-  // Handle initial search query
-  useEffect(() => {
-    if (initialSearchQuery && pdf && !showSearch) {
-      console.log('PDFViewer: Setting initial search query:', initialSearchQuery);
-      setShowSearch(true);
-      handleSearch(initialSearchQuery);
-    }
-  }, [initialSearchQuery, pdf, handleSearch, showSearch]);
 
   const goToPrevPage = () => {
     if (currentPage > 1) {
