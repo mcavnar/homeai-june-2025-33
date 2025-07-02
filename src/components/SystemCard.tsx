@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,10 +19,16 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
   const shouldShowBrand = systemName !== 'roof' && systemName !== 'electrical' && systemName !== 'foundation';
   const isFoundation = systemName === 'foundation';
   const isRoof = systemName === 'roof';
+  const isElectrical = systemName === 'electrical';
   
   const handleRoofingExpertClick = () => {
     // This could be expanded to open a modal, navigate to a contact form, etc.
     console.log('Roofing expert button clicked');
+  };
+  
+  const handleElectricalExpertClick = () => {
+    // This could be expanded to open a modal, navigate to a contact form, etc.
+    console.log('Electrical expert button clicked');
   };
   
   return (
@@ -207,7 +214,7 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
           </CollapsibleContent>
         </Collapsible>
 
-        {/* Roofing Expert Button - Only shows for roof systems and always visible */}
+        {/* Expert Buttons - Only show for specific systems and always visible */}
         {isRoof && (
           <div className="pt-2">
             <Button 
@@ -216,6 +223,18 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
               className="w-full"
             >
               Talk to a Local Roofing Expert
+            </Button>
+          </div>
+        )}
+        
+        {isElectrical && (
+          <div className="pt-2">
+            <Button 
+              onClick={handleElectricalExpertClick}
+              variant="green-dark"
+              className="w-full"
+            >
+              Talk to a Local Electrician
             </Button>
           </div>
         )}
