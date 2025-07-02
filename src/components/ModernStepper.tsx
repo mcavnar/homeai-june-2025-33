@@ -61,9 +61,6 @@ const ModernStepper: React.FC = () => {
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
           Next Steps
         </h2>
-        <p className="text-gray-700 text-lg max-w-2xl mx-auto">
-          Follow this recommended path to maximize the value of your inspection report
-        </p>
       </div>
 
       {/* Desktop Timeline */}
