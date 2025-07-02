@@ -37,12 +37,6 @@ const InspectionReport = () => {
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Inspection Report
-            </CardTitle>
-          </CardHeader>
           <CardContent className="text-center py-12">
             <p className="text-gray-500">Original PDF is not available for viewing.</p>
             <p className="text-gray-400 text-sm mt-2">
