@@ -19,6 +19,11 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
   const isFoundation = systemName === 'foundation';
   const isRoof = systemName === 'roof';
   
+  const handleRoofingExpertClick = () => {
+    // This could be expanded to open a modal, navigate to a contact form, etc.
+    console.log('Roofing expert button clicked');
+  };
+  
   return (
     <Card className="bg-white border border-gray-200">
       <CardHeader className="pb-4">
@@ -201,6 +206,19 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
             )}
           </CollapsibleContent>
         </Collapsible>
+
+        {/* Roofing Expert Button - Only shows for roof systems and always visible */}
+        {isRoof && (
+          <div className="pt-2">
+            <Button 
+              onClick={handleRoofingExpertClick}
+              variant="green-dark"
+              className="w-full"
+            >
+              Talk to a Local Roofing Expert
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
