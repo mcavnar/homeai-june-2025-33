@@ -38,8 +38,7 @@ const RepairCostsCard: React.FC<RepairCostsCardProps> = ({
       icon={Wrench}
       title="Total Repair Costs"
       showBullets={false}
-      gradientFrom="purple-500"
-      gradientTo="purple-600"
+      gradientClass="bg-gradient-to-br from-purple-500 to-purple-600"
       iconColor="text-purple-100"
       textColor="text-white"
     >
