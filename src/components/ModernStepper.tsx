@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Share, MessageSquare, DollarSign, Settings, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -21,19 +22,19 @@ const ModernStepper: React.FC = () => {
   const steps: Step[] = [
     {
       id: 1,
-      title: "See Key Systems",
-      description: "Understand the condition, safety and expected maintenance costs of the property's major systems (HVAC, electrical, plumbing, etc.).",
-      action: "See Key Systems",
-      icon: Settings,
-      onClick: () => navigate('/results/systems')
-    },
-    {
-      id: 2,
       title: "Review Issue List",
       description: "Review every identified issue with detailed locations, priorities, and estimated repair costs",
       action: "Understand Complete Issues List",
       icon: FileText,
       onClick: () => navigate('/results/issues')
+    },
+    {
+      id: 2,
+      title: "See Key Systems",
+      description: "Understand the condition, safety and expected maintenance costs of the property's major systems (HVAC, electrical, plumbing, etc.).",
+      action: "See Key Systems",
+      icon: Settings,
+      onClick: () => navigate('/results/systems')
     },
     {
       id: 3,
