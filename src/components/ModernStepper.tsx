@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Share, MessageSquare, DollarSign, Settings, FileText } from 'lucide-react';
+import { Share, Handshake, Users, Settings, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -24,7 +24,7 @@ const ModernStepper: React.FC = () => {
       title: "Review Issue List",
       description: "Review every identified issue with detailed locations, priorities, and estimated repair costs",
       action: "Issues List",
-      icon: FileText,
+      icon: AlertTriangle,
       onClick: () => navigate('/results/issues')
     },
     {
@@ -40,7 +40,7 @@ const ModernStepper: React.FC = () => {
       title: "See Service Providers",
       description: "Explore monthly service provider costs and connect with qualified contractors for ongoing maintenance",
       action: "Service Providers",
-      icon: DollarSign,
+      icon: Users,
       onClick: () => navigate('/results/providers')
     },
     {
@@ -48,7 +48,7 @@ const ModernStepper: React.FC = () => {
       title: "Get Negotiation Advice",
       description: "Receive strategic guidance on how to use your inspection findings in purchase negotiations",
       action: "Negotiation",
-      icon: MessageSquare,
+      icon: Handshake,
       onClick: () => navigate('/results/negotiation')
     }
   ];
