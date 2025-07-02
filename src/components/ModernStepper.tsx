@@ -38,7 +38,7 @@ const ModernStepper: React.FC = () => {
     {
       id: 3,
       title: "Get Service Providers",
-      description: "Explore monthly service provider costs and connect with qualified contractors for ongoing maintenance",
+      description: "Explore monthly service provider costs and connect with qualified area vendors.",
       action: "Service Providers",
       icon: Users,
       onClick: () => navigate('/results/providers')
