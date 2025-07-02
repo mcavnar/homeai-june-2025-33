@@ -135,6 +135,19 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
           )}
         </div>
 
+        {/* Roofing Expert Button - Only shows for roof systems and always visible */}
+        {isRoof && (
+          <div className="pt-2">
+            <Button 
+              onClick={handleRoofingExpertClick}
+              variant="green-dark"
+              className="w-full"
+            >
+              Talk to a Local Roofing Expert
+            </Button>
+          </div>
+        )}
+
         <Collapsible>
           <CollapsibleTrigger asChild>
             <Button variant="outline" className="w-full justify-between">
@@ -202,19 +215,6 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
                     </ul>
                   </div>
                 )}
-              </div>
-            )}
-
-            {/* Roofing Expert Button - Only shows for roof systems */}
-            {isRoof && (
-              <div className="pt-2">
-                <Button 
-                  onClick={handleRoofingExpertClick}
-                  variant="green-dark"
-                  className="w-full"
-                >
-                  Talk to a Local Roofing Expert
-                </Button>
               </div>
             )}
           </CollapsibleContent>
