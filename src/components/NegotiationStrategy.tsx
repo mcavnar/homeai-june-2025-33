@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TrendingUp, Target, MessageSquare } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { formatCurrency } from '@/utils/formatters';
 import { NegotiationStrategy as NegotiationStrategyType } from '@/types/inspection';
@@ -13,16 +13,7 @@ interface NegotiationStrategyProps {
 const NegotiationStrategy: React.FC<NegotiationStrategyProps> = ({ strategy }) => {
   return (
     <Card className="border-purple-200">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-purple-700">
-          <Target className="h-5 w-5" />
-          Negotiation Strategy
-        </CardTitle>
-        <CardDescription>
-          AI-powered negotiation recommendations based on inspection findings and market data
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 pt-6">
         {/* Quick Reference */}
         <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
           <h3 className="font-semibold text-purple-800 mb-3 flex items-center gap-2">
