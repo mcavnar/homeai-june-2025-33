@@ -41,7 +41,9 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
     matches,
     currentMatchIndex,
     isSearching,
+    textExtractionComplete,
     handleSearch,
+    executeSearchImmediately,
     goToNextMatch,
     goToPrevMatch,
     clearSearch,
@@ -54,18 +56,16 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
     clearSearch
   }), [handleSearch, clearSearch]);
 
-  // Handle initial search query - Fixed timing issue
+  // Handle initial search query - Fixed with proper timing and execution
   useEffect(() => {
-    if (initialSearchQuery && pdf && !initialSearchExecuted) {
+    if (initialSearchQuery && pdf && textExtractionComplete && !initialSearchExecuted) {
       console.log('PDFViewer: Executing initial search for:', initialSearchQuery);
       setShowSearch(true);
-      // Use setTimeout to ensure the search UI is ready
-      setTimeout(() => {
-        handleSearch(initialSearchQuery);
-        setInitialSearchExecuted(true);
-      }, 100);
+      // Execute search immediately without debounce for initial searches
+      executeSearchImmediately(initialSearchQuery);
+      setInitialSearchExecuted(true);
     }
-  }, [initialSearchQuery, pdf, handleSearch, initialSearchExecuted]);
+  }, [initialSearchQuery, pdf, textExtractionComplete, executeSearchImmediately, initialSearchExecuted]);
 
   // Reset initial search flag when initialSearchQuery changes
   useEffect(() => {

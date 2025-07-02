@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { normalizeTextForSearch } from '@/utils/textNormalization';
 import { performMultiStrategySearch, FlexibleMatch } from '@/utils/flexibleSearch';
@@ -23,6 +24,7 @@ export const usePDFSearch = (pdf: any) => {
   const [currentMatchIndex, setCurrentMatchIndex] = useState(-1);
   const [isSearching, setIsSearching] = useState(false);
   const [pageTextContent, setPageTextContent] = useState<Map<number, PageTextContent>>(new Map());
+  const [textExtractionComplete, setTextExtractionComplete] = useState(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
   const textExtractionRef = useRef(false);
 
@@ -33,6 +35,7 @@ export const usePDFSearch = (pdf: any) => {
     const extractAllText = async () => {
       console.log('Starting text extraction for search...');
       textExtractionRef.current = true;
+      setTextExtractionComplete(false);
       const textContentMap = new Map<number, PageTextContent>();
       
       try {
@@ -54,10 +57,12 @@ export const usePDFSearch = (pdf: any) => {
         }
         
         setPageTextContent(textContentMap);
+        setTextExtractionComplete(true);
         console.log('Text extraction complete for', pdf.numPages, 'pages');
       } catch (error) {
         console.error('Error extracting text for search:', error);
         textExtractionRef.current = false;
+        setTextExtractionComplete(false);
       }
     };
 
@@ -118,6 +123,15 @@ export const usePDFSearch = (pdf: any) => {
     }
   }, [pageTextContent]);
 
+  // Immediate search function that bypasses debounce
+  const executeSearchImmediately = useCallback(async (query: string) => {
+    if (!query.trim()) return;
+    
+    console.log('Executing immediate search for:', query);
+    setSearchQuery(query);
+    await performSearch(query);
+  }, [performSearch]);
+
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
     
@@ -169,7 +183,9 @@ export const usePDFSearch = (pdf: any) => {
     matches,
     currentMatchIndex,
     isSearching,
+    textExtractionComplete,
     handleSearch,
+    executeSearchImmediately,
     goToNextMatch,
     goToPrevMatch,
     clearSearch,
