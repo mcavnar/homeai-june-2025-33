@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
   const isRoof = systemName === 'roof';
   const isElectrical = systemName === 'electrical';
   const isPlumbing = systemName === 'plumbing';
+  const isHVAC = systemName === 'hvac';
   
   const handleRoofingExpertClick = () => {
     // This could be expanded to open a modal, navigate to a contact form, etc.
@@ -34,6 +36,11 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
   const handlePlumberClick = () => {
     // This could be expanded to open a modal, navigate to a contact form, etc.
     console.log('Plumber button clicked');
+  };
+  
+  const handleHVACTechnicianClick = () => {
+    // This could be expanded to open a modal, navigate to a contact form, etc.
+    console.log('HVAC technician button clicked');
   };
   
   return (
@@ -252,6 +259,18 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
               className="w-full"
             >
               Find a Local Plumber
+            </Button>
+          </div>
+        )}
+        
+        {isHVAC && (
+          <div className="pt-2">
+            <Button 
+              onClick={handleHVACTechnicianClick}
+              variant="green-dark"
+              className="w-full"
+            >
+              Find a Local HVAC Technician
             </Button>
           </div>
         )}
