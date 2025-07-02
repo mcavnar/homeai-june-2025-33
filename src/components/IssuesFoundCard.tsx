@@ -46,9 +46,9 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
       icon={AlertTriangle}
       title="Issues Found"
       showBullets={false}
-      gradientFrom="red-500"
-      gradientTo="red-600"
-      iconColor="text-red-100"
+      gradientFrom="blue-500"
+      gradientTo="blue-600"
+      iconColor="text-blue-100"
       textColor="text-white"
     >
       <TooltipProvider>
@@ -59,9 +59,9 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
                 {totalIssues}
               </div>
               
-              {/* Compact Bar Chart with Numbers on Bars */}
+              {/* Left-aligned Bar Chart with Numbers on Bars */}
               {chartData.length > 0 && (
-                <div className="flex gap-3 items-end justify-center w-full h-10 px-1">
+                <div className="flex gap-3 items-end justify-start w-full h-10 px-1">
                   {chartData.map((item, index) => (
                     <div 
                       key={index} 
@@ -75,11 +75,11 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
                           height: `${Math.max(10, (item.count / maxCount) * 28)}px`
                         }}
                       >
-                        <span className="text-xs font-bold text-red-600 drop-shadow-sm">
+                        <span className="text-xs font-bold text-blue-600 drop-shadow-sm">
                           {item.count}
                         </span>
                       </div>
-                      <span className="text-xs text-red-100 font-medium group-hover:text-white transition-colors">
+                      <span className="text-xs text-blue-100 font-medium group-hover:text-white transition-colors">
                         {item.priority}
                       </span>
                     </div>

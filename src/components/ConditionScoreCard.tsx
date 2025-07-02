@@ -14,13 +14,6 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
   score, 
   rating 
 }) => {
-  const getScoreColor = (score: number) => {
-    if (score >= 8.0) return 'text-green-100';
-    if (score >= 6.5) return 'text-blue-100';
-    if (score >= 5.5) return 'text-yellow-100';
-    return 'text-red-100';
-  };
-
   const getRatingColor = (rating: string) => {
     switch (rating) {
       case 'Excellent':
@@ -38,14 +31,33 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
     }
   };
 
+  const getGradientColors = (rating: string) => {
+    switch (rating) {
+      case 'Excellent':
+        return { from: 'green-500', to: 'green-600', icon: 'text-green-100' };
+      case 'Very Good':
+        return { from: 'emerald-500', to: 'emerald-600', icon: 'text-emerald-100' };
+      case 'Good':
+        return { from: 'blue-500', to: 'blue-600', icon: 'text-blue-100' };
+      case 'Fair':
+        return { from: 'yellow-500', to: 'yellow-600', icon: 'text-yellow-100' };
+      case 'Poor':
+        return { from: 'red-500', to: 'red-600', icon: 'text-red-100' };
+      default:
+        return { from: 'gray-500', to: 'gray-600', icon: 'text-gray-100' };
+    }
+  };
+
+  const gradientColors = getGradientColors(rating);
+
   return (
     <MetricCard
       icon={TrendingUp}
       title="Condition Score"
       showBullets={false}
-      gradientFrom="blue-500"
-      gradientTo="blue-600"
-      iconColor="text-blue-100"
+      gradientFrom={gradientColors.from}
+      gradientTo={gradientColors.to}
+      iconColor={gradientColors.icon}
       textColor="text-white"
     >
       <HoverCard>
@@ -54,7 +66,7 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
             <div className={`text-3xl font-bold mb-1`}>
               {score}
             </div>
-            <div className="text-sm text-blue-100 mb-2">out of 10</div>
+            <div className={`text-sm ${gradientColors.icon} mb-2`}>out of 10</div>
             <Badge 
               variant="outline" 
               className={`text-xs px-2 py-1 font-medium ${getRatingColor(rating)}`}
