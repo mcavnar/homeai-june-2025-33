@@ -46,9 +46,9 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
       icon={AlertTriangle}
       title="Issues Found"
       showBullets={false}
-      gradientFrom="blue-500"
-      gradientTo="blue-600"
-      iconColor="text-blue-100"
+      gradientFrom="orange-500"
+      gradientTo="orange-600"
+      iconColor="text-orange-100"
       textColor="text-white"
     >
       <TooltipProvider>
@@ -75,11 +75,11 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
                           height: `${Math.max(10, (item.count / maxCount) * 28)}px`
                         }}
                       >
-                        <span className="text-xs font-bold text-blue-600 drop-shadow-sm">
+                        <span className="text-xs font-bold text-orange-600 drop-shadow-sm">
                           {item.count}
                         </span>
                       </div>
-                      <span className="text-xs text-blue-100 font-medium group-hover:text-white transition-colors">
+                      <span className="text-xs text-orange-100 font-medium group-hover:text-white transition-colors">
                         {item.priority}
                       </span>
                     </div>
