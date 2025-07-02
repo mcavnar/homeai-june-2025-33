@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -12,6 +11,22 @@ interface IssuesListProps {
 }
 
 const IssuesList: React.FC<IssuesListProps> = ({ issues }) => {
+  // Debug logging to trace issues data
+  console.log('IssuesList - Raw issues array:', issues);
+  console.log('IssuesList - Issues count:', issues?.length || 0);
+  
+  if (issues && issues.length > 0) {
+    console.log('IssuesList - First few issues with sourceQuote check:');
+    issues.slice(0, 3).forEach((issue, index) => {
+      console.log(`  Issue ${index}:`, {
+        description: issue.description?.substring(0, 50) + '...',
+        hasSourceQuote: !!issue.sourceQuote,
+        sourceQuote: issue.sourceQuote?.substring(0, 100) + (issue.sourceQuote?.length > 100 ? '...' : ''),
+        allKeys: Object.keys(issue)
+      });
+    });
+  }
+
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [priceFilter, setPriceFilter] = useState<string>('all');
@@ -33,7 +48,7 @@ const IssuesList: React.FC<IssuesListProps> = ({ issues }) => {
   const filteredIssues = useMemo(() => {
     if (!issues || issues.length === 0) return [];
 
-    return issues.filter((issue: InspectionIssue) => {
+    const filtered = issues.filter((issue: InspectionIssue) => {
       // Filter by search query
       if (searchQuery.trim() !== '') {
         const query = searchQuery.toLowerCase().trim();
@@ -72,6 +87,12 @@ const IssuesList: React.FC<IssuesListProps> = ({ issues }) => {
 
       return true;
     });
+
+    console.log('IssuesList - Filtered issues:', filtered.length);
+    console.log('IssuesList - Filtered issues with sourceQuote:', 
+      filtered.filter(issue => !!issue.sourceQuote).length);
+
+    return filtered;
   }, [issues, severityFilter, typeFilter, priceFilter, searchQuery]);
 
   // Get unique categories for the type filter

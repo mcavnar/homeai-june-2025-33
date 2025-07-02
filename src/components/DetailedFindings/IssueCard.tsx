@@ -25,6 +25,12 @@ const IssueCard: React.FC<IssueCardProps> = ({
   onToggleQuote,
   onSeeInReport,
 }) => {
+  // Debug logging to trace sourceQuote data
+  console.log(`IssueCard ${index} - Full issue object:`, issue);
+  console.log(`IssueCard ${index} - sourceQuote value:`, issue.sourceQuote);
+  console.log(`IssueCard ${index} - sourceQuote type:`, typeof issue.sourceQuote);
+  console.log(`IssueCard ${index} - Has sourceQuote:`, !!issue.sourceQuote);
+
   const renderPriorityBadge = (priority: 'immediate' | 'high' | 'medium' | 'low') => {
     const colors = {
       immediate: 'bg-red-200 text-red-900 border-red-300',

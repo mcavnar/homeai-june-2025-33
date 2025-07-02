@@ -10,6 +10,18 @@ interface IssuesListContextType {
 const IssuesList = () => {
   const { analysis } = useOutletContext<IssuesListContextType>();
 
+  // Debug logging to trace analysis data at page level
+  console.log('IssuesList Page - Full analysis object:', analysis);
+  console.log('IssuesList Page - analysis.issues:', analysis?.issues);
+  console.log('IssuesList Page - issues type:', typeof analysis?.issues);
+  console.log('IssuesList Page - issues length:', analysis?.issues?.length);
+
+  if (analysis?.issues && analysis.issues.length > 0) {
+    console.log('IssuesList Page - Sample issue keys:', Object.keys(analysis.issues[0] || {}));
+    console.log('IssuesList Page - Issues with sourceQuote:', 
+      analysis.issues.filter((issue: any) => !!issue.sourceQuote).length);
+  }
+
   if (!analysis.issues || analysis.issues.length === 0) {
     return (
       <div className="space-y-6">
