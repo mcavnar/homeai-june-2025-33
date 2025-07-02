@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -43,8 +44,8 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
   };
   
   return (
-    <Card className="bg-white border border-gray-200">
-      <CardHeader className="pb-4">
+    <Card className="bg-white border border-gray-200 h-full flex flex-col">
+      <CardHeader className="pb-4 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Icon className="h-5 w-5" />
@@ -58,176 +59,183 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
-        {/* Grid layout for main information */}
-        <div className={`grid gap-x-6 gap-y-4 p-4 bg-gray-50 rounded-lg ${
-          isFoundation 
-            ? 'grid-cols-3' 
-            : shouldShowBrand 
-              ? 'grid-cols-2' 
-              : 'grid-cols-2'
-        }`}>
-          {isFoundation ? (
-            <>
-              {/* Foundation: Single row with three columns */}
-              <div className="space-y-1">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Type</span>
-                <div className="text-sm font-medium text-gray-900">{system.type || 'N/A'}</div>
-              </div>
-              <div className="space-y-1">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Age</span>
-                <div className="text-sm font-medium text-gray-900">{system.age || 'N/A'}</div>
-              </div>
-              <div className="space-y-1">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Years Left</span>
-                <div className="flex flex-wrap gap-1">
-                  {yearsLeftData.map((unit, index) => (
-                    <span 
-                      key={index}
-                      className={`${getUrgencyColor(unit.value)} px-2 py-1 text-xs font-medium rounded-md border`}
-                    >
-                      {unit.label && `${unit.label}: `}{unit.value} years
-                    </span>
-                  ))}
+      <CardContent className="flex flex-col flex-1">
+        {/* Fixed height content section */}
+        <div className="flex-shrink-0 mb-4">
+          {/* Grid layout for main information */}
+          <div className={`grid gap-x-6 gap-y-4 p-4 bg-gray-50 rounded-lg ${
+            isFoundation 
+              ? 'grid-cols-3' 
+              : shouldShowBrand 
+                ? 'grid-cols-2' 
+                : 'grid-cols-2'
+          }`}>
+            {isFoundation ? (
+              <>
+                {/* Foundation: Single row with three columns */}
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Type</span>
+                  <div className="text-sm font-medium text-gray-900">{system.type || 'N/A'}</div>
                 </div>
-              </div>
-            </>
-          ) : shouldShowBrand ? (
-            <>
-              {/* First row: Brand and Type */}
-              <div className="space-y-1">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Brand</span>
-                <div className="text-sm font-medium text-gray-900">{system.brand || 'N/A'}</div>
-              </div>
-              <div className="space-y-1">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Type</span>
-                <div className="text-sm font-medium text-gray-900">{system.type || 'N/A'}</div>
-              </div>
-              
-              {/* Second row: Age and Years Left */}
-              <div className="space-y-1">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Age</span>
-                <div className="text-sm font-medium text-gray-900">{system.age || 'N/A'}</div>
-              </div>
-              <div className="space-y-1">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Years Left</span>
-                <div className="flex flex-wrap gap-1">
-                  {yearsLeftData.map((unit, index) => (
-                    <span 
-                      key={index}
-                      className={`${getUrgencyColor(unit.value)} px-2 py-1 text-xs font-medium rounded-md border`}
-                    >
-                      {unit.label && `${unit.label}: `}{unit.value} years
-                    </span>
-                  ))}
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Age</span>
+                  <div className="text-sm font-medium text-gray-900">{system.age || 'N/A'}</div>
                 </div>
-              </div>
-            </>
-          ) : (
-            <>
-              {/* First row: Type and Age */}
-              <div className="space-y-1">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Type</span>
-                <div className="text-sm font-medium text-gray-900">{system.type || 'N/A'}</div>
-              </div>
-              <div className="space-y-1">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Age</span>
-                <div className="text-sm font-medium text-gray-900">{system.age || 'N/A'}</div>
-              </div>
-              
-              {/* Second row: Years Left (spans both columns) */}
-              <div className="space-y-1 col-span-2">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Years Left</span>
-                <div className="flex flex-wrap gap-1">
-                  {yearsLeftData.map((unit, index) => (
-                    <span 
-                      key={index}
-                      className={`${getUrgencyColor(unit.value)} px-2 py-1 text-xs font-medium rounded-md border`}
-                    >
-                      {unit.label && `${unit.label}: `}{unit.value} years
-                    </span>
-                  ))}
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Years Left</span>
+                  <div className="flex flex-wrap gap-1">
+                    {yearsLeftData.map((unit, index) => (
+                      <span 
+                        key={index}
+                        className={`${getUrgencyColor(unit.value)} px-2 py-1 text-xs font-medium rounded-md border`}
+                      >
+                        {unit.label && `${unit.label}: `}{unit.value} years
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            ) : shouldShowBrand ? (
+              <>
+                {/* First row: Brand and Type */}
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Brand</span>
+                  <div className="text-sm font-medium text-gray-900">{system.brand || 'N/A'}</div>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Type</span>
+                  <div className="text-sm font-medium text-gray-900">{system.type || 'N/A'}</div>
+                </div>
+                
+                {/* Second row: Age and Years Left */}
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Age</span>
+                  <div className="text-sm font-medium text-gray-900">{system.age || 'N/A'}</div>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Years Left</span>
+                  <div className="flex flex-wrap gap-1">
+                    {yearsLeftData.map((unit, index) => (
+                      <span 
+                        key={index}
+                        className={`${getUrgencyColor(unit.value)} px-2 py-1 text-xs font-medium rounded-md border`}
+                      >
+                        {unit.label && `${unit.label}: `}{unit.value} years
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* First row: Type and Age */}
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Type</span>
+                  <div className="text-sm font-medium text-gray-900">{system.type || 'N/A'}</div>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Age</span>
+                  <div className="text-sm font-medium text-gray-900">{system.age || 'N/A'}</div>
+                </div>
+                
+                {/* Second row: Years Left (spans both columns) */}
+                <div className="space-y-1 col-span-2">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Years Left</span>
+                  <div className="flex flex-wrap gap-1">
+                    {yearsLeftData.map((unit, index) => (
+                      <span 
+                        key={index}
+                        className={`${getUrgencyColor(unit.value)} px-2 py-1 text-xs font-medium rounded-md border`}
+                      >
+                        {unit.label && `${unit.label}: `}{unit.value} years
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
-        <Collapsible>
-          <CollapsibleTrigger asChild>
-            <Button variant="outline" className="w-full justify-between">
-              More Details
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-4 mt-4 pt-4 border-t border-gray-200">
-            {system.summary && (
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Summary</h4>
-                <p className="text-sm text-gray-600">{system.summary}</p>
-              </div>
-            )}
-            
-            {system.replacementCost && (
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Replacement Cost</h4>
-                <p className="text-sm text-gray-600">
-                  {formatCurrency(system.replacementCost.min)} - {formatCurrency(system.replacementCost.max)}
-                </p>
-              </div>
-            )}
+        {/* Flexible spacer */}
+        <div className="flex-1"></div>
 
-            {system.maintenanceCosts && (
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Maintenance Costs</h4>
-                <div className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">5-Year:</span>
-                    <span className="text-gray-900">
-                      {formatCurrency(system.maintenanceCosts.fiveYear.min)} - {formatCurrency(system.maintenanceCosts.fiveYear.max)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">10-Year:</span>
-                    <span className="text-gray-900">
-                      {formatCurrency(system.maintenanceCosts.tenYear.min)} - {formatCurrency(system.maintenanceCosts.tenYear.max)}
-                    </span>
+        {/* Fixed footer section for buttons - always at bottom */}
+        <div className="flex-shrink-0 space-y-4">
+          <Collapsible>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="w-full justify-between">
+                More Details
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 mt-4 pt-4 border-t border-gray-200">
+              {system.summary && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Summary</h4>
+                  <p className="text-sm text-gray-600">{system.summary}</p>
+                </div>
+              )}
+              
+              {system.replacementCost && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Replacement Cost</h4>
+                  <p className="text-sm text-gray-600">
+                    {formatCurrency(system.replacementCost.min)} - {formatCurrency(system.replacementCost.max)}
+                  </p>
+                </div>
+              )}
+
+              {system.maintenanceCosts && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Maintenance Costs</h4>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">5-Year:</span>
+                      <span className="text-gray-900">
+                        {formatCurrency(system.maintenanceCosts.fiveYear.min)} - {formatCurrency(system.maintenanceCosts.fiveYear.max)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">10-Year:</span>
+                      <span className="text-gray-900">
+                        {formatCurrency(system.maintenanceCosts.tenYear.min)} - {formatCurrency(system.maintenanceCosts.tenYear.max)}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {system.anticipatedRepairs && (
-              <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Anticipated Repairs</h4>
-                {system.anticipatedRepairs.fiveYear && system.anticipatedRepairs.fiveYear.length > 0 && (
-                  <div className="mb-2">
-                    <span className="text-xs font-medium text-gray-700">5-Year:</span>
-                    <ul className="text-sm text-gray-600 ml-2 list-disc list-inside">
-                      {system.anticipatedRepairs.fiveYear.map((repair: string, index: number) => (
-                        <li key={index}>{repair}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {system.anticipatedRepairs.tenYear && system.anticipatedRepairs.tenYear.length > 0 && (
-                  <div>
-                    <span className="text-xs font-medium text-gray-700">10-Year:</span>
-                    <ul className="text-sm text-gray-600 ml-2 list-disc list-inside">
-                      {system.anticipatedRepairs.tenYear.map((repair: string, index: number) => (
-                        <li key={index}>{repair}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
-          </CollapsibleContent>
-        </Collapsible>
+              {system.anticipatedRepairs && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Anticipated Repairs</h4>
+                  {system.anticipatedRepairs.fiveYear && system.anticipatedRepairs.fiveYear.length > 0 && (
+                    <div className="mb-2">
+                      <span className="text-xs font-medium text-gray-700">5-Year:</span>
+                      <ul className="text-sm text-gray-600 ml-2 list-disc list-inside">
+                        {system.anticipatedRepairs.fiveYear.map((repair: string, index: number) => (
+                          <li key={index}>{repair}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {system.anticipatedRepairs.tenYear && system.anticipatedRepairs.tenYear.length > 0 && (
+                    <div>
+                      <span className="text-xs font-medium text-gray-700">10-Year:</span>
+                      <ul className="text-sm text-gray-600 ml-2 list-disc list-inside">
+                        {system.anticipatedRepairs.tenYear.map((repair: string, index: number) => (
+                          <li key={index}>{repair}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CollapsibleContent>
+          </Collapsible>
 
-        {/* Expert Buttons - Only show for specific systems and always visible */}
-        {isRoof && (
-          <div className="pt-2">
+          {/* Expert Buttons - Always visible and aligned at bottom */}
+          {isRoof && (
             <Button 
               onClick={handleRoofingExpertClick}
               variant="green-dark"
@@ -235,11 +243,9 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
             >
               Find a Local Roofing Expert
             </Button>
-          </div>
-        )}
-        
-        {isElectrical && (
-          <div className="pt-2">
+          )}
+          
+          {isElectrical && (
             <Button 
               onClick={handleElectricalExpertClick}
               variant="green-dark"
@@ -247,11 +253,9 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
             >
               Find a Local Electrician
             </Button>
-          </div>
-        )}
-        
-        {isPlumbing && (
-          <div className="pt-2">
+          )}
+          
+          {isPlumbing && (
             <Button 
               onClick={handlePlumberClick}
               variant="green-dark"
@@ -259,11 +263,9 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
             >
               Find a Local Plumber
             </Button>
-          </div>
-        )}
-        
-        {isHVAC && (
-          <div className="pt-2">
+          )}
+          
+          {isHVAC && (
             <Button 
               onClick={handleHVACTechnicianClick}
               variant="green-dark"
@@ -271,8 +273,8 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
             >
               Find a Local HVAC Technician
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </CardContent>
     </Card>
   );
