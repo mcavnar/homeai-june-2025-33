@@ -51,24 +51,24 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
         <Tooltip>
           <TooltipTrigger asChild>
             <div className="cursor-help text-center w-full">
-              <div className="text-4xl font-bold text-blue-600 mb-6">
+              <div className="text-4xl font-bold text-blue-600 mb-3">
                 {totalIssues}
               </div>
               
               {/* Compact Bar Chart with Numbers on Bars */}
               {chartData.length > 0 && (
-                <div className="flex gap-4 items-end justify-center w-full h-12 px-2">
+                <div className="flex gap-3 items-end justify-center w-full h-10 px-1">
                   {chartData.map((item, index) => (
                     <div 
                       key={index} 
-                      className="flex flex-col items-center gap-2 group cursor-default min-w-[40px]"
+                      className="flex flex-col items-center gap-1 group cursor-default min-w-[36px]"
                     >
                       <div 
-                        className="rounded-t-sm min-h-[12px] transition-all duration-200 hover:opacity-80 group-hover:shadow-sm relative flex items-center justify-center" 
+                        className="rounded-t-sm min-h-[10px] transition-all duration-200 hover:opacity-80 group-hover:shadow-sm relative flex items-center justify-center" 
                         style={{ 
                           backgroundColor: item.color, 
-                          width: '36px',
-                          height: `${Math.max(12, (item.count / maxCount) * 32)}px`
+                          width: '32px',
+                          height: `${Math.max(10, (item.count / maxCount) * 28)}px`
                         }}
                       >
                         <span className="text-xs font-bold text-white drop-shadow-sm">

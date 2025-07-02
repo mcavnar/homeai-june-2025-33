@@ -23,26 +23,26 @@ const MetricCard: React.FC<MetricCardProps> = ({
   return (
     <Card className="border-indigo-200">
       <CardContent className="p-0">
-        {/* Header Section - Fixed Height */}
-        <div className="p-4 sm:p-6 pb-4">
+        {/* Header Section - Reduced Padding */}
+        <div className="p-3 pb-2">
           <div className="flex items-center gap-2">
-            <Icon className="h-5 w-5 text-gray-600" />
-            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            <Icon className="h-4 w-4 text-gray-600" />
+            <h3 className="text-base font-semibold text-gray-900">{title}</h3>
           </div>
         </div>
         
-        {/* Main Metric Section - Expanded Height */}
-        <div className="px-4 sm:px-6 pb-4 flex-1 flex flex-col justify-center items-center min-h-[200px]">
+        {/* Main Metric Section - Reduced Height and Padding */}
+        <div className="px-3 pb-3 flex-1 flex flex-col justify-center items-center min-h-[120px]">
           {children}
         </div>
         
         {/* Context Bullets Section - Only show if showBullets is true */}
         {showBullets && (
           <>
-            <div className="border-t border-gray-100 mx-4 sm:mx-6"></div>
-            <div className="p-3 sm:p-6 pt-6 min-h-24 flex flex-col items-start overflow-hidden">
-              <h4 className="text-xs font-semibold text-gray-700 mb-2">{bulletHeadline}</h4>
-              <ul className="text-[10px] sm:text-xs text-gray-600 space-y-1 w-full break-words leading-tight">
+            <div className="border-t border-gray-100 mx-3"></div>
+            <div className="p-3 pt-3 min-h-16 flex flex-col items-start overflow-hidden">
+              <h4 className="text-xs font-semibold text-gray-700 mb-1">{bulletHeadline}</h4>
+              <ul className="text-[10px] text-gray-600 space-y-0.5 w-full break-words leading-tight">
                 {bulletPoints.map((point, index) => (
                   <li key={index}>• {point}</li>
                 ))}

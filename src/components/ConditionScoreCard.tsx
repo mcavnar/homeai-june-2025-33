@@ -46,14 +46,14 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
     >
       <HoverCard>
         <HoverCardTrigger asChild>
-          <div className="cursor-help">
-            <div className={`text-5xl font-bold ${getScoreColor(score)} mb-2`}>
+          <div className="cursor-help text-center">
+            <div className={`text-4xl font-bold ${getScoreColor(score)} mb-1`}>
               {score}
             </div>
-            <div className="text-sm text-gray-600 mb-3">out of 10</div>
+            <div className="text-xs text-gray-500 mb-2">out of 10</div>
             <Badge 
               variant="outline" 
-              className={`text-sm px-3 py-1 font-medium ${getRatingColor(rating)}`}
+              className={`text-xs px-2 py-1 font-medium ${getRatingColor(rating)}`}
             >
               {rating}
             </Badge>
