@@ -70,11 +70,11 @@ const ModernStepper: React.FC = () => {
       <div className="hidden lg:block">
         <div className="relative">
           {/* Steps */}
-          <div className="grid grid-cols-4 gap-8">
+          <div className="grid grid-cols-4 gap-8 auto-rows-fr">
             {steps.map((step, index) => (
               <div
                 key={step.id}
-                className="relative animate-step-appear"
+                className="relative animate-step-appear h-full flex flex-col"
                 style={{ animationDelay: `${index * 0.2}s` }}
                 onMouseEnter={() => setHoveredStep(step.id)}
                 onMouseLeave={() => setHoveredStep(null)}
@@ -91,22 +91,22 @@ const ModernStepper: React.FC = () => {
                 </div>
 
                 {/* Step Card */}
-                <div className={`bg-white rounded-lg border border-gray-200 p-6 shadow-sm transition-all duration-300 cursor-pointer ${
+                <div className={`bg-white rounded-lg border border-gray-200 p-6 shadow-sm transition-all duration-300 cursor-pointer flex-1 flex flex-col ${
                   hoveredStep === step.id 
                     ? 'shadow-xl -translate-y-2 scale-105' 
                     : 'hover:shadow-lg hover:-translate-y-1'
                 }`}
                 onClick={step.onClick}>
-                  <div className="text-center mb-4">
+                  <div className="text-center mb-4 flex-1 flex flex-col">
                     <step.icon className="h-8 w-8 mx-auto text-green-600 mb-2" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
-                    <p className="text-sm text-gray-600 mb-4 leading-relaxed">{step.description}</p>
+                    <p className="text-sm text-gray-600 mb-4 leading-relaxed flex-1">{step.description}</p>
                   </div>
                   
                   <Button 
                     variant="green-dark"
                     size="default"
-                    className="w-full text-sm font-semibold"
+                    className="w-full text-sm font-semibold mt-auto"
                   >
                     {step.action}
                   </Button>
@@ -138,11 +138,11 @@ const ModernStepper: React.FC = () => {
                 </div>
                 
                 {/* Step Content */}
-                <div className="flex-1 bg-white rounded-lg border border-gray-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
+                <div className="flex-1 bg-white rounded-lg border border-gray-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col"
                      onClick={step.onClick}>
-                  <div className="flex items-start gap-3 mb-4">
+                  <div className="flex items-start gap-3 mb-4 flex-1">
                     <step.icon className="h-6 w-6 text-green-600 mt-1 flex-shrink-0" />
-                    <div>
+                    <div className="flex-1">
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
                       <p className="text-sm text-gray-600 mb-4 leading-relaxed">{step.description}</p>
                     </div>
@@ -151,7 +151,7 @@ const ModernStepper: React.FC = () => {
                   <Button 
                     variant="green-dark"
                     size="default"
-                    className="w-full text-sm font-semibold"
+                    className="w-full text-sm font-semibold mt-auto"
                   >
                     {step.action}
                   </Button>
