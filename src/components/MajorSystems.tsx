@@ -321,10 +321,6 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-3">Key Systems</h2>
-      </div>
-      
       {/* Projection Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Card className="bg-blue-50 border border-blue-200">
