@@ -23,7 +23,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
   return (
     <Card className="border-indigo-200">
       <CardContent className="p-0">
-        {/* Header Section - Reduced Padding */}
+        {/* Header Section */}
         <div className="p-3 pb-2">
           <div className="flex items-center gap-2">
             <Icon className="h-4 w-4 text-gray-600" />
@@ -31,8 +31,8 @@ const MetricCard: React.FC<MetricCardProps> = ({
           </div>
         </div>
         
-        {/* Main Metric Section - Reduced Height and Padding */}
-        <div className="px-3 pb-3 flex-1 flex flex-col justify-center items-center min-h-[120px]">
+        {/* Main Metric Section - Top aligned */}
+        <div className="px-3 pb-3 flex-1 flex flex-col justify-start items-center min-h-[100px] pt-2">
           {children}
         </div>
         
