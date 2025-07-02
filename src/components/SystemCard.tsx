@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -234,7 +233,7 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
               variant="green-dark"
               className="w-full"
             >
-              Talk to a Local Roofing Expert
+              Find a Local Roofing Expert
             </Button>
           </div>
         )}
@@ -246,7 +245,7 @@ const SystemCard: React.FC<SystemCardProps> = ({ systemName, system, displayName
               variant="green-dark"
               className="w-full"
             >
-              Talk to a Local Electrician
+              Find a Local Electrician
             </Button>
           </div>
         )}
