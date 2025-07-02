@@ -44,19 +44,17 @@ const Synopsis = () => {
         </div>
       </div>
 
-      {/* Property Loading State - Moved to top as immediate placeholder */}
+      {/* Property Loading State - Transparent background */}
       {isLoadingProperty && (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-center gap-3 py-4">
-              <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
-              <div className="text-center">
-                <p className="font-medium text-gray-900">Fetching property details...</p>
-                <p className="text-sm text-gray-600">Looking up market information</p>
-              </div>
+        <div className="py-6 px-6">
+          <div className="flex items-center justify-center gap-3 py-4">
+            <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+            <div className="text-center">
+              <p className="font-medium text-gray-900">Fetching property details...</p>
+              <p className="text-sm text-gray-600">Looking up market information</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {/* Property Error */}
