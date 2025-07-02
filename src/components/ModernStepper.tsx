@@ -100,7 +100,7 @@ const ModernStepper: React.FC = () => {
                   <div className="text-center mb-4 flex-1 flex flex-col">
                     <step.icon className="h-8 w-8 mx-auto text-green-600 mb-2" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
-                    <p className="text-sm text-gray-600 mb-4 leading-relaxed flex-1">{step.description}</p>
+                    <p className="text-sm text-gray-600 mb-2 leading-snug flex-1">{step.description}</p>
                   </div>
                   
                   <Button 
@@ -144,7 +144,7 @@ const ModernStepper: React.FC = () => {
                     <step.icon className="h-6 w-6 text-green-600 mt-1 flex-shrink-0" />
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
-                      <p className="text-sm text-gray-600 mb-4 leading-relaxed">{step.description}</p>
+                      <p className="text-sm text-gray-600 mb-2 leading-snug">{step.description}</p>
                     </div>
                   </div>
                   
