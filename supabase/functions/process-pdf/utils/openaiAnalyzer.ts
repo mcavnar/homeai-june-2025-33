@@ -22,26 +22,27 @@ export const analyzeWithOpenAI = async (cleanedText: string) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
+        model: 'gpt-4o', // Updated to valid OpenAI model
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.3,
-        max_tokens: 6000, // Reverted to proven working configuration
+        max_tokens: 6000,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenAI API error:', response.status, errorText);
-      throw new Error(`OpenAI API error: ${response.status}`);
+      console.error('OpenAI API error:', response.status, response.statusText, errorText);
+      throw new Error(`OpenAI API error: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
     console.log('OpenAI response received');
     
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Invalid OpenAI response structure:', JSON.stringify(data, null, 2));
       throw new Error('Invalid response format from OpenAI');
     }
 
@@ -75,6 +76,12 @@ export const analyzeWithOpenAI = async (cleanedText: string) => {
 
   } catch (error) {
     console.error('OpenAI analysis error:', error);
+    
+    // Enhanced error reporting
+    if (error.message.includes('OpenAI API error:')) {
+      throw error; // Re-throw with full error details
+    }
+    
     throw new Error(`AI analysis failed: ${error.message}`);
   }
 };
