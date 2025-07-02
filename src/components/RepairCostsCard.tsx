@@ -38,14 +38,18 @@ const RepairCostsCard: React.FC<RepairCostsCardProps> = ({
       icon={Wrench}
       title="Total Repair Costs"
       showBullets={false}
+      gradientFrom="purple-500"
+      gradientTo="purple-600"
+      iconColor="text-purple-100"
+      textColor="text-white"
     >
       <HoverCard>
         <HoverCardTrigger asChild>
-          <div className="cursor-help text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-1">
+          <div className="cursor-help">
+            <div className="text-3xl font-bold mb-1">
               {formatCurrency(totalRepairCost)}
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-sm text-purple-100">
               (Top of range estimate)
             </div>
           </div>

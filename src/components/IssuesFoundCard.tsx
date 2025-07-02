@@ -46,12 +46,16 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
       icon={AlertTriangle}
       title="Issues Found"
       showBullets={false}
+      gradientFrom="red-500"
+      gradientTo="red-600"
+      iconColor="text-red-100"
+      textColor="text-white"
     >
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="cursor-help text-center w-full">
-              <div className="text-4xl font-bold text-blue-600 mb-3">
+            <div className="cursor-help w-full">
+              <div className="text-3xl font-bold mb-3">
                 {totalIssues}
               </div>
               
@@ -66,16 +70,16 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
                       <div 
                         className="rounded-t-sm min-h-[10px] transition-all duration-200 hover:opacity-80 group-hover:shadow-sm relative flex items-center justify-center" 
                         style={{ 
-                          backgroundColor: item.color, 
+                          backgroundColor: 'rgba(255,255,255,0.8)', 
                           width: '32px',
                           height: `${Math.max(10, (item.count / maxCount) * 28)}px`
                         }}
                       >
-                        <span className="text-xs font-bold text-white drop-shadow-sm">
+                        <span className="text-xs font-bold text-red-600 drop-shadow-sm">
                           {item.count}
                         </span>
                       </div>
-                      <span className="text-xs text-gray-500 font-medium group-hover:text-gray-700 transition-colors">
+                      <span className="text-xs text-red-100 font-medium group-hover:text-white transition-colors">
                         {item.priority}
                       </span>
                     </div>

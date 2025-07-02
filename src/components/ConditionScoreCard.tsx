@@ -15,10 +15,10 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
   rating 
 }) => {
   const getScoreColor = (score: number) => {
-    if (score >= 8.0) return 'text-green-600';
-    if (score >= 6.5) return 'text-blue-600';
-    if (score >= 5.5) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 8.0) return 'text-green-100';
+    if (score >= 6.5) return 'text-blue-100';
+    if (score >= 5.5) return 'text-yellow-100';
+    return 'text-red-100';
   };
 
   const getRatingColor = (rating: string) => {
@@ -43,14 +43,18 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
       icon={TrendingUp}
       title="Condition Score"
       showBullets={false}
+      gradientFrom="blue-500"
+      gradientTo="blue-600"
+      iconColor="text-blue-100"
+      textColor="text-white"
     >
       <HoverCard>
         <HoverCardTrigger asChild>
-          <div className="cursor-help text-center">
-            <div className={`text-4xl font-bold ${getScoreColor(score)} mb-1`}>
+          <div className="cursor-help">
+            <div className={`text-3xl font-bold mb-1`}>
               {score}
             </div>
-            <div className="text-xs text-gray-500 mb-2">out of 10</div>
+            <div className="text-sm text-blue-100 mb-2">out of 10</div>
             <Badge 
               variant="outline" 
               className={`text-xs px-2 py-1 font-medium ${getRatingColor(rating)}`}
