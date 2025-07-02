@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Share, MessageSquare, DollarSign, Settings, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,7 +21,7 @@ const ModernStepper: React.FC = () => {
   const steps: Step[] = [
     {
       id: 1,
-      title: "Start Here",
+      title: "See Key Systems",
       description: "Understand the condition, safety and expected maintenance costs of the property's major systems (HVAC, electrical, plumbing, etc.).",
       action: "See Key Systems",
       icon: Settings,
@@ -30,7 +29,7 @@ const ModernStepper: React.FC = () => {
     },
     {
       id: 2,
-      title: "Understand More",
+      title: "Review Issue List",
       description: "Review every identified issue with detailed locations, priorities, and estimated repair costs",
       action: "Understand Complete Issues List",
       icon: FileText,
@@ -38,7 +37,7 @@ const ModernStepper: React.FC = () => {
     },
     {
       id: 3,
-      title: "Take Action",
+      title: "See Service Providers",
       description: "Explore monthly service provider costs and connect with qualified contractors for ongoing maintenance",
       action: "See Property Service Costs",
       icon: DollarSign,
@@ -46,7 +45,7 @@ const ModernStepper: React.FC = () => {
     },
     {
       id: 4,
-      title: "Go Further",
+      title: "Get Negotiation Advice",
       description: "Receive strategic guidance on how to use your inspection findings in purchase negotiations",
       action: "Get Negotiation Strategy",
       icon: MessageSquare,
