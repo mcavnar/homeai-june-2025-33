@@ -84,8 +84,12 @@ const ServiceProviders = () => {
 
   return (
     <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Provider Overview</h1>
+      {/* Page Header */}
+      <div className="text-left">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Providers</h1>
+        <div className="text-gray-600 text-lg">
+          <p>Estimated costs and recommended service providers for property maintenance</p>
+        </div>
       </div>
 
       <CostSummaryCards costSummary={costSummary} />

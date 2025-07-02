@@ -19,44 +19,44 @@ const Negotiation = () => {
     strategyError,
   } = useOutletContext<NegotiationContextType>();
 
-  if (isGeneratingStrategy) {
-    return (
-      <Card className="border-purple-200">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-center gap-3 py-4">
-            <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
-            <div className="text-center">
-              <p className="font-medium text-gray-900">Generating negotiation strategy...</p>
-              <p className="text-sm text-gray-600">Analyzing inspection and market data</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (strategyError) {
-    return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Negotiation strategy unavailable: {strategyError}
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
-  if (!negotiationStrategy) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">No negotiation strategy available yet.</p>
-      </div>
-    );
-  }
-
   return (
-    <div>
-      <NegotiationStrategy strategy={negotiationStrategy} />
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="text-left">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Negotiation Strategy</h1>
+        <div className="text-gray-600 text-lg">
+          <p>AI-powered negotiation recommendations based on inspection findings</p>
+        </div>
+      </div>
+
+      {isGeneratingStrategy && (
+        <Card className="border-purple-200">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-center gap-3 py-4">
+              <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
+              <div className="text-center">
+                <p className="font-medium text-gray-900">Generating negotiation strategy...</p>
+                <p className="text-sm text-gray-600">Analyzing inspection and market data</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {strategyError ? (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Negotiation strategy unavailable: {strategyError}
+          </AlertDescription>
+        </Alert>
+      ) : negotiationStrategy ? (
+        <NegotiationStrategy strategy={negotiationStrategy} />
+      ) : !isGeneratingStrategy && (
+        <div className="text-center py-12">
+          <p className="text-gray-500">No negotiation strategy available yet.</p>
+        </div>
+      )}
     </div>
   );
 };
