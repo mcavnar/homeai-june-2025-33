@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Share, Handshake, Users, Settings, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -56,7 +57,7 @@ const ModernStepper: React.FC = () => {
   return (
     <div className="w-full py-8">
       {/* Header */}
-      <div className="text-center pb-8">
+      <div className="text-left pb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
           Next Steps
         </h2>
