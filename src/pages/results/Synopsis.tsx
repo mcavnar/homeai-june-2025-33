@@ -44,20 +44,7 @@ const Synopsis = () => {
         </div>
       </div>
 
-      {/* At a Glance Section */}
-      {analysis && propertyData && (
-        <AtAGlance analysis={analysis} propertyData={propertyData} />
-      )}
-
-      {/* Modern Stepper Next Steps */}
-      <ModernStepper />
-
-      {/* Most Expensive Issues Section */}
-      {analysis.issues && analysis.issues.length > 0 && (
-        <MostExpensiveIssues issues={analysis.issues} />
-      )}
-
-      {/* Property Loading State */}
+      {/* Property Loading State - Moved to top as immediate placeholder */}
       {isLoadingProperty && (
         <Card>
           <CardContent className="pt-6">
@@ -80,6 +67,19 @@ const Synopsis = () => {
             Property details unavailable: {propertyError}
           </AlertDescription>
         </Alert>
+      )}
+
+      {/* At a Glance Section */}
+      {analysis && propertyData && (
+        <AtAGlance analysis={analysis} propertyData={propertyData} />
+      )}
+
+      {/* Modern Stepper Next Steps */}
+      <ModernStepper />
+
+      {/* Most Expensive Issues Section */}
+      {analysis.issues && analysis.issues.length > 0 && (
+        <MostExpensiveIssues issues={analysis.issues} />
       )}
     </div>
   );
