@@ -23,8 +23,8 @@ const ModernStepper: React.FC = () => {
     {
       id: 1,
       title: "Start Here",
-      description: "Begin by understanding what major systems (HVAC, electrical, plumbing) mean for your home's condition and safety",
-      action: "Learn About Key Systems",
+      description: "Understand the condition, safety and expected maintenance costs of the property's major systems (HVAC, electrical, plumbing, etc.).",
+      action: "See Key Systems",
       icon: Settings,
       onClick: () => navigate('/results/systems')
     },
