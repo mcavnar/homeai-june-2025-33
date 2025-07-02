@@ -42,8 +42,11 @@ const RepairCostsCard: React.FC<RepairCostsCardProps> = ({
       <HoverCard>
         <HoverCardTrigger asChild>
           <div className="cursor-help">
-            <div className="text-4xl font-bold text-blue-600 mb-2">
+            <div className="text-4xl font-bold text-blue-600 mb-1">
               {formatCurrency(totalRepairCost)}
+            </div>
+            <div className="text-sm text-gray-500 mb-2">
+              (Top of range estimate)
             </div>
           </div>
         </HoverCardTrigger>
