@@ -1,11 +1,14 @@
 
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
 import ResultsSidebar from '@/components/ResultsSidebar';
 import { demoAnalysis, demoPropertyData, demoNegotiationStrategy } from '@/data/demoData';
 
 const DemoResults = () => {
+  const navigate = useNavigate();
+
   // Create a mock PDF ArrayBuffer for demo purposes
   const mockPdfArrayBuffer = new ArrayBuffer(0);
 
@@ -21,13 +24,21 @@ const DemoResults = () => {
     pdfArrayBuffer: mockPdfArrayBuffer,
   };
 
+  const handleGetStarted = () => {
+    navigate('/auth');
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-blue-50 to-indigo-100">
-        {/* Demo Indicator */}
-        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-          Demo Report
-        </div>
+        {/* CTA Button */}
+        <Button
+          onClick={handleGetStarted}
+          className="fixed top-4 right-4 z-50 shadow-lg"
+          variant="default"
+        >
+          Get Started With Your Own Report
+        </Button>
         
         <ResultsSidebar />
         
