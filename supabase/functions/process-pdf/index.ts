@@ -15,13 +15,15 @@ serve(async (req) => {
   }
 
   try {
-    const { extractedText } = await req.json();
+    const { extractedText, userEmail, emailCaptureSource } = await req.json();
     
     if (!extractedText || typeof extractedText !== 'string') {
       throw new Error('No extracted text provided');
     }
 
     console.log('Processing extracted text. Original length:', extractedText.length);
+    console.log('User email:', userEmail);
+    console.log('Email capture source:', emailCaptureSource);
 
     // Clean and filter the extracted text
     const cleanedText = cleanExtractedText(extractedText);
@@ -37,9 +39,11 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         analysis,
-        cleanedText, // Include the cleaned text in the response
+        cleanedText,
         extractedTextLength: extractedText.length,
-        cleanedTextLength: cleanedText.length
+        cleanedTextLength: cleanedText.length,
+        userEmail,
+        emailCaptureSource
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

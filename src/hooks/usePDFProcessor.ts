@@ -77,7 +77,11 @@ export const usePDFProcessor = () => {
       });
 
       const { data, error: functionError } = await supabase.functions.invoke('process-pdf', {
-        body: { extractedText: extractionResult.text },
+        body: { 
+          extractedText: extractionResult.text,
+          userEmail: sessionStorage.getItem('userEmail') || '',
+          emailCaptureSource: sessionStorage.getItem('emailCaptureSource') || 'upload-page'
+        },
       });
 
       if (functionError) {
@@ -102,7 +106,8 @@ export const usePDFProcessor = () => {
         analysis: analysisData,
         pdfArrayBuffer: arrayBuffer,
         pdfText: data.cleanedText || '',
-        address: analysisData.propertyInfo?.address
+        address: analysisData.propertyInfo?.address,
+        userEmail: sessionStorage.getItem('userEmail') || ''
       };
 
     } catch (err) {
