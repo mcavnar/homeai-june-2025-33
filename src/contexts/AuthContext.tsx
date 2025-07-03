@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +12,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<{ error: any }>;
   checkForExistingReport: () => Promise<boolean>;
+  requestAccountDeletion: () => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -137,6 +137,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
+  const requestAccountDeletion = async () => {
+    if (!user) {
+      return { error: { message: 'No user logged in' } };
+    }
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ deletion_requested_at: new Date().toISOString() })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error requesting account deletion:', error);
+        return { error };
+      }
+
+      return { error: null };
+    } catch (err) {
+      console.error('Error requesting account deletion:', err);
+      return { error: err };
+    }
+  };
+
   const value = {
     user,
     session,
@@ -147,6 +170,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signInWithGoogle,
     signOut,
     checkForExistingReport,
+    requestAccountDeletion,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

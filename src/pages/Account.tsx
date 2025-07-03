@@ -11,7 +11,7 @@ import { LogOut, User, Trash2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Account = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, requestAccountDeletion } = useAuth();
   const navigate = useNavigate();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -24,11 +24,16 @@ const Account = () => {
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
     try {
-      // TODO: Implement account deletion functionality
-      // This would involve calling a Supabase edge function to safely delete user data
-      toast.error('Account deletion is not yet implemented');
+      const { error } = await requestAccountDeletion();
+      if (error) {
+        toast.error('Failed to request account deletion');
+        console.error('Account deletion request error:', error);
+      } else {
+        toast.success('Your account is set for deletion. Someone from our team will email you to confirm when it has been deleted');
+      }
     } catch (error) {
-      toast.error('Failed to delete account');
+      toast.error('Failed to request account deletion');
+      console.error('Account deletion request error:', error);
     } finally {
       setIsDeleting(false);
     }
@@ -148,7 +153,7 @@ const Account = () => {
                           disabled={isDeleting}
                           className="bg-red-600 hover:bg-red-700"
                         >
-                          {isDeleting ? 'Deleting...' : 'Delete Account'}
+                          {isDeleting ? 'Processing...' : 'Delete Account'}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
