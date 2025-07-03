@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Share, Handshake, Users, Settings, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
@@ -17,7 +18,6 @@ interface Step {
 const ModernStepper: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [hoveredStep, setHoveredStep] = useState<number | null>(null);
 
   const steps: Step[] = [
     {
@@ -66,98 +66,30 @@ const ModernStepper: React.FC = () => {
         </p>
       </div>
 
-      {/* Desktop Timeline */}
-      <div className="hidden lg:block">
-        <div className="relative">
-          {/* Steps */}
-          <div className="grid grid-cols-4 gap-8 auto-rows-fr">
-            {steps.map((step, index) => (
-              <div
-                key={step.id}
-                className="relative h-full flex flex-col"
-                onMouseEnter={() => setHoveredStep(step.id)}
-                onMouseLeave={() => setHoveredStep(null)}
-              >
-                {/* Step Node */}
-                <div className="relative z-10 flex justify-center mb-8">
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-xl transition-all duration-300 ${
-                    hoveredStep === step.id 
-                      ? 'bg-green-600 shadow-lg scale-110' 
-                      : 'bg-green-500 shadow-md'
-                  }`}>
-                    {step.id}
-                  </div>
+      {/* Steps Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        {steps.map((step) => (
+          <Card key={step.id} className="bg-white border shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer" onClick={step.onClick}>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-center">
+                  <step.icon className="h-8 w-8 text-green-500" />
                 </div>
-
-                {/* Step Card */}
-                <div className={`bg-white rounded-lg border border-gray-200 p-6 shadow-sm transition-all duration-300 cursor-pointer flex-1 flex flex-col ${
-                  hoveredStep === step.id 
-                    ? 'shadow-xl -translate-y-2 scale-105' 
-                    : 'hover:shadow-lg hover:-translate-y-1'
-                }`}
-                onClick={step.onClick}>
-                  <div className="text-center mb-4 flex-1 flex flex-col">
-                    <step.icon className="h-8 w-8 mx-auto text-green-600 mb-2" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
-                    <p className="text-sm text-gray-600 mb-2 leading-snug flex-1">{step.description}</p>
-                  </div>
-                  
-                  <Button 
-                    variant="green-dark"
-                    size="default"
-                    className="w-full text-sm font-semibold mt-auto"
-                  >
-                    {step.action}
-                  </Button>
+                <div className="space-y-2 text-center">
+                  <h3 className="text-lg font-semibold text-gray-900">{step.title}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">{step.description}</p>
                 </div>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-sm font-medium"
+                >
+                  {step.action}
+                </Button>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Tablet/Mobile Layout */}
-      <div className="lg:hidden">
-        <div className="space-y-6">
-          {steps.map((step, index) => (
-            <div
-              key={step.id}
-              className="relative"
-            >
-              {/* Connecting Line for Mobile */}
-              {index < steps.length - 1 && (
-                <div className="absolute left-8 top-20 w-0.5 h-12 bg-green-300 z-0"></div>
-              )}
-              
-              <div className="flex items-start gap-4 relative z-10">
-                {/* Step Node */}
-                <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-xl shadow-md flex-shrink-0">
-                  {step.id}
-                </div>
-                
-                {/* Step Content */}
-                <div className="flex-1 bg-white rounded-lg border border-gray-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col"
-                     onClick={step.onClick}>
-                  <div className="flex items-start gap-3 mb-4 flex-1">
-                    <step.icon className="h-6 w-6 text-green-600 mt-1 flex-shrink-0" />
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
-                      <p className="text-sm text-gray-600 mb-2 leading-snug">{step.description}</p>
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    variant="green-dark"
-                    size="default"
-                    className="w-full text-sm font-semibold mt-auto"
-                  >
-                    {step.action}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );
