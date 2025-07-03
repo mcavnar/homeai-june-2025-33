@@ -6,6 +6,7 @@ import { calculateConditionScore } from '@/utils/conditionScore';
 import ConditionScoreCard from './ConditionScoreCard';
 import RepairCostsCard from './RepairCostsCard';
 import IssuesFoundCard from './IssuesFoundCard';
+import BottomLineSummary from './BottomLineSummary';
 
 interface AtAGlanceProps {
   analysis: HomeInspectionAnalysis;
@@ -17,19 +18,26 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
   const totalRepairCost = analysis.costSummary?.grandTotal?.max || 0;
 
   return (
-    <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
-      <ConditionScoreCard 
-        score={conditionResult.score} 
-        rating={conditionResult.rating} 
-      />
+    <div className="space-y-6">
+      <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
+        <ConditionScoreCard 
+          score={conditionResult.score} 
+          rating={conditionResult.rating} 
+        />
+        
+        <RepairCostsCard 
+          totalRepairCost={totalRepairCost}
+          analysis={analysis}
+        />
+        
+        <IssuesFoundCard 
+          issues={analysis.issues || []} 
+        />
+      </div>
       
-      <RepairCostsCard 
-        totalRepairCost={totalRepairCost}
-        analysis={analysis}
-      />
-      
-      <IssuesFoundCard 
-        issues={analysis.issues || []} 
+      <BottomLineSummary 
+        analysis={analysis} 
+        propertyData={propertyData} 
       />
     </div>
   );
