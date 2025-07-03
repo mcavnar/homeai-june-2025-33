@@ -43,13 +43,18 @@ export const usePDFProcessor = () => {
   };
 
   const processPDF = async () => {
-    if (!file || !user) return null;
+    if (!file || !user) {
+      console.error('Missing file or user:', { file: !!file, user: !!user });
+      return null;
+    }
 
     setIsProcessing(true);
     setError('');
     setExtractionProgress(0);
 
     try {
+      console.log('Starting PDF processing for user:', user.id);
+
       // Convert file to ArrayBuffer and store it
       const arrayBuffer = await file.arrayBuffer();
       setPdfArrayBuffer(arrayBuffer);
@@ -86,6 +91,8 @@ export const usePDFProcessor = () => {
         throw new Error('Unable to extract sufficient text from PDF. The document may be image-based or corrupted.');
       }
 
+      console.log('Text extracted successfully, length:', extractionResult.text.length);
+
       // Send extracted text to Edge Function for analysis
       toast({
         title: "Analyzing with AI...",
@@ -102,19 +109,37 @@ export const usePDFProcessor = () => {
       });
 
       if (functionError) {
+        console.error('Edge function error:', functionError);
         throw new Error(functionError.message);
       }
 
       if (!data.success) {
+        console.error('Analysis failed:', data.error);
         throw new Error(data.error || 'Failed to analyze extracted text');
       }
+
+      console.log('Analysis completed successfully');
 
       const analysisData = data.analysis;
       setAnalysis(analysisData);
       setCleanedText(data.cleanedText || '');
 
-      // Save to new user_reports table
-      const { error: saveError } = await supabase.from('user_reports').insert({
+      // First, mark any existing reports as inactive
+      console.log('Marking existing reports as inactive for user:', user.id);
+      const { error: deactivateError } = await supabase
+        .from('user_reports')
+        .update({ is_active: false })
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+
+      if (deactivateError) {
+        console.error('Error deactivating existing reports:', deactivateError);
+        // Continue - this is not critical
+      }
+
+      // Save to user_reports table - this is critical for the app to work
+      console.log('Saving report to user_reports table');
+      const { data: reportData, error: saveError } = await supabase.from('user_reports').insert({
         user_id: user.id,
         analysis_data: analysisData,
         property_address: analysisData.propertyInfo?.address,
@@ -129,27 +154,14 @@ export const usePDFProcessor = () => {
         },
         is_active: true,
         processing_status: 'completed'
-      });
+      }).select().single();
 
       if (saveError) {
-        console.error('Error saving to user_reports:', saveError);
-        // Continue - this is not critical for the user experience
+        console.error('Critical error saving to user_reports:', saveError);
+        throw new Error(`Failed to save report: ${saveError.message}`);
       }
 
-      // Also save to legacy analysis_sessions for backward compatibility
-      const sessionId = crypto.randomUUID();
-      await supabase.from('analysis_sessions').insert({
-        session_id: sessionId,
-        user_id: user.id,
-        user_email: user.email,
-        file_name: file.name,
-        file_type: file.type,
-        file_size: file.size,
-        extracted_text: data.cleanedText,
-        analysis_data: analysisData,
-        property_address: analysisData.propertyInfo?.address,
-        email_capture_source: 'authenticated-upload'
-      });
+      console.log('Report saved successfully to user_reports:', reportData?.id);
 
       toast({
         title: "Analysis complete!",
@@ -167,6 +179,7 @@ export const usePDFProcessor = () => {
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to process PDF';
+      console.error('PDF processing error:', err);
       setError(errorMessage);
       toast({
         title: "Processing failed",
