@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import FileUploadSection from '@/components/FileUploadSection';
@@ -7,7 +7,7 @@ import { usePDFProcessor } from '@/hooks/usePDFProcessor';
 
 const UploadPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, checkForExistingReport } = useAuth();
   
   const {
     file,
@@ -27,15 +27,8 @@ const UploadPage = () => {
     console.log('Analysis result in UploadPage:', result);
     
     if (result) {
-      // Store only essential data in sessionStorage (without ArrayBuffer)
-      const sessionData = {
-        analysis: result.analysis,
-        address: result.address,
-        pdfText: result.pdfText,
-        userEmail: user.email
-      };
-      
-      sessionStorage.setItem('analysisData', JSON.stringify(sessionData));
+      // Update auth context to reflect that user now has a report
+      await checkForExistingReport();
 
       console.log('Navigating to /results/synopsis with state');
 

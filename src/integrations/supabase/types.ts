@@ -303,6 +303,57 @@ export type Database = {
         }
         Relationships: []
       }
+      user_reports: {
+        Row: {
+          analysis_data: Json
+          created_at: string
+          id: string
+          inspection_date: string | null
+          is_active: boolean
+          negotiation_strategy: Json | null
+          pdf_file_path: string | null
+          pdf_metadata: Json | null
+          pdf_text: string | null
+          processing_status: string
+          property_address: string | null
+          property_data: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_data: Json
+          created_at?: string
+          id?: string
+          inspection_date?: string | null
+          is_active?: boolean
+          negotiation_strategy?: Json | null
+          pdf_file_path?: string | null
+          pdf_metadata?: Json | null
+          pdf_text?: string | null
+          processing_status?: string
+          property_address?: string | null
+          property_data?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis_data?: Json
+          created_at?: string
+          id?: string
+          inspection_date?: string | null
+          is_active?: boolean
+          negotiation_strategy?: Json | null
+          pdf_file_path?: string | null
+          pdf_metadata?: Json | null
+          pdf_text?: string | null
+          processing_status?: string
+          property_address?: string | null
+          property_data?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

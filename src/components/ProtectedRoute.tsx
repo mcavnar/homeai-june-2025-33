@@ -1,15 +1,17 @@
 
-import React from 'react';
-import { Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  requiresReport?: boolean;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user, loading } = useAuth();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiresReport = false }) => {
+  const { user, loading, hasExistingReport } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -23,7 +25,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  // If user is trying to access upload page but already has a report, redirect to results
+  if (location.pathname === '/upload' && hasExistingReport) {
+    return <Navigate to="/results/synopsis" replace />;
+  }
+
+  // If user is trying to access results but doesn't have a report, redirect to upload
+  if (requiresReport && hasExistingReport === false) {
+    return <Navigate to="/upload" replace />;
   }
 
   return <>{children}</>;

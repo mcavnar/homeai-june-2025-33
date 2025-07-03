@@ -54,6 +54,20 @@ export const usePDFProcessor = () => {
       const arrayBuffer = await file.arrayBuffer();
       setPdfArrayBuffer(arrayBuffer);
 
+      // Upload PDF to Supabase storage
+      const fileName = `${user.id}/${Date.now()}-${file.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from('inspection-reports')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('PDF upload error:', uploadError);
+        // Continue without PDF storage - not critical for analysis
+      }
+
       // Extract text from PDF in the frontend
       toast({
         title: "Extracting text from PDF...",
@@ -99,7 +113,30 @@ export const usePDFProcessor = () => {
       setAnalysis(analysisData);
       setCleanedText(data.cleanedText || '');
 
-      // Save to database
+      // Save to new user_reports table
+      const { error: saveError } = await supabase.from('user_reports').insert({
+        user_id: user.id,
+        analysis_data: analysisData,
+        property_address: analysisData.propertyInfo?.address,
+        inspection_date: analysisData.propertyInfo?.inspectionDate,
+        pdf_file_path: uploadError ? null : fileName,
+        pdf_text: data.cleanedText,
+        pdf_metadata: {
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          pageCount: extractionResult.pageCount
+        },
+        is_active: true,
+        processing_status: 'completed'
+      });
+
+      if (saveError) {
+        console.error('Error saving to user_reports:', saveError);
+        // Continue - this is not critical for the user experience
+      }
+
+      // Also save to legacy analysis_sessions for backward compatibility
       const sessionId = crypto.randomUUID();
       await supabase.from('analysis_sessions').insert({
         session_id: sessionId,

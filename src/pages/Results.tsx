@@ -1,28 +1,23 @@
 
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
+import { useUserReport } from '@/hooks/useUserReport';
 import { usePropertyData } from '@/hooks/usePropertyData';
 import { useNegotiationStrategy } from '@/hooks/useNegotiationStrategy';
-import { HomeInspectionAnalysis } from '@/types/inspection';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import ResultsSidebar from '@/components/ResultsSidebar';
+import { Loader2 } from 'lucide-react';
 
 const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [analysisData, setAnalysisData] = useState<{ 
-    analysis: HomeInspectionAnalysis; 
-    address?: string; 
-    pdfText?: string;
-    pdfArrayBuffer?: ArrayBuffer;
-  } | null>(null);
-  const [hasInitialized, setHasInitialized] = useState(false);
+  const { userReport, isLoading: isLoadingReport, error: reportError } = useUserReport();
+  const [pdfArrayBuffer, setPdfArrayBuffer] = useState<ArrayBuffer | null>(null);
   
   const state = location.state as { 
-    analysis: HomeInspectionAnalysis; 
-    address?: string; 
-    pdfText?: string;
+    analysis: any; 
     pdfArrayBuffer?: ArrayBuffer;
+    pdfText?: string;
   } | null;
   
   const {
@@ -36,66 +31,57 @@ const Results = () => {
     negotiationStrategy,
     isGeneratingStrategy,
     strategyError,
-  } = useNegotiationStrategy(analysisData?.analysis || null, propertyData);
+  } = useNegotiationStrategy(userReport?.analysis_data || null, propertyData);
 
   useEffect(() => {
-    // Only run initialization once
-    if (hasInitialized) return;
-
-    console.log('Results component mounted');
-    console.log('Location state:', state);
+    // If coming from upload flow with state, use that ArrayBuffer
+    if (state?.pdfArrayBuffer) {
+      setPdfArrayBuffer(state.pdfArrayBuffer);
+    }
     
-    let dataToUse = state;
-    
-    // If no state from navigation, try sessionStorage
-    if (!dataToUse) {
-      console.log('No state from navigation, checking sessionStorage');
-      const storedData = sessionStorage.getItem('analysisData');
-      if (storedData) {
-        try {
-          const parsed = JSON.parse(storedData);
-          dataToUse = parsed;
-          console.log('Found data in sessionStorage:', dataToUse);
-        } catch (e) {
-          console.error('Error parsing sessionStorage data:', e);
-        }
-      }
+    // If we have a report but no property data, fetch it
+    if (userReport?.property_address && !propertyData) {
+      console.log('Fetching property details for:', userReport.property_address);
+      fetchPropertyDetails(userReport.property_address);
     }
+  }, [userReport, state, propertyData, fetchPropertyDetails]);
 
-    if (!dataToUse?.analysis) {
-      console.log('No analysis data found, redirecting to upload');
-      navigate('/');
-      return;
-    }
+  // Show loading state while fetching user report
+  if (isLoadingReport) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+          <p className="text-gray-600">Loading your report...</p>
+        </div>
+      </div>
+    );
+  }
 
-    console.log('Setting analysis data:', dataToUse);
-    console.log('pdfArrayBuffer in analysisData:', dataToUse.pdfArrayBuffer ? 'Available' : 'Not available');
-    setAnalysisData(dataToUse);
-    setHasInitialized(true);
+  // If no report found, redirect to upload
+  if (!userReport && !reportError) {
+    console.log('No user report found, redirecting to upload');
+    navigate('/upload');
+    return null;
+  }
 
-    // Fetch property data if address is available
-    if (dataToUse.address) {
-      console.log('Fetching property details for:', dataToUse.address);
-      fetchPropertyDetails(dataToUse.address);
-    }
-  }, [navigate, fetchPropertyDetails, hasInitialized, state]);
-
-  // If no analysis data, don't render anything (will redirect)
-  if (!analysisData?.analysis) {
-    console.log('No analysis data, not rendering');
+  // If there's an error loading the report
+  if (reportError) {
+    console.error('Error loading user report:', reportError);
+    navigate('/upload');
     return null;
   }
 
   const contextValue = {
-    analysis: analysisData.analysis,
+    analysis: userReport.analysis_data,
     propertyData,
     isLoadingProperty,
     propertyError,
     negotiationStrategy,
     isGeneratingStrategy,
     strategyError,
-    pdfText: analysisData.pdfText,
-    pdfArrayBuffer: analysisData.pdfArrayBuffer,
+    pdfText: userReport.pdf_text,
+    pdfArrayBuffer: pdfArrayBuffer,
   };
 
   console.log('Results context value pdfArrayBuffer:', contextValue.pdfArrayBuffer ? 'Available' : 'Not available');

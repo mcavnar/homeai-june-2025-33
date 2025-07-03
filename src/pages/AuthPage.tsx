@@ -12,7 +12,7 @@ import { Mail, ArrowRight, AlertCircle, Chrome } from 'lucide-react';
 const AuthPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, signUp, signIn, signInWithGoogle } = useAuth();
+  const { user, signUp, signIn, signInWithGoogle, hasExistingReport } = useAuth();
   const [isSignUp, setIsSignUp] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,11 +21,17 @@ const AuthPage = () => {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (user) {
-      const from = location.state?.from?.pathname || '/upload';
-      navigate(from, { replace: true });
+    if (user && hasExistingReport !== null) {
+      const from = location.state?.from?.pathname;
+      
+      // If user has existing report, go to results, otherwise go to upload
+      if (hasExistingReport) {
+        navigate(from || '/results/synopsis', { replace: true });
+      } else {
+        navigate(from || '/upload', { replace: true });
+      }
     }
-  }, [user, navigate, location]);
+  }, [user, hasExistingReport, navigate, location]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
