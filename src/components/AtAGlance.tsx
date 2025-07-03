@@ -22,7 +22,9 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
       <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
         <ConditionScoreCard 
           score={conditionResult.score} 
-          rating={conditionResult.rating} 
+          rating={conditionResult.rating}
+          analysis={analysis}
+          propertyData={propertyData}
         />
         
         <RepairCostsCard 
