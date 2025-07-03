@@ -31,9 +31,9 @@ interface UserReport {
 const convertRowToUserReport = (row: UserReportRow): UserReport => {
   return {
     id: row.id,
-    analysis_data: row.analysis_data as HomeInspectionAnalysis,
-    property_data: row.property_data as RedfinPropertyData | undefined,
-    negotiation_strategy: row.negotiation_strategy as NegotiationStrategy | undefined,
+    analysis_data: row.analysis_data as unknown as HomeInspectionAnalysis,
+    property_data: row.property_data ? (row.property_data as unknown as RedfinPropertyData) : undefined,
+    negotiation_strategy: row.negotiation_strategy ? (row.negotiation_strategy as unknown as NegotiationStrategy) : undefined,
     pdf_file_path: row.pdf_file_path || undefined,
     pdf_text: row.pdf_text || undefined,
     pdf_metadata: row.pdf_metadata || undefined,
