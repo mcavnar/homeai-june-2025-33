@@ -2,6 +2,7 @@
 import React from 'react';
 import { Share, Handshake, Users, Settings, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
@@ -74,13 +75,15 @@ const ModernStepper: React.FC = () => {
                 <div className="flex items-center justify-center">
                   <step.icon className="h-8 w-8 text-green-500" />
                 </div>
-                <div className="space-y-2 text-center">
-                  <button
+                <div className="space-y-3 text-center">
+                  <Button
                     onClick={step.onClick}
-                    className="text-lg font-semibold text-gray-900 hover:text-green-600 transition-colors cursor-pointer"
+                    variant="green"
+                    size="default"
+                    className="w-full font-semibold"
                   >
                     {step.action}
-                  </button>
+                  </Button>
                   <p className="text-sm text-gray-600 leading-relaxed">{step.description}</p>
                 </div>
               </div>
