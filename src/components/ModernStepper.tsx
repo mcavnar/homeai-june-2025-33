@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Share, Handshake, Users, Settings, AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -69,23 +68,21 @@ const ModernStepper: React.FC = () => {
       {/* Steps Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {steps.map((step) => (
-          <Card key={step.id} className="bg-white border shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer" onClick={step.onClick}>
+          <Card key={step.id} className="bg-white border shadow-sm hover:shadow-lg transition-all duration-300">
             <CardContent className="p-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-center">
                   <step.icon className="h-8 w-8 text-green-500" />
                 </div>
                 <div className="space-y-2 text-center">
-                  <h3 className="text-lg font-semibold text-gray-900">{step.title}</h3>
+                  <button
+                    onClick={step.onClick}
+                    className="text-lg font-semibold text-gray-900 hover:text-green-600 transition-colors cursor-pointer"
+                  >
+                    {step.action}
+                  </button>
                   <p className="text-sm text-gray-600 leading-relaxed">{step.description}</p>
                 </div>
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  className="w-full text-sm font-medium"
-                >
-                  {step.action}
-                </Button>
               </div>
             </CardContent>
           </Card>
