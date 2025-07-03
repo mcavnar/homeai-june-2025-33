@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -45,7 +46,7 @@ const Landing = () => {
           <a href="#how-it-works" className="text-gray-600 hover:text-gray-900">How It Works</a>
           {user ? (
             <Button onClick={() => navigate('/upload')} className="bg-blue-600 hover:bg-blue-700">
-              Go to Upload
+              Go to Dashboard
             </Button>
           ) : (
             <Button variant="ghost" onClick={handleSignIn}>
