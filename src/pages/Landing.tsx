@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -100,6 +101,9 @@ const Landing = () => {
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
               Demystify Your Home Inspection Report
             </h2>
+            <p className="text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed">
+              Home inspectors provide thorough, expert reports that detail the condition of a property — but many buyers and homeowners struggle to fully understand the technical language and complex findings. Our tool makes it easy to decode these reports, offering clear, actionable insights in a way that's simple to follow. With our user-friendly analysis, you can confidently prioritize issues and make informed decisions, ensuring you get the most out of your home inspection.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto">
