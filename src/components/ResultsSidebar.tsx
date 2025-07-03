@@ -70,6 +70,10 @@ const ResultsSidebar = () => {
     navigate('/');
   };
 
+  const handleAccountClick = () => {
+    navigate('/account');
+  };
+
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -141,6 +145,15 @@ const ResultsSidebar = () => {
 
             {/* Account Actions */}
             <div className={`flex gap-1 ${state === 'collapsed' ? 'flex-col' : 'flex-row w-full'}`}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleAccountClick}
+                className={`${state === 'collapsed' ? 'p-2' : 'flex-1'} text-gray-600 hover:text-gray-900`}
+              >
+                <User className="h-4 w-4" />
+                {state !== 'collapsed' && <span className="ml-1">Account</span>}
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"

@@ -9,6 +9,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Landing from "./pages/Landing";
 import AuthPage from "./pages/AuthPage";
 import UploadPage from "./pages/UploadPage";
+import Account from "./pages/Account";
 import Results from "./pages/Results";
 import Synopsis from "./pages/results/Synopsis";
 import IssuesList from "./pages/results/IssuesList";
@@ -33,6 +34,11 @@ const App = () => (
             <Route path="/upload" element={
               <ProtectedRoute>
                 <UploadPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/account" element={
+              <ProtectedRoute>
+                <Account />
               </ProtectedRoute>
             } />
             <Route path="/results" element={
