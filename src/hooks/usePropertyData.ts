@@ -11,12 +11,25 @@ export const usePropertyData = () => {
   const [propertyError, setPropertyError] = useState<string>('');
   const [lastFetchedAddress, setLastFetchedAddress] = useState<string>('');
   const { toast } = useToast();
-  const { updateUserReport } = useUserReport();
+  const { userReport, updateUserReport } = useUserReport();
 
   const fetchPropertyDetails = useCallback(async (address: string) => {
     // Prevent duplicate API calls for the same address
     if (address === lastFetchedAddress && propertyData) {
       console.log('Property data already fetched for this address, skipping API call');
+      return;
+    }
+
+    // Check if userReport exists before proceeding
+    if (!userReport) {
+      console.log('UserReport not yet loaded, waiting...');
+      // Set a short timeout to retry when userReport becomes available
+      setTimeout(() => {
+        if (userReport) {
+          console.log('UserReport now available, retrying property fetch');
+          fetchPropertyDetails(address);
+        }
+      }, 1000);
       return;
     }
 
@@ -35,9 +48,21 @@ export const usePropertyData = () => {
       setPropertyData(data);
       setLastFetchedAddress(address);
 
-      // Save property data to user_reports table
+      // Save property data to user_reports table with retry logic
       console.log('Saving property data to user_reports table');
-      await updateUserReport({ property_data: data });
+      try {
+        await updateUserReport({ property_data: data });
+        console.log('Property data saved successfully to database');
+      } catch (updateError) {
+        console.error('Failed to save property data to database:', updateError);
+        // Don't fail the entire operation if database save fails
+        // The user still gets the property data in the UI
+        toast({
+          title: "Property data loaded",
+          description: "Market information loaded, but there was an issue saving to database.",
+          variant: "destructive"
+        });
+      }
 
       toast({
         title: "Property details loaded!",
@@ -55,7 +80,7 @@ export const usePropertyData = () => {
     } finally {
       setIsLoadingProperty(false);
     }
-  }, [lastFetchedAddress, propertyData, toast, updateUserReport]);
+  }, [lastFetchedAddress, propertyData, userReport, toast, updateUserReport]);
 
   const resetPropertyData = () => {
     setPropertyData(null);

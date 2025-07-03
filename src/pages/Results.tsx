@@ -43,25 +43,34 @@ const Results = () => {
   }, [state]);
 
   useEffect(() => {
-    if (!userReport) return;
+    if (!userReport) {
+      console.log('UserReport not yet available, waiting...');
+      return;
+    }
     
     console.log('Loading data from user report:', {
       hasPropertyData: !!userReport.property_data,
       hasNegotiationStrategy: !!userReport.negotiation_strategy,
-      propertyAddress: userReport.property_address
+      propertyAddress: userReport.property_address,
+      userReportId: userReport.id
     });
 
     // Load property data from database if it exists
     if (userReport.property_data) {
+      console.log('Loading existing property data from database');
       setPropertyDataFromDatabase(userReport.property_data as any);
     } else if (userReport.property_address && !propertyData && !isLoadingProperty) {
       // Only fetch if we don't have property data in database and aren't already loading
-      console.log('Fetching property details for:', userReport.property_address);
-      fetchPropertyDetails(userReport.property_address);
+      console.log('No property data in database, fetching from API for:', userReport.property_address);
+      // Add a small delay to ensure userReport state is fully settled
+      setTimeout(() => {
+        fetchPropertyDetails(userReport.property_address!);
+      }, 100);
     }
 
     // Load negotiation strategy from database if it exists
     if (userReport.negotiation_strategy) {
+      console.log('Loading existing negotiation strategy from database');
       setNegotiationStrategyFromDatabase(userReport.negotiation_strategy as any);
     }
   }, [userReport, propertyData, isLoadingProperty, fetchPropertyDetails, setPropertyDataFromDatabase, setNegotiationStrategyFromDatabase]);
