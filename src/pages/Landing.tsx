@@ -63,7 +63,7 @@ const Landing = () => {
         </Badge>
         
         <h1 className="text-6xl font-bold text-gray-900 mb-6 leading-tight max-w-5xl mx-auto">
-          Get Instant, Accurate Repair Costs and Analysis of Key Systems from Your Home Inspection Report
+          Get Instant, Accurate Repair Costs and Key Systems Analysis from Your Home Inspection Report
         </h1>
         
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
