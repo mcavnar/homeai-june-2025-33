@@ -29,6 +29,10 @@ const Landing = () => {
     }
   };
 
+  const handleSignIn = () => {
+    navigate('/auth?mode=signin');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Navigation */}
@@ -41,10 +45,10 @@ const Landing = () => {
             </Button>
           ) : (
             <>
-              <Button variant="ghost" onClick={() => navigate('/auth')}>
+              <Button variant="ghost" onClick={handleSignIn}>
                 Sign In
               </Button>
-              <Button onClick={() => navigate('/auth')} className="bg-blue-600 hover:bg-blue-700">
+              <Button onClick={handleGetStarted} className="bg-blue-600 hover:bg-blue-700">
                 Get Started
               </Button>
             </>
@@ -229,7 +233,6 @@ const Landing = () => {
         </div>
       </div>
 
-      {/* Footer */}
       <footer className="bg-gray-900 text-white py-8">
         <div className="container mx-auto px-6 text-center">
           <div className="text-xl font-bold mb-4">HomeAi</div>

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,8 +12,11 @@ import { Mail, ArrowRight, AlertCircle, Chrome } from 'lucide-react';
 const AuthPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { user, signUp, signIn, signInWithGoogle, hasExistingReport } = useAuth();
-  const [isSignUp, setIsSignUp] = useState(true);
+  
+  // Check if mode=signin is in URL params, otherwise default to signup
+  const [isSignUp, setIsSignUp] = useState(searchParams.get('mode') !== 'signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
