@@ -25,12 +25,14 @@ const Results = () => {
     isLoadingProperty,
     propertyError,
     fetchPropertyDetails,
+    setPropertyDataFromDatabase,
   } = usePropertyData();
 
   const {
     negotiationStrategy,
     isGeneratingStrategy,
     strategyError,
+    setNegotiationStrategyFromDatabase,
   } = useNegotiationStrategy(userReport?.analysis_data || null, propertyData);
 
   useEffect(() => {
@@ -38,13 +40,31 @@ const Results = () => {
     if (state?.pdfArrayBuffer) {
       setPdfArrayBuffer(state.pdfArrayBuffer);
     }
+  }, [state]);
+
+  useEffect(() => {
+    if (!userReport) return;
     
-    // If we have a report but no property data, fetch it
-    if (userReport?.property_address && !propertyData) {
+    console.log('Loading data from user report:', {
+      hasPropertyData: !!userReport.property_data,
+      hasNegotiationStrategy: !!userReport.negotiation_strategy,
+      propertyAddress: userReport.property_address
+    });
+
+    // Load property data from database if it exists
+    if (userReport.property_data) {
+      setPropertyDataFromDatabase(userReport.property_data as any);
+    } else if (userReport.property_address && !propertyData && !isLoadingProperty) {
+      // Only fetch if we don't have property data in database and aren't already loading
       console.log('Fetching property details for:', userReport.property_address);
       fetchPropertyDetails(userReport.property_address);
     }
-  }, [userReport, state, propertyData, fetchPropertyDetails]);
+
+    // Load negotiation strategy from database if it exists
+    if (userReport.negotiation_strategy) {
+      setNegotiationStrategyFromDatabase(userReport.negotiation_strategy as any);
+    }
+  }, [userReport, propertyData, isLoadingProperty, fetchPropertyDetails, setPropertyDataFromDatabase, setNegotiationStrategyFromDatabase]);
 
   // Show loading state while fetching user report
   if (isLoadingReport) {

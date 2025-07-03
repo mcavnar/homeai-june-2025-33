@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { HomeInspectionAnalysis, NegotiationStrategy } from '@/types/inspection';
 import { RedfinPropertyData } from '@/types/redfin';
+import { useUserReport } from '@/hooks/useUserReport';
 
 export const useNegotiationStrategy = (
   analysis: HomeInspectionAnalysis | null,
@@ -13,6 +14,7 @@ export const useNegotiationStrategy = (
   const [isGeneratingStrategy, setIsGeneratingStrategy] = useState(false);
   const [strategyError, setStrategyError] = useState<string>('');
   const { toast } = useToast();
+  const { updateUserReport } = useUserReport();
 
   useEffect(() => {
     const generateNegotiationStrategy = async () => {
@@ -44,7 +46,12 @@ export const useNegotiationStrategy = (
           throw new Error(data.error || 'Failed to generate negotiation strategy');
         }
 
-        setNegotiationStrategy(data.negotiationStrategy);
+        const generatedStrategy = data.negotiationStrategy;
+        setNegotiationStrategy(generatedStrategy);
+
+        // Save negotiation strategy to user_reports table
+        console.log('Saving negotiation strategy to user_reports table');
+        await updateUserReport({ negotiation_strategy: generatedStrategy });
 
         toast({
           title: "Negotiation strategy ready!",
@@ -66,11 +73,18 @@ export const useNegotiationStrategy = (
     };
 
     generateNegotiationStrategy();
-  }, [analysis, propertyData, negotiationStrategy, isGeneratingStrategy, toast]);
+  }, [analysis, propertyData, negotiationStrategy, isGeneratingStrategy, toast, updateUserReport]);
 
   const resetStrategy = () => {
     setNegotiationStrategy(null);
     setStrategyError('');
+  };
+
+  const setNegotiationStrategyFromDatabase = (strategy: NegotiationStrategy | null) => {
+    setNegotiationStrategy(strategy);
+    if (strategy) {
+      console.log('Negotiation strategy loaded from database');
+    }
   };
 
   return {
@@ -78,5 +92,6 @@ export const useNegotiationStrategy = (
     isGeneratingStrategy,
     strategyError,
     resetStrategy,
+    setNegotiationStrategyFromDatabase,
   };
 };

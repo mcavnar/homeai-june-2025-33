@@ -1,16 +1,25 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { fetchPropertyData } from '@/services/redfinApi';
 import { RedfinPropertyData } from '@/types/redfin';
 import { useToast } from '@/hooks/use-toast';
+import { useUserReport } from '@/hooks/useUserReport';
 
 export const usePropertyData = () => {
   const [propertyData, setPropertyData] = useState<RedfinPropertyData | null>(null);
   const [isLoadingProperty, setIsLoadingProperty] = useState(false);
   const [propertyError, setPropertyError] = useState<string>('');
+  const [lastFetchedAddress, setLastFetchedAddress] = useState<string>('');
   const { toast } = useToast();
+  const { updateUserReport } = useUserReport();
 
-  const fetchPropertyDetails = async (address: string) => {
+  const fetchPropertyDetails = useCallback(async (address: string) => {
+    // Prevent duplicate API calls for the same address
+    if (address === lastFetchedAddress && propertyData) {
+      console.log('Property data already fetched for this address, skipping API call');
+      return;
+    }
+
     setIsLoadingProperty(true);
     setPropertyError('');
 
@@ -24,6 +33,11 @@ export const usePropertyData = () => {
 
       const data = await fetchPropertyData(address);
       setPropertyData(data);
+      setLastFetchedAddress(address);
+
+      // Save property data to user_reports table
+      console.log('Saving property data to user_reports table');
+      await updateUserReport({ property_data: data });
 
       toast({
         title: "Property details loaded!",
@@ -33,14 +47,27 @@ export const usePropertyData = () => {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch property details';
       setPropertyError(errorMessage);
       console.error('Property fetch error:', err);
+      toast({
+        title: "Property fetch failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsLoadingProperty(false);
     }
-  };
+  }, [lastFetchedAddress, propertyData, toast, updateUserReport]);
 
   const resetPropertyData = () => {
     setPropertyData(null);
     setPropertyError('');
+    setLastFetchedAddress('');
+  };
+
+  const setPropertyDataFromDatabase = (data: RedfinPropertyData | null) => {
+    setPropertyData(data);
+    if (data) {
+      console.log('Property data loaded from database');
+    }
   };
 
   return {
@@ -49,5 +76,6 @@ export const usePropertyData = () => {
     propertyError,
     fetchPropertyDetails,
     resetPropertyData,
+    setPropertyDataFromDatabase,
   };
 };
