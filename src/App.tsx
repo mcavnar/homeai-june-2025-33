@@ -4,8 +4,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Landing from "./pages/Landing";
-import EmailCapture from "./pages/EmailCapture";
+import AuthPage from "./pages/AuthPage";
 import UploadPage from "./pages/UploadPage";
 import Results from "./pages/Results";
 import Synopsis from "./pages/results/Synopsis";
@@ -20,28 +22,38 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/get-started" element={<EmailCapture />} />
-          <Route path="/upload" element={<UploadPage />} />
-          <Route path="/results" element={<Results />}>
-            <Route index element={<Navigate to="/results/synopsis" replace />} />
-            <Route path="synopsis" element={<Synopsis />} />
-            <Route path="issues" element={<IssuesList />} />
-            <Route path="systems" element={<KeySystems />} />
-            <Route path="providers" element={<ServiceProviders />} />
-            <Route path="negotiation" element={<Negotiation />} />
-            <Route path="report" element={<InspectionReport />} />
-          </Route>
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/upload" element={
+              <ProtectedRoute>
+                <UploadPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/results" element={
+              <ProtectedRoute>
+                <Results />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Navigate to="/results/synopsis" replace />} />
+              <Route path="synopsis" element={<Synopsis />} />
+              <Route path="issues" element={<IssuesList />} />
+              <Route path="systems" element={<KeySystems />} />
+              <Route path="providers" element={<ServiceProviders />} />
+              <Route path="negotiation" element={<Negotiation />} />
+              <Route path="report" element={<InspectionReport />} />
+            </Route>
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

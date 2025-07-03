@@ -27,6 +27,7 @@ export type Database = {
           survey_responses: Json | null
           updated_at: string
           user_email: string | null
+          user_id: string | null
           user_question: string | null
         }
         Insert: {
@@ -46,6 +47,7 @@ export type Database = {
           survey_responses?: Json | null
           updated_at?: string
           user_email?: string | null
+          user_id?: string | null
           user_question?: string | null
         }
         Update: {
@@ -65,7 +67,35 @@ export type Database = {
           survey_responses?: Json | null
           updated_at?: string
           user_email?: string | null
+          user_id?: string | null
           user_question?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
         }
         Relationships: []
       }

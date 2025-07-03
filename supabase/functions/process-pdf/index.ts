@@ -15,7 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    const { extractedText, userEmail, emailCaptureSource } = await req.json();
+    const { extractedText, userEmail, userId, emailCaptureSource } = await req.json();
     
     if (!extractedText || typeof extractedText !== 'string') {
       throw new Error('No extracted text provided');
@@ -23,6 +23,7 @@ serve(async (req) => {
 
     console.log('Processing extracted text. Original length:', extractedText.length);
     console.log('User email:', userEmail);
+    console.log('User ID:', userId);
     console.log('Email capture source:', emailCaptureSource);
 
     // Clean and filter the extracted text
@@ -43,6 +44,7 @@ serve(async (req) => {
         extractedTextLength: extractedText.length,
         cleanedTextLength: cleanedText.length,
         userEmail,
+        userId,
         emailCaptureSource
       }),
       {

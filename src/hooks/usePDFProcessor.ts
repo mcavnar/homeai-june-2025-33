@@ -1,11 +1,13 @@
 
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { extractTextFromPDF } from '@/utils/pdfTextExtractor';
 import { HomeInspectionAnalysis } from '@/types/inspection';
 
 export const usePDFProcessor = () => {
+  const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [extractionProgress, setExtractionProgress] = useState(0);
@@ -41,7 +43,7 @@ export const usePDFProcessor = () => {
   };
 
   const processPDF = async () => {
-    if (!file) return null;
+    if (!file || !user) return null;
 
     setIsProcessing(true);
     setError('');
@@ -79,8 +81,9 @@ export const usePDFProcessor = () => {
       const { data, error: functionError } = await supabase.functions.invoke('process-pdf', {
         body: { 
           extractedText: extractionResult.text,
-          userEmail: sessionStorage.getItem('userEmail') || '',
-          emailCaptureSource: sessionStorage.getItem('emailCaptureSource') || 'upload-page'
+          userEmail: user.email,
+          userId: user.id,
+          emailCaptureSource: 'authenticated-upload'
         },
       });
 
@@ -96,6 +99,21 @@ export const usePDFProcessor = () => {
       setAnalysis(analysisData);
       setCleanedText(data.cleanedText || '');
 
+      // Save to database
+      const sessionId = crypto.randomUUID();
+      await supabase.from('analysis_sessions').insert({
+        session_id: sessionId,
+        user_id: user.id,
+        user_email: user.email,
+        file_name: file.name,
+        file_type: file.type,
+        file_size: file.size,
+        extracted_text: data.cleanedText,
+        analysis_data: analysisData,
+        property_address: analysisData.propertyInfo?.address,
+        email_capture_source: 'authenticated-upload'
+      });
+
       toast({
         title: "Analysis complete!",
         description: `Processed ${extractionResult.pageCount} pages and generated comprehensive insights.`,
@@ -107,7 +125,7 @@ export const usePDFProcessor = () => {
         pdfArrayBuffer: arrayBuffer,
         pdfText: data.cleanedText || '',
         address: analysisData.propertyInfo?.address,
-        userEmail: sessionStorage.getItem('userEmail') || ''
+        userEmail: user.email
       };
 
     } catch (err) {

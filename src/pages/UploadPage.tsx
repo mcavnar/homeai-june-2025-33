@@ -1,12 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import FileUploadSection from '@/components/FileUploadSection';
 import { usePDFProcessor } from '@/hooks/usePDFProcessor';
 
 const UploadPage = () => {
   const navigate = useNavigate();
-  const [userEmail, setUserEmail] = useState<string>('');
+  const { user } = useAuth();
   
   const {
     file,
@@ -18,17 +19,9 @@ const UploadPage = () => {
     resetProcessor,
   } = usePDFProcessor();
 
-  useEffect(() => {
-    // Check if user has provided email, redirect if not
-    const email = sessionStorage.getItem('userEmail');
-    if (!email) {
-      navigate('/get-started');
-      return;
-    }
-    setUserEmail(email);
-  }, [navigate]);
-
   const handleProcessPDF = async () => {
+    if (!user) return;
+    
     const result = await processPDF();
     
     console.log('Analysis result in UploadPage:', result);
@@ -39,7 +32,7 @@ const UploadPage = () => {
         analysis: result.analysis,
         address: result.address,
         pdfText: result.pdfText,
-        userEmail: userEmail
+        userEmail: user.email
       };
       
       sessionStorage.setItem('analysisData', JSON.stringify(sessionData));
@@ -55,8 +48,7 @@ const UploadPage = () => {
     }
   };
 
-  // Don't render anything if we're redirecting
-  if (!userEmail) {
+  if (!user) {
     return null;
   }
 
@@ -66,7 +58,7 @@ const UploadPage = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Upload Your Inspection Report</h1>
           <p className="text-gray-600">Upload your home inspection PDF to get started with the analysis</p>
-          <p className="text-sm text-gray-500 mt-2">Analysis will be sent to: {userEmail}</p>
+          <p className="text-sm text-gray-500 mt-2">Welcome, {user.email}</p>
         </div>
 
         <FileUploadSection
@@ -86,26 +78,19 @@ const UploadPage = () => {
               <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm">
                 ✓
               </div>
-              <span className="ml-2 text-sm text-gray-600">Get Started</span>
-            </div>
-            <div className="w-8 h-px bg-gray-300"></div>
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm">
-                ✓
-              </div>
-              <span className="ml-2 text-sm text-gray-600">Email</span>
+              <span className="ml-2 text-sm text-gray-600">Account Created</span>
             </div>
             <div className="w-8 h-px bg-gray-300"></div>
             <div className="flex items-center">
               <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm">
-                3
+                2
               </div>
               <span className="ml-2 text-sm font-medium text-gray-900">Upload</span>
             </div>
             <div className="w-8 h-px bg-gray-300"></div>
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm">
-                4
+                3
               </div>
               <span className="ml-2 text-sm text-gray-600">Results</span>
             </div>
