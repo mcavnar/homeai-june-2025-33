@@ -17,6 +17,13 @@ import KeySystems from "./pages/results/KeySystems";
 import ServiceProviders from "./pages/results/ServiceProviders";
 import Negotiation from "./pages/results/Negotiation";
 import InspectionReport from "./pages/results/InspectionReport";
+import DemoResults from "./pages/DemoResults";
+import DemoSynopsis from "./pages/demo/DemoSynopsis";
+import DemoIssuesList from "./pages/demo/DemoIssuesList";
+import DemoKeySystems from "./pages/demo/DemoKeySystems";
+import DemoServiceProviders from "./pages/demo/DemoServiceProviders";
+import DemoNegotiation from "./pages/demo/DemoNegotiation";
+import DemoInspectionReport from "./pages/demo/DemoInspectionReport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,6 +60,15 @@ const App = () => (
               <Route path="providers" element={<ServiceProviders />} />
               <Route path="negotiation" element={<Negotiation />} />
               <Route path="report" element={<InspectionReport />} />
+            </Route>
+            <Route path="/demo" element={<DemoResults />}>
+              <Route index element={<Navigate to="/demo/synopsis" replace />} />
+              <Route path="synopsis" element={<DemoSynopsis />} />
+              <Route path="issues" element={<DemoIssuesList />} />
+              <Route path="systems" element={<DemoKeySystems />} />
+              <Route path="providers" element={<DemoServiceProviders />} />
+              <Route path="negotiation" element={<DemoNegotiation />} />
+              <Route path="report" element={<DemoInspectionReport />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -27,8 +26,7 @@ const Landing = () => {
   };
 
   const handleViewDemo = () => {
-    // This would navigate to a demo report in a real implementation
-    console.log('View Demo Report clicked');
+    navigate('/demo');
   };
 
   return (
