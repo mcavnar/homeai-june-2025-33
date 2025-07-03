@@ -9,7 +9,8 @@ import { AlertCircle } from 'lucide-react';
 interface FileUploadSectionProps {
   file: File | null;
   isProcessing: boolean;
-  extractionProgress: number;
+  overallProgress: number;
+  phaseMessage: string;
   error: string;
   onFileSelect: (file: File) => void;
   onProcess: () => void;
@@ -19,7 +20,8 @@ interface FileUploadSectionProps {
 const FileUploadSection: React.FC<FileUploadSectionProps> = ({
   file,
   isProcessing,
-  extractionProgress,
+  overallProgress,
+  phaseMessage,
   error,
   onFileSelect,
   onProcess,
@@ -101,7 +103,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
             {isProcessing ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {extractionProgress > 0 ? `Extracting... ${Math.round(extractionProgress)}%` : 'Analyzing with AI...'}
+                {phaseMessage} {Math.round(overallProgress)}%
               </>
             ) : (
               <>

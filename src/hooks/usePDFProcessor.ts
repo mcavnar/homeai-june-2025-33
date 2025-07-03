@@ -6,11 +6,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { extractTextFromPDF } from '@/utils/pdfTextExtractor';
 import { HomeInspectionAnalysis } from '@/types/inspection';
 
+type ProcessingPhase = 'extraction' | 'analysis' | 'saving' | 'complete';
+
 export const usePDFProcessor = () => {
   const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [extractionProgress, setExtractionProgress] = useState(0);
+  const [overallProgress, setOverallProgress] = useState(0);
+  const [currentPhase, setCurrentPhase] = useState<ProcessingPhase>('extraction');
   const [analysis, setAnalysis] = useState<HomeInspectionAnalysis | null>(null);
   const [cleanedText, setCleanedText] = useState<string>('');
   const [pdfArrayBuffer, setPdfArrayBuffer] = useState<ArrayBuffer | null>(null);
@@ -22,6 +26,8 @@ export const usePDFProcessor = () => {
     setAnalysis(null);
     setPdfArrayBuffer(null);
     setError('');
+    setOverallProgress(0);
+    setCurrentPhase('extraction');
 
     // Validate file type
     if (selectedFile.type !== 'application/pdf') {
@@ -42,6 +48,45 @@ export const usePDFProcessor = () => {
     });
   };
 
+  const simulateAIProgress = (textLength: number): Promise<void> => {
+    return new Promise((resolve) => {
+      // Estimate processing time based on text length
+      const baseTime = 35; // 35 seconds for average case
+      const timeMultiplier = Math.min(Math.max(textLength / 5000, 0.8), 2.5); // Scale between 0.8x and 2.5x
+      const estimatedTime = baseTime * timeMultiplier * 1000; // Convert to ms
+      
+      const startProgress = 25;
+      const endProgress = 85;
+      const totalProgressRange = endProgress - startProgress;
+      
+      const startTime = Date.now();
+      const interval = 200; // Update every 200ms
+      
+      const progressInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const progressRatio = Math.min(elapsed / estimatedTime, 1);
+        
+        // Use easing function for more natural progress (faster start, slower end)
+        const easedProgress = 1 - Math.pow(1 - progressRatio, 2);
+        const currentProgress = startProgress + (totalProgressRange * easedProgress);
+        
+        setOverallProgress(Math.min(currentProgress, endProgress));
+        
+        if (progressRatio >= 1) {
+          clearInterval(progressInterval);
+          resolve();
+        }
+      }, interval);
+      
+      // Safety timeout - never exceed 2.5 minutes
+      setTimeout(() => {
+        clearInterval(progressInterval);
+        setOverallProgress(endProgress);
+        resolve();
+      }, 150000); // 2.5 minutes max
+    });
+  };
+
   const processPDF = async () => {
     if (!file || !user) {
       console.error('Missing file or user:', { file: !!file, user: !!user });
@@ -51,6 +96,8 @@ export const usePDFProcessor = () => {
     setIsProcessing(true);
     setError('');
     setExtractionProgress(0);
+    setOverallProgress(0);
+    setCurrentPhase('extraction');
 
     try {
       console.log('Starting PDF processing for user:', user.id);
@@ -81,6 +128,8 @@ export const usePDFProcessor = () => {
 
       const extractionResult = await extractTextFromPDF(file, (progress) => {
         setExtractionProgress(progress);
+        // Map extraction progress to overall progress (0-25%)
+        setOverallProgress((progress / 100) * 25);
       });
 
       if (extractionResult.error) {
@@ -93,11 +142,18 @@ export const usePDFProcessor = () => {
 
       console.log('Text extracted successfully, length:', extractionResult.text.length);
 
+      // Transition to AI analysis phase
+      setCurrentPhase('analysis');
+      setOverallProgress(25);
+
       // Send extracted text to Edge Function for analysis
       toast({
         title: "Analyzing with AI...",
         description: "Processing the content with OpenAI for detailed insights.",
       });
+
+      // Start simulated progress for AI analysis
+      const aiProgressPromise = simulateAIProgress(extractionResult.text.length);
 
       const { data, error: functionError } = await supabase.functions.invoke('process-pdf', {
         body: { 
@@ -107,6 +163,9 @@ export const usePDFProcessor = () => {
           emailCaptureSource: 'authenticated-upload'
         },
       });
+
+      // Wait for either AI completion or simulated progress to finish
+      await aiProgressPromise;
 
       if (functionError) {
         console.error('Edge function error:', functionError);
@@ -119,6 +178,10 @@ export const usePDFProcessor = () => {
       }
 
       console.log('Analysis completed successfully');
+
+      // Transition to saving phase
+      setCurrentPhase('saving');
+      setOverallProgress(85);
 
       const analysisData = data.analysis;
       setAnalysis(analysisData);
@@ -136,6 +199,9 @@ export const usePDFProcessor = () => {
         console.error('Error deactivating existing reports:', deactivateError);
         // Continue - this is not critical
       }
+
+      // Progress to 95% during database save
+      setOverallProgress(95);
 
       // Save to user_reports table - this is critical for the app to work
       console.log('Saving report to user_reports table');
@@ -162,6 +228,10 @@ export const usePDFProcessor = () => {
       }
 
       console.log('Report saved successfully to user_reports:', reportData?.id);
+
+      // Complete the process
+      setCurrentPhase('complete');
+      setOverallProgress(100);
 
       toast({
         title: "Analysis complete!",
@@ -190,6 +260,8 @@ export const usePDFProcessor = () => {
     } finally {
       setIsProcessing(false);
       setExtractionProgress(0);
+      setOverallProgress(0);
+      setCurrentPhase('extraction');
     }
   };
 
@@ -199,12 +271,50 @@ export const usePDFProcessor = () => {
     setCleanedText('');
     setPdfArrayBuffer(null);
     setError('');
+    setOverallProgress(0);
+    setCurrentPhase('extraction');
+  };
+
+  const getPhaseMessage = () => {
+    switch (currentPhase) {
+      case 'extraction':
+        return 'Extracting text from PDF...';
+      case 'analysis':
+        return 'Analyzing with AI for insights and costs...';
+      case 'saving':
+        return 'Saving your report...';
+      case 'complete':
+        return 'Analysis complete!';
+      default:
+        return 'Processing...';
+    }
+  };
+
+  const getEstimatedTimeRemaining = () => {
+    if (!isProcessing) return null;
+    
+    switch (currentPhase) {
+      case 'extraction':
+        return '10 seconds remaining';
+      case 'analysis':
+        const analysisProgress = (overallProgress - 25) / 60; // Progress within analysis phase
+        const remainingSeconds = Math.max(5, Math.round(40 * (1 - analysisProgress)));
+        return `${remainingSeconds} seconds remaining`;
+      case 'saving':
+        return '5 seconds remaining';
+      case 'complete':
+        return null;
+      default:
+        return null;
+    }
   };
 
   return {
     file,
     isProcessing,
     extractionProgress,
+    overallProgress,
+    currentPhase,
     analysis,
     cleanedText,
     pdfArrayBuffer,
@@ -212,5 +322,7 @@ export const usePDFProcessor = () => {
     handleFileSelect,
     processPDF,
     resetProcessor,
+    getPhaseMessage,
+    getEstimatedTimeRemaining,
   };
 };

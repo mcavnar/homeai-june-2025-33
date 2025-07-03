@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import FileUploadSection from '@/components/FileUploadSection';
+import ProcessingStatus from '@/components/ProcessingStatus';
 import { usePDFProcessor } from '@/hooks/usePDFProcessor';
 
 const Upload = () => {
@@ -9,11 +10,13 @@ const Upload = () => {
   const {
     file,
     isProcessing,
-    extractionProgress,
+    overallProgress,
     error,
     handleFileSelect,
     processPDF,
     resetProcessor,
+    getPhaseMessage,
+    getEstimatedTimeRemaining,
   } = usePDFProcessor();
 
   const handleProcessPDF = async () => {
@@ -53,11 +56,19 @@ const Upload = () => {
         <FileUploadSection
           file={file}
           isProcessing={isProcessing}
-          extractionProgress={extractionProgress}
+          overallProgress={overallProgress}
+          phaseMessage={getPhaseMessage()}
           error={error}
           onFileSelect={handleFileSelect}
           onProcess={handleProcessPDF}
           onReset={resetProcessor}
+        />
+
+        <ProcessingStatus
+          isProcessing={isProcessing}
+          overallProgress={overallProgress}
+          phaseMessage={getPhaseMessage()}
+          estimatedTimeRemaining={getEstimatedTimeRemaining()}
         />
       </div>
     </div>
