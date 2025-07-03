@@ -90,7 +90,7 @@ const Landing = () => {
             className="border-green-500 text-green-600 hover:bg-green-50 px-8 py-6 text-lg font-semibold"
           >
             <Upload className="mr-2 h-5 w-5" />
-            Upload Inspection Report
+            Get Started Free
           </Button>
         </div>
       </div>
