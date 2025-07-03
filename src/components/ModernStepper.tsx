@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Share, Handshake, Users, Settings, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -24,7 +23,7 @@ const ModernStepper: React.FC = () => {
       id: 1,
       title: "Review Issue List",
       description: "Review every identified issue with detailed locations, priorities, and estimated repair costs",
-      action: "Issues List",
+      action: "Review Issues List",
       icon: AlertTriangle,
       onClick: () => navigate('/results/issues')
     },
@@ -32,7 +31,7 @@ const ModernStepper: React.FC = () => {
       id: 2,
       title: "See Key Systems",
       description: "Understand the condition and expected maintenance costs of the property's major systems.",
-      action: "Key Systems",
+      action: "See Key Systems",
       icon: Settings,
       onClick: () => navigate('/results/systems')
     },
@@ -40,7 +39,7 @@ const ModernStepper: React.FC = () => {
       id: 3,
       title: "Get Service Providers",
       description: "Explore monthly service provider costs and connect with qualified area vendors.",
-      action: "Service Providers",
+      action: "Get Service Providers",
       icon: Users,
       onClick: () => navigate('/results/providers')
     },
@@ -48,7 +47,7 @@ const ModernStepper: React.FC = () => {
       id: 4,
       title: "Negotiate Effectively",
       description: "Receive strategic guidance on how to use your inspection findings in purchase negotiations",
-      action: "Negotiation",
+      action: "Negotiate Effectively",
       icon: Handshake,
       onClick: () => navigate('/results/negotiation')
     }
