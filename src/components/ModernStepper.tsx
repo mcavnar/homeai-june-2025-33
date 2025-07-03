@@ -74,8 +74,7 @@ const ModernStepper: React.FC = () => {
             {steps.map((step, index) => (
               <div
                 key={step.id}
-                className="relative animate-step-appear h-full flex flex-col"
-                style={{ animationDelay: `${index * 0.2}s` }}
+                className="relative h-full flex flex-col"
                 onMouseEnter={() => setHoveredStep(step.id)}
                 onMouseLeave={() => setHoveredStep(null)}
               >
@@ -123,8 +122,7 @@ const ModernStepper: React.FC = () => {
           {steps.map((step, index) => (
             <div
               key={step.id}
-              className="relative animate-step-appear"
-              style={{ animationDelay: `${index * 0.15}s` }}
+              className="relative"
             >
               {/* Connecting Line for Mobile */}
               {index < steps.length - 1 && (
