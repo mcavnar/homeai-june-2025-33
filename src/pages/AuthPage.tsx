@@ -7,8 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { Mail, ArrowRight, AlertCircle } from 'lucide-react';
-import { FcGoogle } from 'react-icons/fc';
+import { Mail, ArrowRight, AlertCircle, Chrome } from 'lucide-react';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -104,7 +103,7 @@ const AuthPage = () => {
               className="w-full flex items-center gap-3"
               size="lg"
             >
-              <FcGoogle className="h-5 w-5" />
+              <Chrome className="h-5 w-5 text-blue-500" />
               {isSignUp ? 'Sign up with Google' : 'Sign in with Google'}
             </Button>
 
