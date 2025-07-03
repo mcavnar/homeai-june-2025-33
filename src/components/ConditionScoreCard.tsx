@@ -1,7 +1,5 @@
 
 import React from 'react';
-import { TrendingUp } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import MetricCard from './MetricCard';
 
@@ -17,79 +15,36 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
   const getRatingColor = (rating: string) => {
     switch (rating) {
       case 'Excellent':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'text-green-600';
       case 'Very Good':
-        return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+        return 'text-emerald-600';
       case 'Good':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'text-green-600';
       case 'Fair':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'text-yellow-600';
       case 'Poor':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'text-red-600';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'text-gray-600';
     }
   };
-
-  const getGradientConfig = (rating: string) => {
-    switch (rating) {
-      case 'Excellent':
-        return { 
-          gradientClass: 'bg-gradient-to-br from-green-500 to-green-600', 
-          iconColor: 'text-green-100' 
-        };
-      case 'Very Good':
-        return { 
-          gradientClass: 'bg-gradient-to-br from-emerald-500 to-emerald-600', 
-          iconColor: 'text-emerald-100' 
-        };
-      case 'Good':
-        return { 
-          gradientClass: 'bg-gradient-to-br from-blue-500 to-blue-600', 
-          iconColor: 'text-blue-100' 
-        };
-      case 'Fair':
-        return { 
-          gradientClass: 'bg-gradient-to-br from-yellow-500 to-yellow-600', 
-          iconColor: 'text-yellow-100' 
-        };
-      case 'Poor':
-        return { 
-          gradientClass: 'bg-gradient-to-br from-red-500 to-red-600', 
-          iconColor: 'text-red-100' 
-        };
-      default:
-        return { 
-          gradientClass: 'bg-gradient-to-br from-gray-500 to-gray-600', 
-          iconColor: 'text-gray-100' 
-        };
-    }
-  };
-
-  const gradientConfig = getGradientConfig(rating);
 
   return (
     <MetricCard
-      icon={TrendingUp}
-      title="Condition Score"
+      title="Overall Condition"
       showBullets={false}
-      gradientClass={gradientConfig.gradientClass}
-      iconColor={gradientConfig.iconColor}
-      textColor="text-white"
+      backgroundColor="bg-white"
+      textColor="text-gray-900"
     >
       <HoverCard>
         <HoverCardTrigger asChild>
           <div className="cursor-help">
-            <div className="text-3xl font-bold mb-1">
-              {score}
-            </div>
-            <div className={`text-sm ${gradientConfig.iconColor} mb-2`}>out of 10</div>
-            <Badge 
-              variant="outline" 
-              className={`text-xs px-2 py-1 font-medium ${getRatingColor(rating)}`}
-            >
+            <div className={`text-4xl font-bold mb-1 ${getRatingColor(rating)}`}>
               {rating}
-            </Badge>
+            </div>
+            <div className="text-sm text-gray-500">
+              {score} / 10
+            </div>
           </div>
         </HoverCardTrigger>
         <HoverCardContent className="w-80">

@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { LucideIcon } from 'lucide-react';
 
 interface MetricCardProps {
-  icon: LucideIcon;
+  icon?: LucideIcon;
   title: string;
   children: React.ReactNode;
   bulletPoints?: string[];
@@ -13,6 +13,7 @@ interface MetricCardProps {
   gradientClass?: string;
   iconColor?: string;
   textColor?: string;
+  backgroundColor?: string;
 }
 
 const MetricCard: React.FC<MetricCardProps> = ({ 
@@ -22,29 +23,37 @@ const MetricCard: React.FC<MetricCardProps> = ({
   bulletPoints = [],
   bulletHeadline = "How this conclusion was reached:",
   showBullets = true,
-  gradientClass = "bg-gradient-to-br from-blue-500 to-blue-600",
-  iconColor = "text-blue-100",
-  textColor = "text-white"
+  gradientClass,
+  iconColor,
+  textColor = "text-gray-900",
+  backgroundColor = "bg-white"
 }) => {
+  // Use clean white background if no gradient specified
+  const cardClass = gradientClass || backgroundColor;
+  
   return (
-    <Card className={`${gradientClass} ${textColor} border-0`}>
+    <Card className={`${cardClass} ${textColor} border shadow-sm`}>
       <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <Icon className={`h-8 w-8 ${iconColor}`} />
-        </div>
-        <div className="space-y-2">
-          <h3 className={`text-lg font-semibold ${iconColor}`}>{title}</h3>
-          {children}
-          {showBullets && bulletPoints.length > 0 && (
-            <div className="mt-4 pt-2 border-t border-white/20">
-              <p className={`text-sm ${iconColor} mb-2`}>{bulletHeadline}</p>
-              <ul className={`text-xs ${iconColor} space-y-1`}>
-                {bulletPoints.map((point, index) => (
-                  <li key={index}>• {point}</li>
-                ))}
-              </ul>
+        <div className="space-y-4">
+          {Icon && (
+            <div className="flex items-center justify-between">
+              <Icon className={`h-6 w-6 ${iconColor || 'text-green-500'}`} />
             </div>
           )}
+          <div className="space-y-2">
+            <h3 className={`text-sm font-medium ${iconColor || 'text-gray-600'}`}>{title}</h3>
+            {children}
+            {showBullets && bulletPoints.length > 0 && (
+              <div className="mt-4 pt-2 border-t border-gray-200">
+                <p className={`text-sm ${iconColor || 'text-gray-600'} mb-2`}>{bulletHeadline}</p>
+                <ul className={`text-xs ${iconColor || 'text-gray-600'} space-y-1`}>
+                  {bulletPoints.map((point, index) => (
+                    <li key={index}>• {point}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Wrench } from 'lucide-react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import MetricCard from './MetricCard';
 import { formatCurrency } from '@/utils/formatters';
@@ -35,20 +34,18 @@ const RepairCostsCard: React.FC<RepairCostsCardProps> = ({
 
   return (
     <MetricCard
-      icon={Wrench}
-      title="Total Repair Costs"
+      title="Estimated Repair Costs"
       showBullets={false}
-      gradientClass="bg-gradient-to-br from-purple-500 to-purple-600"
-      iconColor="text-purple-100"
-      textColor="text-white"
+      backgroundColor="bg-white"
+      textColor="text-gray-900"
     >
       <HoverCard>
         <HoverCardTrigger asChild>
           <div className="cursor-help">
-            <div className="text-3xl font-bold mb-1">
+            <div className="text-4xl font-bold mb-1 text-blue-600">
               {formatCurrency(totalRepairCost)}
             </div>
-            <div className="text-sm text-purple-100">
+            <div className="text-sm text-gray-500">
               (Top of range estimate)
             </div>
           </div>

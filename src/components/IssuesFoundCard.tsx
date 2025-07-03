@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { AlertTriangle } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import MetricCard from './MetricCard';
 import { InspectionIssue } from '@/types/inspection';
 
@@ -10,95 +9,87 @@ interface IssuesFoundCardProps {
 }
 
 const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
-  const totalIssues = issues?.length || 0;
-
+  const totalIssues = issues.length;
+  
   // Count issues by priority
-  const issueCounts = {
-    immediate: issues?.filter(issue => issue.priority === 'immediate').length || 0,
-    high: issues?.filter(issue => issue.priority === 'high').length || 0,
-    medium: issues?.filter(issue => issue.priority === 'medium').length || 0,
-    low: issues?.filter(issue => issue.priority === 'low').length || 0,
-  };
-
-  // Prepare data for custom mini bars
-  const chartData = [
-    {
-      priority: 'High',
-      count: issueCounts.immediate + issueCounts.high,
-      color: '#ef4444'
-    },
-    {
-      priority: 'Medium',
-      count: issueCounts.medium,
-      color: '#eab308'
-    },
-    {
-      priority: 'Low',
-      count: issueCounts.low,
-      color: '#3b82f6'
-    }
-  ].filter(item => item.count > 0);
-
-  const maxCount = Math.max(...chartData.map(d => d.count), 1);
+  const highPriorityCount = issues.filter(issue => 
+    issue.priority === 'immediate' || issue.priority === 'high'
+  ).length;
+  const mediumPriorityCount = issues.filter(issue => issue.priority === 'medium').length;
+  const lowPriorityCount = issues.filter(issue => issue.priority === 'low').length;
 
   return (
     <MetricCard
-      icon={AlertTriangle}
-      title="Issues Found"
+      title="Issues Identified"
       showBullets={false}
-      gradientClass="bg-gradient-to-br from-orange-500 to-orange-600"
-      iconColor="text-orange-100"
-      textColor="text-white"
+      backgroundColor="bg-white"
+      textColor="text-gray-900"
     >
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="cursor-help w-full">
-              <div className="text-3xl font-bold mb-3">
-                {totalIssues}
-              </div>
-              
-              {/* Left-aligned Bar Chart with Numbers on Bars */}
-              {chartData.length > 0 && (
-                <div className="flex gap-3 items-end justify-start w-full h-10 px-1">
-                  {chartData.map((item, index) => (
-                    <div 
-                      key={index} 
-                      className="flex flex-col items-center gap-1 group cursor-default min-w-[36px]"
-                    >
-                      <div 
-                        className="rounded-t-sm min-h-[10px] transition-all duration-200 hover:opacity-80 group-hover:shadow-sm relative flex items-center justify-center" 
-                        style={{ 
-                          backgroundColor: 'rgba(255,255,255,0.8)', 
-                          width: '32px',
-                          height: `${Math.max(10, (item.count / maxCount) * 28)}px`
-                        }}
-                      >
-                        <span className="text-xs font-bold text-orange-600 drop-shadow-sm">
-                          {item.count}
-                        </span>
-                      </div>
-                      <span className="text-xs text-orange-100 font-medium group-hover:text-white transition-colors">
-                        {item.priority}
-                      </span>
-                    </div>
-                  ))}
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <div className="cursor-help">
+            <div className="text-4xl font-bold mb-2 text-blue-600">
+              {totalIssues}
+            </div>
+            
+            {/* Priority breakdown bars */}
+            <div className="flex gap-1 mb-2">
+              {highPriorityCount > 0 && (
+                <div className="bg-red-500 text-white px-2 py-1 rounded text-xs font-medium flex items-center justify-center min-w-[24px]">
+                  {highPriorityCount}
+                </div>
+              )}
+              {mediumPriorityCount > 0 && (
+                <div className="bg-orange-500 text-white px-2 py-1 rounded text-xs font-medium flex items-center justify-center min-w-[24px]">
+                  {mediumPriorityCount}
+                </div>
+              )}
+              {lowPriorityCount > 0 && (
+                <div className="bg-green-500 text-white px-2 py-1 rounded text-xs font-medium flex items-center justify-center min-w-[24px]">
+                  {lowPriorityCount}
                 </div>
               )}
             </div>
-          </TooltipTrigger>
-          <TooltipContent className="max-w-xs">
-            <div className="space-y-2">
-              <h4 className="font-semibold text-sm">Issue Priority Definition</h4>
-              <div className="text-xs space-y-1">
-                <div><strong>High:</strong> Safety & structural issues</div>
-                <div><strong>Medium:</strong> Systems needing attention</div>
-                <div><strong>Low:</strong> Cosmetic & maintenance</div>
+            
+            <div className="flex gap-4 text-xs text-gray-500">
+              {highPriorityCount > 0 && <span>High</span>}
+              {mediumPriorityCount > 0 && <span>Medium</span>}
+              {lowPriorityCount > 0 && <span>Low</span>}
+            </div>
+          </div>
+        </HoverCardTrigger>
+        <HoverCardContent className="w-80">
+          <div className="space-y-3">
+            <h4 className="font-semibold text-gray-900">Issues Breakdown</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between items-center p-2 bg-red-50 rounded">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <span className="font-medium text-red-700">High Priority</span>
+                </div>
+                <span className="font-bold text-red-700">{highPriorityCount}</span>
+              </div>
+              <div className="flex justify-between items-center p-2 bg-yellow-50 rounded">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                  <span className="font-medium text-yellow-700">Medium Priority</span>
+                </div>
+                <span className="font-bold text-yellow-700">{mediumPriorityCount}</span>
+              </div>
+              <div className="flex justify-between items-center p-2 bg-green-50 rounded">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="font-medium text-green-700">Low Priority</span>
+                </div>
+                <span className="font-bold text-green-700">{lowPriorityCount}</span>
+              </div>
+              <div className="pt-2 border-t text-xs text-gray-600">
+                Issues are prioritized based on safety concerns and potential impact on the property.
               </div>
             </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+          </div>
+        </HoverCardContent>
+      </HoverCard>
     </MetricCard>
   );
 };
