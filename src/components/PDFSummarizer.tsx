@@ -17,13 +17,15 @@ const PDFSummarizer = () => {
   const {
     file,
     isProcessing,
-    extractionProgress,
+    overallProgress,
     analysis,
     cleanedText,
     error,
     handleFileSelect,
     processPDF,
     resetProcessor,
+    getPhaseMessage,
+    getEstimatedTimeRemaining,
   } = usePDFProcessor();
 
   const {
@@ -74,7 +76,8 @@ const PDFSummarizer = () => {
       <FileUploadSection
         file={file}
         isProcessing={isProcessing}
-        extractionProgress={extractionProgress}
+        overallProgress={overallProgress}
+        phaseMessage={getPhaseMessage()}
         error={error}
         onFileSelect={handleFileSelectAndReset}
         onProcess={handleProcessPDF}
@@ -155,7 +158,12 @@ const PDFSummarizer = () => {
       )}
 
       {/* Processing Status */}
-      <ProcessingStatus isProcessing={isProcessing} extractionProgress={extractionProgress} />
+      <ProcessingStatus 
+        isProcessing={isProcessing} 
+        overallProgress={overallProgress}
+        phaseMessage={getPhaseMessage()}
+        estimatedTimeRemaining={getEstimatedTimeRemaining()}
+      />
     </div>
   );
 };
