@@ -93,8 +93,8 @@ const ServiceProviders = () => {
       </div>
 
       <CostSummaryCards costSummary={costSummary} />
-      <ActionCards />
       <ServiceProvidersTable providers={serviceProviders} />
+      <ActionCards />
     </div>
   );
 };
