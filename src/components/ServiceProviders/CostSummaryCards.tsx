@@ -4,15 +4,48 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Calculator, TrendingUp } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatters';
 
+interface MaintenanceEstimate {
+  monthlyRangeLow: number;
+  monthlyRangeHigh: number;
+  regionalComparison: string;
+  explanation: string;
+}
+
 interface CostSummaryCardsProps {
   costSummary: {
     monthlyAverage: number;
     annualTotal: number;
     marketDifference: number;
   };
+  estimate?: MaintenanceEstimate | null;
 }
 
-const CostSummaryCards: React.FC<CostSummaryCardsProps> = ({ costSummary }) => {
+const CostSummaryCards: React.FC<CostSummaryCardsProps> = ({ costSummary, estimate }) => {
+  // Parse regional comparison to determine if it's above or below average
+  const getMarketComparisonText = () => {
+    if (!estimate?.regionalComparison) {
+      return "Based on service providers in your area";
+    }
+    
+    const isAbove = estimate.regionalComparison.startsWith('+');
+    const isBelow = estimate.regionalComparison.startsWith('-');
+    
+    if (isAbove) {
+      return `${estimate.regionalComparison} above regional average`;
+    } else if (isBelow) {
+      return `${estimate.regionalComparison.replace('-', '')} below regional average`;
+    }
+    
+    return estimate.regionalComparison;
+  };
+
+  const getMarketComparisonColor = () => {
+    if (!estimate?.regionalComparison) return "text-gray-600";
+    
+    const isAbove = estimate.regionalComparison.startsWith('+');
+    return isAbove ? "text-red-600" : "text-green-600";
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <Card className="bg-white border border-gray-200 shadow-sm">
@@ -23,7 +56,13 @@ const CostSummaryCards: React.FC<CostSummaryCardsProps> = ({ costSummary }) => {
           <div className="space-y-2">
             <h3 className="text-lg font-semibold text-gray-600">Estimated Monthly Average</h3>
             <p className="text-3xl font-bold text-gray-900">{formatCurrency(costSummary.monthlyAverage)}</p>
-            <p className="text-sm text-gray-600">Based on scheduled services only</p>
+            {estimate ? (
+              <p className="text-sm text-gray-600">
+                Range: {formatCurrency(estimate.monthlyRangeLow)} - {formatCurrency(estimate.monthlyRangeHigh)}
+              </p>
+            ) : (
+              <p className="text-sm text-gray-600">Based on scheduled services only</p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -47,9 +86,14 @@ const CostSummaryCards: React.FC<CostSummaryCardsProps> = ({ costSummary }) => {
             <TrendingUp className="h-8 w-8 text-green-500" />
           </div>
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-gray-600">Difference vs Market Average</h3>
-            <p className="text-3xl font-bold text-gray-900">+{formatCurrency(costSummary.marketDifference)}</p>
-            <p className="text-sm text-gray-600">Based on service providers in your area</p>
+            <h3 className="text-lg font-semibold text-gray-600">Market Comparison</h3>
+            <p className="text-3xl font-bold text-gray-900">
+              {estimate?.regionalComparison?.startsWith('-') ? '' : '+'}
+              {formatCurrency(costSummary.marketDifference)}
+            </p>
+            <p className={`text-sm ${getMarketComparisonColor()}`}>
+              {getMarketComparisonText()}
+            </p>
           </div>
         </CardContent>
       </Card>

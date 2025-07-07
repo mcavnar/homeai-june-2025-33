@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import CostSummaryCards from '@/components/ServiceProviders/CostSummaryCards';
 import ActionCards from '@/components/ServiceProviders/ActionCards';
 import ServiceProvidersTable from '@/components/ServiceProviders/ServiceProvidersTable';
+import { useMaintenanceEstimate } from '@/hooks/useMaintenanceEstimate';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ServiceProvidersContextType {
   analysis: any;
@@ -12,9 +14,33 @@ interface ServiceProvidersContextType {
 
 const ServiceProviders = () => {
   const { analysis, propertyData } = useOutletContext<ServiceProvidersContextType>();
+  const { estimate, serviceProviders, isLoading, error, fetchEstimate } = useMaintenanceEstimate();
 
-  // Calculate estimated costs based on analysis data
+  // Extract address from property data
+  const propertyAddress = propertyData?.address || propertyData?.streetAddress || analysis?.propertyInfo?.address;
+
+  useEffect(() => {
+    if (propertyAddress) {
+      console.log('Fetching maintenance estimate for address:', propertyAddress);
+      fetchEstimate(propertyAddress);
+    }
+  }, [propertyAddress, fetchEstimate]);
+
+  // Calculate cost summary based on estimate and service providers
   const calculateCostSummary = () => {
+    if (estimate && serviceProviders.length > 0) {
+      const monthlyAverage = Math.round((estimate.monthlyRangeLow + estimate.monthlyRangeHigh) / 2);
+      const annualTotal = serviceProviders.reduce((sum, provider) => sum + provider.annualCost, 0);
+      
+      // Extract percentage from regionalComparison (e.g., "+15%" -> 15)
+      const percentageMatch = estimate.regionalComparison.match(/([+-]?\d+)%/);
+      const comparisonPercentage = percentageMatch ? parseInt(percentageMatch[1]) : 0;
+      const marketDifference = Math.round(annualTotal * (Math.abs(comparisonPercentage) / 100));
+
+      return { monthlyAverage, annualTotal, marketDifference };
+    }
+
+    // Fallback calculation if estimate is not available
     if (!analysis?.issues) {
       return {
         monthlyAverage: 820,
@@ -23,64 +49,39 @@ const ServiceProviders = () => {
       };
     }
 
-    // Calculate total estimated costs from analysis
     const totalCosts = analysis.issues.reduce((sum: number, issue: any) => {
       return sum + ((issue.estimatedCost?.min || 0) + (issue.estimatedCost?.max || 0)) / 2;
     }, 0);
 
-    // Estimate monthly and annual costs based on repair urgency
-    const monthlyAverage = Math.round(totalCosts * 0.05); // 5% of total per month for maintenance
-    const annualTotal = Math.round(totalCosts * 0.6); // 60% of issues addressed annually
-    const marketDifference = Math.round(annualTotal * 0.42); // 42% above market average
+    const monthlyAverage = Math.round(totalCosts * 0.05);
+    const annualTotal = Math.round(totalCosts * 0.6);
+    const marketDifference = Math.round(annualTotal * 0.42);
 
     return { monthlyAverage, annualTotal, marketDifference };
   };
 
   const costSummary = calculateCostSummary();
 
-  // Mock service providers data - these are placeholders without ratings
-  const serviceProviders = [
-    {
-      id: 1,
-      serviceType: "Lawn Care",
-      company: "",
-      frequency: "Weekly",
-      monthlyCost: 80,
-      annualCost: 4160,
-    },
-    {
-      id: 2,
-      serviceType: "House Cleaning",
-      company: "",
-      frequency: "Bi-weekly",
-      monthlyCost: 125,
-      annualCost: 3250,
-    },
-    {
-      id: 3,
-      serviceType: "Plumbing",
-      company: "",
-      frequency: "As-needed",
-      monthlyCost: 0,
-      annualCost: 1200,
-    },
-    {
-      id: 4,
-      serviceType: "HVAC",
-      company: "",
-      frequency: "Quarterly",
-      monthlyCost: 100,
-      annualCost: 1200,
-    },
-    {
-      id: 5,
-      serviceType: "Electrical",
-      company: "",
-      frequency: "As-needed",
-      monthlyCost: 0,
-      annualCost: 800,
-    },
-  ];
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-left">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Providers</h1>
+          <div className="text-gray-600 text-lg">
+            <p>Loading location-specific maintenance costs...</p>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-32 w-full" />
+          ))}
+        </div>
+        
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -88,11 +89,26 @@ const ServiceProviders = () => {
       <div className="text-left">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Providers</h1>
         <div className="text-gray-600 text-lg">
-          <p>Estimated costs and recommended service providers for property maintenance</p>
+          {estimate ? (
+            <div>
+              <p>Location-specific maintenance costs for {propertyAddress}</p>
+              <p className="text-sm mt-1 text-gray-500">{estimate.explanation}</p>
+            </div>
+          ) : (
+            <p>Estimated costs and recommended service providers for property maintenance</p>
+          )}
         </div>
       </div>
 
-      <CostSummaryCards costSummary={costSummary} />
+      {error && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-yellow-800 text-sm">
+            Using default estimates. Location-specific data unavailable: {error}
+          </p>
+        </div>
+      )}
+
+      <CostSummaryCards costSummary={costSummary} estimate={estimate} />
       <ServiceProvidersTable providers={serviceProviders} />
       <ActionCards />
     </div>
