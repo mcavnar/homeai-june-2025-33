@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, TrendingUp } from 'lucide-react';
+import { Calendar, TrendingUp, Info } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatters';
 
 interface ProjectionCardsProps {
@@ -16,6 +16,7 @@ const ProjectionCards: React.FC<ProjectionCardsProps> = ({ fiveYearTotal, tenYea
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <Calendar className="h-8 w-8 text-green-500" />
+            <Info className="h-4 w-4 text-gray-400" />
           </div>
           <div className="space-y-2">
             <h3 className="text-lg font-semibold text-gray-600">5-Year Maintenance Projection</h3>
@@ -31,6 +32,7 @@ const ProjectionCards: React.FC<ProjectionCardsProps> = ({ fiveYearTotal, tenYea
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <TrendingUp className="h-8 w-8 text-green-500" />
+            <Info className="h-4 w-4 text-gray-400" />
           </div>
           <div className="space-y-2">
             <h3 className="text-lg font-semibold text-gray-600">10-Year Maintenance Projection</h3>
