@@ -3,10 +3,10 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import SystemCard from './SystemCard';
 import ProjectionCards from './ProjectionCards';
-import { MajorSystemsType } from '@/types/inspection';
+import { MajorSystems } from '@/types/inspection';
 
 interface MajorSystemsProps {
-  systems: MajorSystemsType;
+  systems: MajorSystems;
 }
 
 const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
@@ -16,14 +16,14 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
     let tenYear = { min: 0, max: 0 };
 
     Object.values(systems).forEach(system => {
-      if (system.maintenanceProjection) {
-        if (system.maintenanceProjection.fiveYear) {
-          fiveYear.min += system.maintenanceProjection.fiveYear.min || 0;
-          fiveYear.max += system.maintenanceProjection.fiveYear.max || 0;
+      if (system && system.maintenanceCosts) {
+        if (system.maintenanceCosts.fiveYear) {
+          fiveYear.min += system.maintenanceCosts.fiveYear.min || 0;
+          fiveYear.max += system.maintenanceCosts.fiveYear.max || 0;
         }
-        if (system.maintenanceProjection.tenYear) {
-          tenYear.min += system.maintenanceProjection.tenYear.min || 0;
-          tenYear.max += system.maintenanceProjection.tenYear.max || 0;
+        if (system.maintenanceCosts.tenYear) {
+          tenYear.min += system.maintenanceCosts.tenYear.min || 0;
+          tenYear.max += system.maintenanceCosts.tenYear.max || 0;
         }
       }
     });
@@ -44,7 +44,7 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
       {/* Systems Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Object.entries(systems).map(([key, system]) => (
-          <SystemCard key={key} system={system} />
+          <SystemCard key={key} systemName={key} system={system} />
         ))}
       </div>
     </div>
