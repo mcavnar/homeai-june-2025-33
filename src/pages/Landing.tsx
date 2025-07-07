@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -97,12 +96,12 @@ const Landing = () => {
         </div>
       </div>
 
-      {/* Problems Section - Stop Overpaying on Repairs */}
+      {/* Problems Section - Your Inspection Report, Demystified */}
       <div className="bg-gray-50 py-24">
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
-              Stop Overpaying on Repairs
+              Your Inspection Report, Demystified.
             </h2>
           </div>
 
