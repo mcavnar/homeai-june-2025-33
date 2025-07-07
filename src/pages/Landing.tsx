@@ -73,7 +73,7 @@ const Landing = () => {
             Get instant repair costs, priority rankings, and negotiation strategies from your inspection report using AI-powered analysis.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               onClick={handleViewDemo}
               size="lg" 
@@ -92,8 +92,6 @@ const Landing = () => {
               Get Started Free
             </Button>
           </div>
-
-          <p className="text-gray-400 text-sm font-light">No signup required for demo • Get instant results</p>
         </div>
       </div>
 
