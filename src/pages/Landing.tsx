@@ -11,7 +11,10 @@ import {
   Upload,
   FileText,
   Users,
-  TrendingUp
+  TrendingUp,
+  BarChart3,
+  Wrench,
+  MessageSquare
 } from 'lucide-react';
 
 const Landing = () => {
@@ -94,33 +97,26 @@ const Landing = () => {
         </div>
       </div>
 
-      {/* Problems Section - askauntsally.ai style */}
+      {/* Problems Section - Stop Overpaying on Repairs */}
       <div className="bg-gray-50 py-24">
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
-              Stop Struggling With Complex Inspection Reports
+              Stop Overpaying on Repairs
             </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto font-light leading-relaxed">
-              Most homebuyers receive detailed inspection reports but struggle to understand what really matters, what things cost to fix, and how to use the information effectively.
-            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <div className="bg-white rounded-2xl p-10 text-center shadow-sm border border-gray-100">
-              <div className="w-20 h-20 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-8">
-                <FileText className="h-10 w-10 text-red-500" />
-              </div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-6">Dense Technical Reports</h3>
+              <div className="text-6xl mb-8">😰</div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-6">15+ Page Reports</h3>
               <p className="text-gray-600 text-lg font-light leading-relaxed">
-                15+ pages of technical jargon that leave you more confused than when you started
+                Dense technical jargon that leaves you more confused than when you started
               </p>
             </div>
 
             <div className="bg-white rounded-2xl p-10 text-center shadow-sm border border-gray-100">
-              <div className="w-20 h-20 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-8">
-                <Clock className="h-10 w-10 text-orange-500" />
-              </div>
+              <div className="text-6xl mb-8">⏰</div>
               <h3 className="text-2xl font-semibold text-gray-900 mb-6">Time Pressure</h3>
               <p className="text-gray-600 text-lg font-light leading-relaxed">
                 Need to make critical decisions quickly while emotions and stakes are high
@@ -128,53 +124,64 @@ const Landing = () => {
             </div>
 
             <div className="bg-white rounded-2xl p-10 text-center shadow-sm border border-gray-100">
-              <div className="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-8">
-                <DollarSign className="h-10 w-10 text-blue-500" />
-              </div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-6">Cost Uncertainty</h3>
+              <div className="text-6xl mb-8">💸</div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-6">Financial Uncertainty</h3>
               <p className="text-gray-600 text-lg font-light leading-relaxed">
-                No idea what repairs actually cost or how to prioritize issues effectively
+                No idea what repairs actually cost or how to negotiate effectively
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Benefits Section - askauntsally.ai style */}
+      {/* Benefits Section - Get The Clarity You Need In Minutes */}
       <div className="py-24 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
-              Get Clear Answers in Minutes, Not Hours
+              Instantly Understand What Matters In Your Report
             </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto font-light leading-relaxed">
-              Our AI analyzes your inspection report and provides the insights you need to make confident decisions.
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-7xl mx-auto">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="h-8 w-8 text-emerald-500" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 max-w-7xl mx-auto">
+            <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
+              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <FileText className="h-8 w-8 text-gray-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Instant Cost Estimates</h3>
-              <p className="text-gray-600 font-light leading-relaxed">Get accurate repair cost estimates for every issue identified</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Clear Summary</h3>
+              <p className="text-gray-600 font-light leading-relaxed text-sm">Plain English breakdown of what actually matters in your report</p>
             </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <TrendingUp className="h-8 w-8 text-emerald-500" />
+            <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
+              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <BarChart3 className="h-8 w-8 text-gray-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Priority Rankings</h3>
-              <p className="text-gray-600 font-light leading-relaxed">Understand which issues need immediate attention vs. future planning</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Market Analysis</h3>
+              <p className="text-gray-600 font-light leading-relaxed text-sm">How your home's condition compares to similar properties in your area</p>
             </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Users className="h-8 w-8 text-emerald-500" />
+            <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
+              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <DollarSign className="h-8 w-8 text-gray-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Negotiation Strategy</h3>
-              <p className="text-gray-600 font-light leading-relaxed">Get specific advice on how to use findings in purchase negotiations</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Repair Estimates</h3>
+              <p className="text-gray-600 font-light leading-relaxed text-sm">Real cost estimates for every issue, from minor fixes to major repairs</p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
+              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Wrench className="h-8 w-8 text-gray-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Service providers</h3>
+              <p className="text-gray-600 font-light leading-relaxed text-sm">Vetted contractors and specialists recommended for each repair type and ongoing service</p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
+              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <MessageSquare className="h-8 w-8 text-gray-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Negotiation Tips</h3>
+              <p className="text-gray-600 font-light leading-relaxed text-sm">Strategic advice on what to ask for and how to approach sellers</p>
             </div>
           </div>
         </div>
