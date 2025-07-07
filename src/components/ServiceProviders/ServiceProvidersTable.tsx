@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -287,7 +288,6 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
           <TableHeader>
             <TableRow>
               <TableHead className="text-gray-500 font-medium">Service Type</TableHead>
-              <TableHead className="text-gray-500 font-medium">Company</TableHead>
               <TableHead className="text-gray-500 font-medium">Frequency</TableHead>
               <TableHead className="text-gray-500 font-medium text-right">Monthly Cost</TableHead>
               <TableHead className="text-gray-500 font-medium text-right">Annual Cost</TableHead>
@@ -298,16 +298,13 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
               <React.Fragment key={provider.id}>
                 <TableRow className="hover:bg-gray-50">
                   <TableCell>
-                    <Badge 
-                      variant="outline" 
-                      className="border-gray-300 text-black bg-white rounded-full px-3 py-1"
-                    >
-                      {provider.serviceType}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-gray-900">{provider.company}</span>
+                      <Badge 
+                        variant="outline" 
+                        className="border-gray-300 text-black bg-white rounded-full px-3 py-1"
+                      >
+                        {provider.serviceType}
+                      </Badge>
                       {!isPlaceholderProvider(provider) && (
                         <Collapsible open={openDetails === provider.id} onOpenChange={() => toggleDetails(provider.id)}>
                           <CollapsibleTrigger asChild>
@@ -334,7 +331,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
                 
                 {!isPlaceholderProvider(provider) && (
                   <TableRow>
-                    <TableCell colSpan={5} className="p-0">
+                    <TableCell colSpan={4} className="p-0">
                       <Collapsible open={openDetails === provider.id}>
                         <CollapsibleContent className="bg-gray-50 border-t">
                           <div className="p-6 space-y-4">
