@@ -145,41 +145,31 @@ const Landing = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-7xl mx-auto">
             <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
-              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <FileText className="h-8 w-8 text-gray-500" />
-              </div>
+              <div className="text-4xl mb-6">📋</div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Clear Summary</h3>
               <p className="text-gray-600 font-light leading-relaxed text-sm">Plain English breakdown of what actually matters in your report</p>
             </div>
 
             <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
-              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <BarChart3 className="h-8 w-8 text-gray-500" />
-              </div>
+              <div className="text-4xl mb-6">📊</div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Market Analysis</h3>
               <p className="text-gray-600 font-light leading-relaxed text-sm">How your home's condition compares to similar properties in your area</p>
             </div>
 
             <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
-              <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <DollarSign className="h-8 w-8 text-yellow-600" />
-              </div>
+              <div className="text-4xl mb-6">💰</div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Repair Estimates</h3>
               <p className="text-gray-600 font-light leading-relaxed text-sm">Real cost estimates for every issue, from minor fixes to major repairs</p>
             </div>
 
             <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
-              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Wrench className="h-8 w-8 text-gray-500" />
-              </div>
+              <div className="text-4xl mb-6">🔧</div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Service providers</h3>
               <p className="text-gray-600 font-light leading-relaxed text-sm">Vetted contractors and specialists recommended for each repair type and ongoing service</p>
             </div>
 
             <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
-              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <MessageSquare className="h-8 w-8 text-gray-500" />
-              </div>
+              <div className="text-4xl mb-6">💬</div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Negotiation Tips</h3>
               <p className="text-gray-600 font-light leading-relaxed text-sm">Strategic advice on what to ask for and how to approach sellers</p>
             </div>
