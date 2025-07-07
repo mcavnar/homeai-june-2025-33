@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import SystemCard from './SystemCard';
 import ProjectionCards from './ProjectionCards';
-import { MajorSystems } from '@/types/inspection';
+import { type MajorSystems } from '@/types/inspection';
 
 interface MajorSystemsProps {
   systems: MajorSystems;
