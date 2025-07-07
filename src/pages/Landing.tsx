@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -138,49 +139,92 @@ const Landing = () => {
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
-              Instantly Understand What Matters In Your Report
+              Get The Clarity You Need In Minutes
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-7xl mx-auto">
             <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
-              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <FileText className="h-8 w-8 text-gray-600" />
+              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <FileText className="h-8 w-8 text-gray-500" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Clear Summary</h3>
               <p className="text-gray-600 font-light leading-relaxed text-sm">Plain English breakdown of what actually matters in your report</p>
             </div>
 
             <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
-              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <BarChart3 className="h-8 w-8 text-gray-600" />
+              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <BarChart3 className="h-8 w-8 text-gray-500" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Market Analysis</h3>
               <p className="text-gray-600 font-light leading-relaxed text-sm">How your home's condition compares to similar properties in your area</p>
             </div>
 
             <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
-              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <DollarSign className="h-8 w-8 text-gray-600" />
+              <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <DollarSign className="h-8 w-8 text-yellow-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Repair Estimates</h3>
               <p className="text-gray-600 font-light leading-relaxed text-sm">Real cost estimates for every issue, from minor fixes to major repairs</p>
             </div>
 
             <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
-              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Wrench className="h-8 w-8 text-gray-600" />
+              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Wrench className="h-8 w-8 text-gray-500" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Service providers</h3>
               <p className="text-gray-600 font-light leading-relaxed text-sm">Vetted contractors and specialists recommended for each repair type and ongoing service</p>
             </div>
 
             <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
-              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <MessageSquare className="h-8 w-8 text-gray-600" />
+              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <MessageSquare className="h-8 w-8 text-gray-500" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Negotiation Tips</h3>
               <p className="text-gray-600 font-light leading-relaxed text-sm">Strategic advice on what to ask for and how to approach sellers</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Process Section - Simple Process, Powerful Results */}
+      <div className="py-24 bg-gray-50">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
+              Simple Process, Powerful Results
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-8">
+                <span className="text-white font-bold text-2xl">1</span>
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-6">Upload Report</h3>
+              <p className="text-gray-600 text-lg font-light leading-relaxed">
+                Simply drag and drop your PDF inspection report
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-8">
+                <span className="text-white font-bold text-2xl">2</span>
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-6">Intelligent Data Analysis</h3>
+              <p className="text-gray-600 text-lg font-light leading-relaxed">
+                Our AI processes your report using millions of proprietary data points to deliver insights you can't get anywhere else
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-8">
+                <span className="text-white font-bold text-2xl">3</span>
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-6">Get Insights</h3>
+              <p className="text-gray-600 text-lg font-light leading-relaxed">
+                Receive your personalized analysis and action plan
+              </p>
             </div>
           </div>
         </div>
