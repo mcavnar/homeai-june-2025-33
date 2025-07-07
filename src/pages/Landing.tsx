@@ -3,11 +3,15 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { 
-  FileText, 
+  CheckCircle,
+  Clock,
+  DollarSign,
   Eye,
-  Upload
+  Upload,
+  FileText,
+  Users,
+  TrendingUp
 } from 'lucide-react';
 
 const Landing = () => {
@@ -31,53 +35,45 @@ const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Navigation */}
-      <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-lg">🏠</span>
+    <div className="min-h-screen bg-white">
+      {/* Clean, minimal navigation */}
+      <nav className="border-b border-gray-100">
+        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">🏠</span>
+            </div>
+            <div className="text-xl font-bold text-gray-900">HomeAi</div>
           </div>
-          <div className="text-2xl font-bold text-gray-900">HomeAi</div>
-        </div>
-        <div className="flex items-center gap-6">
-          <a href="#features" className="text-gray-600 hover:text-gray-900">Features</a>
-          <a href="#how-it-works" className="text-gray-600 hover:text-gray-900">How It Works</a>
-          {user ? (
-            <Button onClick={() => navigate('/upload')} className="bg-blue-600 hover:bg-blue-700">
-              Go to Dashboard
-            </Button>
-          ) : (
-            <Button variant="ghost" onClick={handleSignIn}>
-              Sign In
-            </Button>
-          )}
+          <div className="flex items-center gap-4">
+            {user ? (
+              <Button onClick={() => navigate('/upload')} variant="outline">
+                Dashboard
+              </Button>
+            ) : (
+              <Button variant="ghost" onClick={handleSignIn} className="text-gray-600">
+                Sign In
+              </Button>
+            )}
+          </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <div className="container mx-auto px-6 py-16 text-center">
-        <Badge variant="secondary" className="mb-6 bg-white/50 text-gray-700">
-          AI-Powered Home Inspection Analysis
-        </Badge>
-        
-        <h1 className="text-6xl font-bold text-gray-900 mb-6 leading-tight max-w-5xl mx-auto">
-          Get Instant, Accurate Repair Costs and Key Systems Analysis from Your Home Inspection Report
+      {/* Hero Section - Bold and Clean */}
+      <div className="container mx-auto px-6 py-20 text-center">
+        <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight max-w-4xl mx-auto">
+          Turn Your Home Inspection Report Into Clear, Actionable Insights
         </h1>
         
-        <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-          Prioritize repairs and negotiate confidently using accurate inspection report analysis.
-        </p>
-
-        <p className="text-lg text-gray-700 mb-12 max-w-2xl mx-auto">
-          Want to see how it works? View a sample report — or upload your own and try it for free!
+        <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
+          Get instant repair costs, priority rankings, and negotiation strategies from your inspection report using AI-powered analysis.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           <Button 
             onClick={handleViewDemo}
             size="lg" 
-            className="bg-green-500 hover:bg-green-600 px-8 py-6 text-lg font-semibold"
+            className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 text-lg font-semibold h-14"
           >
             <Eye className="mr-2 h-5 w-5" />
             View Demo Report
@@ -86,58 +82,112 @@ const Landing = () => {
             onClick={handleGetStarted}
             variant="outline" 
             size="lg"
-            className="border-green-500 text-green-600 hover:bg-green-50 px-8 py-6 text-lg font-semibold"
+            className="border-2 border-green-500 text-green-600 hover:bg-green-50 px-8 py-4 text-lg font-semibold h-14"
           >
             <Upload className="mr-2 h-5 w-5" />
             Get Started Free
           </Button>
         </div>
+
+        <p className="text-gray-500 text-sm">No signup required for demo • Get instant results</p>
       </div>
 
-      {/* Problems Section */}
-      <div className="bg-white py-16">
+      {/* Problems Section - Redesigned */}
+      <div className="bg-gray-50 py-20">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Demystify Your Home Inspection Report
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+              Stop Struggling With Complex Inspection Reports
             </h2>
-            <p className="text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              Home inspectors provide thorough, expert reports that detail the condition of a property — but many buyers and homeowners struggle to fully understand the technical language and complex findings. Our tool makes it easy to decode these reports, offering clear, actionable insights in a way that's simple to follow. With our user-friendly analysis, you can confidently prioritize issues and make informed decisions, ensuring you get the most out of your home inspection.
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Most homebuyers receive detailed inspection reports but struggle to understand what really matters, what things cost to fix, and how to use the information effectively.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto">
-            <div className="text-center">
-              <div className="text-6xl mb-6">😰</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">15+ Page Reports</h3>
-              <p className="text-gray-600 text-lg">
-                Dense technical jargon that leaves you more confused than when you started
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="bg-white rounded-xl p-8 text-center shadow-sm border border-gray-100">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <FileText className="h-8 w-8 text-red-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Dense Technical Reports</h3>
+              <p className="text-gray-600">
+                15+ pages of technical jargon that leave you more confused than when you started
               </p>
             </div>
 
-            <div className="text-center">
-              <div className="text-6xl mb-6">⏰</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Time Pressure</h3>
-              <p className="text-gray-600 text-lg">
+            <div className="bg-white rounded-xl p-8 text-center shadow-sm border border-gray-100">
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Clock className="h-8 w-8 text-orange-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Time Pressure</h3>
+              <p className="text-gray-600">
                 Need to make critical decisions quickly while emotions and stakes are high
               </p>
             </div>
 
-            <div className="text-center">
-              <div className="text-6xl mb-6">💸</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Financial Uncertainty</h3>
-              <p className="text-gray-600 text-lg">
-                No idea what repairs actually cost or how to negotiate effectively
+            <div className="bg-white rounded-xl p-8 text-center shadow-sm border border-gray-100">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <DollarSign className="h-8 w-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Cost Uncertainty</h3>
+              <p className="text-gray-600">
+                No idea what repairs actually cost or how to prioritize issues effectively
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      <footer className="bg-gray-900 text-white py-8">
+      {/* Benefits Section */}
+      <div className="py-20">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+              Get Clear Answers in Minutes, Not Hours
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Our AI analyzes your inspection report and provides the insights you need to make confident decisions.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="h-6 w-6 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Instant Cost Estimates</h3>
+              <p className="text-gray-600">Get accurate repair cost estimates for every issue identified</p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="h-6 w-6 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Priority Rankings</h3>
+              <p className="text-gray-600">Understand which issues need immediate attention vs. future planning</p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Users className="h-6 w-6 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Negotiation Strategy</h3>
+              <p className="text-gray-600">Get specific advice on how to use findings in purchase negotiations</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-100 py-12">
         <div className="container mx-auto px-6 text-center">
-          <div className="text-xl font-bold mb-4">HomeAi</div>
-          <p className="text-gray-400">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">🏠</span>
+            </div>
+            <div className="text-xl font-bold text-gray-900">HomeAi</div>
+          </div>
+          <p className="text-gray-500">
             Transform your home inspection reports with AI-powered insights.
           </p>
         </div>
