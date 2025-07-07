@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Share, Handshake, Users, Settings, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,7 +31,7 @@ const ModernStepper: React.FC = () => {
     {
       id: 2,
       title: "See Key Systems",
-      description: "Understand the condition and expected maintenance costs of the property's major systems.",
+      description: "Understand the condition and expected maintenance costs of the property's major systems (e.g. HVAC, electrical, etc.).",
       action: "See Key Systems",
       icon: Settings,
       onClick: () => navigate('/results/systems')
