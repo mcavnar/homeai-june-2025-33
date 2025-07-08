@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Token is required' }),
         { 
-          status: 400, 
+          status: 200, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Invalid or inactive share token' }),
         { 
-          status: 404, 
+          status: 200, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Report not found' }),
         { 
-          status: 404, 
+          status: 200, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { 
-        status: 500, 
+        status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     )
