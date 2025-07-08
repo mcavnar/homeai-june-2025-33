@@ -1,6 +1,6 @@
 
 import React, { useRef } from 'react';
-import { Upload, FileText, Loader2 } from 'lucide-react';
+import { Upload, FileText, Loader2, Clock } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -85,6 +85,17 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
               <p className="text-sm text-gray-500">Maximum file size: 10MB</p>
             </div>
           )}
+        </div>
+
+        {/* Processing Time Notice */}
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-start gap-2">
+            <Clock className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-blue-800">
+              <p className="font-medium mb-1">Please be patient during analysis</p>
+              <p>Our AI thoroughly analyzes your inspection report, which can take 1-2 minutes to complete. We're extracting key findings, estimating repair costs, and generating insights to help you make informed decisions.</p>
+            </div>
+          </div>
         </div>
 
         {error && (
