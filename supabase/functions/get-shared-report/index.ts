@@ -8,6 +8,9 @@ const corsHeaders = {
 
 Deno.serve(async (req) => {
   console.log('=== get-shared-report function started ===');
+  console.log('Request method:', req.method);
+  console.log('Request URL:', req.url);
+  console.log('Request headers:', Object.fromEntries(req.headers.entries()));
   
   try {
     // Handle CORS preflight requests
@@ -16,32 +19,49 @@ Deno.serve(async (req) => {
       return new Response('ok', { headers: corsHeaders })
     }
 
-    console.log('Request method:', req.method);
-    console.log('Request headers:', Object.fromEntries(req.headers.entries()));
+    // Parse request body with improved error handling
+    let requestBody = {};
+    let token = null;
 
-    // Parse request body with error handling
-    let requestBody;
     try {
       const bodyText = await req.text();
       console.log('Raw request body:', bodyText);
-      requestBody = JSON.parse(bodyText);
-      console.log('Parsed request body:', requestBody);
-    } catch (parseError) {
-      console.error('Error parsing request body:', parseError);
-      return new Response(
-        JSON.stringify({ error: 'Invalid JSON in request body' }),
-        { 
-          status: 200, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      
+      if (bodyText && bodyText.trim()) {
+        try {
+          requestBody = JSON.parse(bodyText);
+          console.log('Parsed request body:', requestBody);
+          token = requestBody.token;
+        } catch (jsonError) {
+          console.error('JSON parsing error:', jsonError);
+          console.log('Body text that failed to parse:', bodyText);
         }
-      )
+      }
+    } catch (bodyError) {
+      console.error('Error reading request body:', bodyError);
     }
 
-    const { token } = requestBody;
-    console.log('Extracted token:', token);
+    // Try to extract token from URL if not in body
+    if (!token) {
+      const url = new URL(req.url);
+      const pathSegments = url.pathname.split('/');
+      console.log('URL path segments:', pathSegments);
+      
+      // Look for token in path segments
+      const tokenFromPath = pathSegments.find(segment => 
+        segment.length === 36 && segment.includes('-')
+      );
+      
+      if (tokenFromPath) {
+        token = tokenFromPath;
+        console.log('Token extracted from URL path:', token);
+      }
+    }
+
+    console.log('Final token value:', token);
 
     if (!token) {
-      console.log('No token provided');
+      console.log('No token found in request body or URL');
       return new Response(
         JSON.stringify({ error: 'Token is required' }),
         { 
@@ -69,52 +89,26 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Create Supabase client with error handling
-    let supabaseClient;
-    try {
-      supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
-      console.log('Supabase client created successfully');
-    } catch (clientError) {
-      console.error('Error creating Supabase client:', clientError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to initialize database connection' }),
-        { 
-          status: 200, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    }
+    // Create Supabase client
+    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
+    console.log('Supabase client created successfully');
 
     // Get the shared report by token
     console.log('Querying shared_reports table with token:', token);
     
-    let sharedReport;
-    try {
-      const { data, error: shareError } = await supabaseClient
-        .from('shared_reports')
-        .select('*')
-        .eq('report_token', token)
-        .eq('is_active', true)
-        .maybeSingle()
+    const { data: sharedReport, error: shareError } = await supabaseClient
+      .from('shared_reports')
+      .select('*')
+      .eq('report_token', token)
+      .eq('is_active', true)
+      .maybeSingle()
 
-      console.log('Shared report query result:', { data, error: shareError });
+    console.log('Shared report query result:', { data: sharedReport, error: shareError });
 
-      if (shareError) {
-        console.error('Error querying shared_reports:', shareError);
-        return new Response(
-          JSON.stringify({ error: 'Database error while fetching shared report' }),
-          { 
-            status: 200, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        )
-      }
-
-      sharedReport = data;
-    } catch (queryError) {
-      console.error('Exception during shared_reports query:', queryError);
+    if (shareError) {
+      console.error('Error querying shared_reports:', shareError);
       return new Response(
-        JSON.stringify({ error: 'Database query failed' }),
+        JSON.stringify({ error: 'Database error while fetching shared report' }),
         { 
           status: 200, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -138,33 +132,19 @@ Deno.serve(async (req) => {
     // Get the user's active report
     console.log('Querying user_reports table for user_id:', sharedReport.user_id);
     
-    let userReport;
-    try {
-      const { data, error: reportError } = await supabaseClient
-        .from('user_reports')
-        .select('*')
-        .eq('user_id', sharedReport.user_id)
-        .eq('is_active', true)
-        .maybeSingle()
+    const { data: userReport, error: reportError } = await supabaseClient
+      .from('user_reports')
+      .select('*')
+      .eq('user_id', sharedReport.user_id)
+      .eq('is_active', true)
+      .maybeSingle()
 
-      console.log('User report query result:', { data, error: reportError });
+    console.log('User report query result:', { data: userReport, error: reportError });
 
-      if (reportError) {
-        console.error('Error querying user_reports:', reportError);
-        return new Response(
-          JSON.stringify({ error: 'Database error while fetching user report' }),
-          { 
-            status: 200, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        )
-      }
-
-      userReport = data;
-    } catch (queryError) {
-      console.error('Exception during user_reports query:', queryError);
+    if (reportError) {
+      console.error('Error querying user_reports:', reportError);
       return new Response(
-        JSON.stringify({ error: 'User report query failed' }),
+        JSON.stringify({ error: 'Database error while fetching user report' }),
         { 
           status: 200, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
