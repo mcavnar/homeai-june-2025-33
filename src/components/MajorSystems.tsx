@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import SystemCard from './SystemCard';
@@ -32,6 +33,22 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
 
   const totalCosts = calculateTotalCosts();
 
+  // Map system data to the props expected by SystemCard
+  const mapSystemToCardProps = (key: string, system: any) => {
+    return {
+      title: system.name || key.charAt(0).toUpperCase() + key.slice(1),
+      status: system.condition || 'Unknown',
+      description: system.summary || 'No details available',
+      repairCost: {
+        min: system.repairCost?.min || 0,
+        max: system.repairCost?.max || 5000,
+      },
+      maintenanceTips: system.maintenanceTips || ['Regular inspection recommended'],
+      ctaText: `See Local ${key.charAt(0).toUpperCase() + key.slice(1)} Experts`,
+      ctaType: key.toLowerCase() as 'hvac' | 'roofing' | 'plumbing' | 'electrical',
+    };
+  };
+
   return (
     <div className="space-y-6">
       {/* Projection Cards */}
@@ -43,7 +60,10 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
       {/* Systems Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Object.entries(systems).map(([key, system]) => (
-          <SystemCard key={key} systemName={key} system={system} />
+          <SystemCard
+            key={key}
+            {...mapSystemToCardProps(key, system)}
+          />
         ))}
       </div>
     </div>
