@@ -11,7 +11,7 @@ const ProblemsSection = () => {
     {
       emoji: "⏰",
       title: "Time Pressure",
-      description: "We help you make critical decisions quickly while emotions and stakes are high"
+      description: "We help you make important decisions quickly while emotions and stakes are high"
     },
     {
       emoji: "💸",
