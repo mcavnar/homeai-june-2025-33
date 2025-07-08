@@ -22,6 +22,8 @@ const DemoNegotiation = () => {
         </div>
       </div>
 
+      <NegotiationStrategy strategy={negotiationStrategy} />
+
       {/* Get Concierge Negotiation Help Section */}
       <Card className="border-gray-200">
         <CardContent className="p-6 text-center">
@@ -41,8 +43,6 @@ const DemoNegotiation = () => {
           </TrackedButton>
         </CardContent>
       </Card>
-
-      <NegotiationStrategy strategy={negotiationStrategy} />
     </div>
   );
 };

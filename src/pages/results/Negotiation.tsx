@@ -30,26 +30,6 @@ const Negotiation = () => {
         </div>
       </div>
 
-      {/* Get Concierge Negotiation Help Section */}
-      <Card className="border-gray-200">
-        <CardContent className="p-6 text-center">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">
-            Get Concierge Negotiation Help
-          </h3>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
-            Take the stress out of negotiations with our expert concierge service. Our experienced negotiation specialists will guide you through every step, help you craft compelling arguments, and ensure you maximize your leverage while maintaining positive relationships with all parties involved.
-          </p>
-          <TrackedButton 
-            variant="default" 
-            size="lg" 
-            className="px-8"
-            trackingLabel="Get Concierge Negotiation Help"
-          >
-            Get Concierge Negotiation Help
-          </TrackedButton>
-        </CardContent>
-      </Card>
-
       {isGeneratingStrategy && (
         <Card className="border-purple-200">
           <CardContent className="pt-6">
@@ -78,6 +58,26 @@ const Negotiation = () => {
           <p className="text-gray-500">No negotiation strategy available yet.</p>
         </div>
       )}
+
+      {/* Get Concierge Negotiation Help Section */}
+      <Card className="border-gray-200">
+        <CardContent className="p-6 text-center">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+            Get Concierge Negotiation Help
+          </h3>
+          <p className="text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
+            Take the stress out of negotiations with our expert concierge service. Our experienced negotiation specialists will guide you through every step, help you craft compelling arguments, and ensure you maximize your leverage while maintaining positive relationships with all parties involved.
+          </p>
+          <TrackedButton 
+            variant="default" 
+            size="lg" 
+            className="px-8"
+            trackingLabel="Get Concierge Negotiation Help"
+          >
+            Get Concierge Negotiation Help
+          </TrackedButton>
+        </CardContent>
+      </Card>
     </div>
   );
 };
