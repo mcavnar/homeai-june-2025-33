@@ -35,8 +35,9 @@ const HeroSection = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <TrackedButton 
             onClick={handleViewDemo}
+            variant="outline"
             size="lg" 
-            className="bg-emerald-500 hover:bg-emerald-600 text-white px-10 py-6 text-lg font-medium h-auto rounded-lg shadow-none border-0"
+            className="bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 hover:border-gray-300 px-10 py-6 text-lg font-medium h-auto rounded-lg shadow-none"
             trackingLabel="Hero View Demo Button"
           >
             <Eye className="mr-2 h-5 w-5" />
