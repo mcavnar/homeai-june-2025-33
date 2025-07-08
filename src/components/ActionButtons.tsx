@@ -1,29 +1,11 @@
 
 import React from 'react';
-import { Share, MessageSquare, DollarSign, Settings, ArrowRight, FileText } from 'lucide-react';
+import { MessageSquare, DollarSign, Settings, ArrowRight, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
 
 const ActionButtons: React.FC = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const handleShareAccess = () => {
-    const currentUrl = window.location.origin + '/results/synopsis';
-    navigator.clipboard.writeText(currentUrl).then(() => {
-      toast({
-        title: "Link copied!",
-        description: "Synopsis page link has been copied to your clipboard.",
-      });
-    }).catch(() => {
-      toast({
-        title: "Failed to copy",
-        description: "Please copy the link manually from your browser.",
-        variant: "destructive",
-      });
-    });
-  };
 
   const handleUnderstandServiceCosts = () => {
     navigate('/results/providers');

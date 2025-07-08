@@ -25,9 +25,7 @@ import {
   ClipboardList,
   LogOut,
   User,
-  Share2,
 } from 'lucide-react';
-import ShareReportModal from './ShareReportModal';
 
 const navigationItems = [
   {
@@ -66,7 +64,6 @@ const ResultsSidebar = () => {
   const { state } = useSidebar();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -90,106 +87,87 @@ const ResultsSidebar = () => {
   const initials = getInitials(displayName);
 
   return (
-    <>
-      <Sidebar className="border-r bg-white">
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-xl font-bold text-gray-900 px-3 py-4 mb-2">
-              HomeAi
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {navigationItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <NavLink
-                        to={item.url}
-                        className={({ isActive }) =>
-                          `flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
-                            isActive
-                              ? 'bg-blue-50 text-blue-700 font-medium'
-                              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                          }`
-                        }
-                      >
-                        <item.icon className="h-4 w-4" />
-                        <div className={state === 'collapsed' ? 'hidden' : 'block'}>
-                          <span>{item.title}</span>
-                        </div>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+    <Sidebar className="border-r bg-white">
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-xl font-bold text-gray-900 px-3 py-4 mb-2">
+            HomeAi
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navigationItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                          isActive
+                            ? 'bg-blue-50 text-blue-700 font-medium'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        }`
+                      }
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <div className={state === 'collapsed' ? 'hidden' : 'block'}>
+                        <span>{item.title}</span>
+                      </div>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-          {/* Share Report Section */}
-          <div className="px-3 py-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsShareModalOpen(true)}
-              className={`w-full flex items-center gap-2 ${state === 'collapsed' ? 'px-2' : ''}`}
-            >
-              <Share2 className="h-4 w-4" />
-              {state !== 'collapsed' && <span>Share Report</span>}
-            </Button>
-          </div>
+        {/* User Account Section */}
+        <div className="mt-auto p-3 border-t">
+          <div className={`${state === 'collapsed' ? 'flex flex-col items-center' : 'space-y-3'}`}>
+            {/* User Info */}
+            <div className={`flex items-center gap-3 ${state === 'collapsed' ? 'justify-center mb-2' : ''}`}>
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={user?.user_metadata?.avatar_url} />
+                <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              {state !== 'collapsed' && (
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {displayName}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {user?.email}
+                  </p>
+                </div>
+              )}
+            </div>
 
-          {/* User Account Section */}
-          <div className="mt-auto p-3 border-t">
-            <div className={`${state === 'collapsed' ? 'flex flex-col items-center' : 'space-y-3'}`}>
-              {/* User Info */}
-              <div className={`flex items-center gap-3 ${state === 'collapsed' ? 'justify-center mb-2' : ''}`}>
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={user?.user_metadata?.avatar_url} />
-                  <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-                {state !== 'collapsed' && (
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {displayName}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate">
-                      {user?.email}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Account Actions */}
-              <div className={`flex gap-1 ${state === 'collapsed' ? 'flex-col' : 'flex-row w-full'}`}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleAccountClick}
-                  className={`${state === 'collapsed' ? 'p-2' : 'flex-1'} text-gray-600 hover:text-gray-900`}
-                >
-                  <User className="h-4 w-4" />
-                  {state !== 'collapsed' && <span className="ml-1">Account</span>}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSignOut}
-                  className={`${state === 'collapsed' ? 'p-2' : 'flex-1'} text-gray-600 hover:text-gray-900`}
-                >
-                  <LogOut className="h-4 w-4" />
-                  {state !== 'collapsed' && <span className="ml-1">Sign Out</span>}
-                </Button>
-              </div>
+            {/* Account Actions */}
+            <div className={`flex gap-1 ${state === 'collapsed' ? 'flex-col' : 'flex-row w-full'}`}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleAccountClick}
+                className={`${state === 'collapsed' ? 'p-2' : 'flex-1'} text-gray-600 hover:text-gray-900`}
+              >
+                <User className="h-4 w-4" />
+                {state !== 'collapsed' && <span className="ml-1">Account</span>}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSignOut}
+                className={`${state === 'collapsed' ? 'p-2' : 'flex-1'} text-gray-600 hover:text-gray-900`}
+              >
+                <LogOut className="h-4 w-4" />
+                {state !== 'collapsed' && <span className="ml-1">Sign Out</span>}
+              </Button>
             </div>
           </div>
-        </SidebarContent>
-      </Sidebar>
-
-      <ShareReportModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-      />
-    </>
+        </div>
+      </SidebarContent>
+    </Sidebar>
   );
 };
 
