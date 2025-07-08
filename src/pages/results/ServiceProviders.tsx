@@ -8,6 +8,8 @@ import { useMaintenanceEstimate } from '@/hooks/useMaintenanceEstimate';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { TrackedButton } from '@/components/TrackedButton';
+import { useServiceOptIn } from '@/hooks/useServiceOptIn';
+import ServiceOptInModal from '@/components/ServiceOptInModal';
 
 interface ServiceProvidersContextType {
   analysis: any;
@@ -17,6 +19,13 @@ interface ServiceProvidersContextType {
 const ServiceProviders = () => {
   const { analysis, propertyData } = useOutletContext<ServiceProvidersContextType>();
   const { estimate, serviceProviders, isLoading, error, fetchEstimate } = useMaintenanceEstimate();
+  const {
+    isModalOpen,
+    openOptInModal,
+    closeModal,
+    confirmOptIn,
+    getCurrentServiceConfig
+  } = useServiceOptIn();
 
   // Extract address from property data
   const propertyAddress = propertyData?.address || propertyData?.streetAddress || analysis?.propertyInfo?.address;
@@ -63,6 +72,12 @@ const ServiceProviders = () => {
   };
 
   const costSummary = calculateCostSummary();
+
+  const handleRecommendedProvidersClick = () => {
+    openOptInModal('recommended_providers');
+  };
+
+  const config = getCurrentServiceConfig();
 
   if (isLoading) {
     return (
@@ -125,6 +140,7 @@ const ServiceProviders = () => {
             variant="default" 
             size="lg" 
             className="px-8"
+            onClick={handleRecommendedProvidersClick}
             trackingLabel="See Recommended Providers"
           >
             See Our Recommended Providers
@@ -134,6 +150,17 @@ const ServiceProviders = () => {
 
       <ServiceProvidersTable providers={serviceProviders} />
       <ActionCards />
+
+      {config && (
+        <ServiceOptInModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          serviceType={getCurrentServiceConfig()?.columnName.replace('_opted_in_at', '') as any}
+          title={config.title}
+          description={config.description}
+          onConfirm={confirmOptIn}
+        />
+      )}
     </div>
   );
 };

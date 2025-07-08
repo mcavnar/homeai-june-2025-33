@@ -6,6 +6,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { TrackedButton } from '@/components/TrackedButton';
+import { useServiceOptIn } from '@/hooks/useServiceOptIn';
+import ServiceOptInModal from '@/components/ServiceOptInModal';
 
 interface NegotiationContextType {
   negotiationStrategy: any;
@@ -19,6 +21,20 @@ const Negotiation = () => {
     isGeneratingStrategy,
     strategyError,
   } = useOutletContext<NegotiationContextType>();
+
+  const {
+    isModalOpen,
+    openOptInModal,
+    closeModal,
+    confirmOptIn,
+    getCurrentServiceConfig
+  } = useServiceOptIn();
+
+  const handleConciergeClick = () => {
+    openOptInModal('concierge_negotiation');
+  };
+
+  const config = getCurrentServiceConfig();
 
   return (
     <div className="space-y-6">
@@ -72,12 +88,24 @@ const Negotiation = () => {
             variant="default" 
             size="lg" 
             className="px-8"
+            onClick={handleConciergeClick}
             trackingLabel="Get Concierge Negotiation Help"
           >
             Get Concierge Negotiation Help
           </TrackedButton>
         </CardContent>
       </Card>
+
+      {config && (
+        <ServiceOptInModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          serviceType={getCurrentServiceConfig()?.columnName.replace('_opted_in_at', '') as any}
+          title={config.title}
+          description={config.description}
+          onConfirm={confirmOptIn}
+        />
+      )}
     </div>
   );
 };

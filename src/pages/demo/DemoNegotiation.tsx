@@ -4,6 +4,8 @@ import { useOutletContext } from 'react-router-dom';
 import NegotiationStrategy from '@/components/NegotiationStrategy';
 import { Card, CardContent } from '@/components/ui/card';
 import { TrackedButton } from '@/components/TrackedButton';
+import { useServiceOptIn } from '@/hooks/useServiceOptIn';
+import ServiceOptInModal from '@/components/ServiceOptInModal';
 
 interface DemoNegotiationContextType {
   negotiationStrategy: any;
@@ -11,6 +13,19 @@ interface DemoNegotiationContextType {
 
 const DemoNegotiation = () => {
   const { negotiationStrategy } = useOutletContext<DemoNegotiationContextType>();
+  const {
+    isModalOpen,
+    openOptInModal,
+    closeModal,
+    confirmOptIn,
+    getCurrentServiceConfig
+  } = useServiceOptIn();
+
+  const handleConciergeClick = () => {
+    openOptInModal('concierge_negotiation');
+  };
+
+  const config = getCurrentServiceConfig();
 
   return (
     <div className="space-y-6">
@@ -37,12 +52,24 @@ const DemoNegotiation = () => {
             variant="default" 
             size="lg" 
             className="px-8"
+            onClick={handleConciergeClick}
             trackingLabel="Get Concierge Negotiation Help"
           >
             Get Concierge Negotiation Help
           </TrackedButton>
         </CardContent>
       </Card>
+
+      {config && (
+        <ServiceOptInModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          serviceType={getCurrentServiceConfig()?.columnName.replace('_opted_in_at', '') as any}
+          title={config.title}
+          description={config.description}
+          onConfirm={confirmOptIn}
+        />
+      )}
     </div>
   );
 };

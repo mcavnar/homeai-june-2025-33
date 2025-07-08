@@ -80,29 +80,47 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          concierge_negotiation_opted_in_at: string | null
           created_at: string
           deletion_requested_at: string | null
+          electricians_opted_in_at: string | null
           email: string | null
           full_name: string | null
+          hvac_technicians_opted_in_at: string | null
           id: string
+          plumbers_opted_in_at: string | null
+          recommended_providers_opted_in_at: string | null
+          roofing_experts_opted_in_at: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
+          concierge_negotiation_opted_in_at?: string | null
           created_at?: string
           deletion_requested_at?: string | null
+          electricians_opted_in_at?: string | null
           email?: string | null
           full_name?: string | null
+          hvac_technicians_opted_in_at?: string | null
           id: string
+          plumbers_opted_in_at?: string | null
+          recommended_providers_opted_in_at?: string | null
+          roofing_experts_opted_in_at?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
+          concierge_negotiation_opted_in_at?: string | null
           created_at?: string
           deletion_requested_at?: string | null
+          electricians_opted_in_at?: string | null
           email?: string | null
           full_name?: string | null
+          hvac_technicians_opted_in_at?: string | null
           id?: string
+          plumbers_opted_in_at?: string | null
+          recommended_providers_opted_in_at?: string | null
+          roofing_experts_opted_in_at?: string | null
           updated_at?: string
         }
         Relationships: []

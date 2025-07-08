@@ -6,6 +6,8 @@ import ActionCards from '@/components/ServiceProviders/ActionCards';
 import ServiceProvidersTable from '@/components/ServiceProviders/ServiceProvidersTable';
 import { Card, CardContent } from '@/components/ui/card';
 import { TrackedButton } from '@/components/TrackedButton';
+import { useServiceOptIn } from '@/hooks/useServiceOptIn';
+import ServiceOptInModal from '@/components/ServiceOptInModal';
 
 interface DemoServiceProvidersContextType {
   analysis: any;
@@ -13,6 +15,13 @@ interface DemoServiceProvidersContextType {
 
 const DemoServiceProviders = () => {
   const { analysis } = useOutletContext<DemoServiceProvidersContextType>();
+  const {
+    isModalOpen,
+    openOptInModal,
+    closeModal,
+    confirmOptIn,
+    getCurrentServiceConfig
+  } = useServiceOptIn();
 
   // Demo cost summary
   const costSummary = {
@@ -65,6 +74,12 @@ const DemoServiceProviders = () => {
     },
   ];
 
+  const handleRecommendedProvidersClick = () => {
+    openOptInModal('recommended_providers');
+  };
+
+  const config = getCurrentServiceConfig();
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -90,6 +105,7 @@ const DemoServiceProviders = () => {
             variant="default" 
             size="lg" 
             className="px-8"
+            onClick={handleRecommendedProvidersClick}
             trackingLabel="See Recommended Providers"
           >
             See Our Recommended Providers
@@ -99,6 +115,17 @@ const DemoServiceProviders = () => {
 
       <ActionCards />
       <ServiceProvidersTable providers={serviceProviders} />
+
+      {config && (
+        <ServiceOptInModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          serviceType={getCurrentServiceConfig()?.columnName.replace('_opted_in_at', '') as any}
+          title={config.title}
+          description={config.description}
+          onConfirm={confirmOptIn}
+        />
+      )}
     </div>
   );
 };
