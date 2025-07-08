@@ -26,6 +26,8 @@ import DemoServiceProviders from "./pages/demo/DemoServiceProviders";
 import DemoNegotiation from "./pages/demo/DemoNegotiation";
 import DemoInspectionReport from "./pages/demo/DemoInspectionReport";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +74,8 @@ const App = () => (
                 <Route path="negotiation" element={<DemoNegotiation />} />
                 <Route path="report" element={<DemoInspectionReport />} />
               </Route>
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsAndConditions />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

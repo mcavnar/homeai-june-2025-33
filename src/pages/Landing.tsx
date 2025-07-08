@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { TrackedButton } from '@/components/TrackedButton';
@@ -239,9 +239,17 @@ const Landing = () => {
             </div>
             <div className="text-xl font-bold text-gray-900">HomeAi</div>
           </div>
-          <p className="text-gray-500 font-light">
+          <p className="text-gray-500 font-light mb-6">
             Transform your home inspection reports with AI-powered insights.
           </p>
+          <div className="flex justify-center gap-8">
+            <Link to="/privacy" className="text-gray-500 hover:text-gray-700 transition-colors text-sm">
+              Privacy Policy
+            </Link>
+            <Link to="/terms" className="text-gray-500 hover:text-gray-700 transition-colors text-sm">
+              Terms & Conditions
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
