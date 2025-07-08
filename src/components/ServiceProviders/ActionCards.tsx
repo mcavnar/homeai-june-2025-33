@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { TrackedButton } from '@/components/TrackedButton';
 import ProviderRequestFormModal from './ProviderRequestFormModal';
 
 const ActionCards: React.FC = () => {
@@ -18,14 +18,15 @@ const ActionCards: React.FC = () => {
             <p className="text-gray-600 mb-4 flex-grow">
               Generate a shareable form link to send to the seller or their agent. This will allow them to provide detailed information about all current service providers for this property.
             </p>
-            <Button 
+            <TrackedButton 
               variant="default"
               size="lg"
               className="w-full"
               onClick={() => setIsFormModalOpen(true)}
+              trackingLabel="Generate Provider Request Form"
             >
               Generate Provider Request Form
-            </Button>
+            </TrackedButton>
           </CardContent>
         </Card>
 
@@ -37,9 +38,14 @@ const ActionCards: React.FC = () => {
             <p className="text-gray-600 mb-4 flex-grow">
               We use our database of the most qualified providers in your area to find the right options for you.
             </p>
-            <Button variant="default" size="lg" className="w-full">
+            <TrackedButton 
+              variant="default" 
+              size="lg" 
+              className="w-full"
+              trackingLabel="Find More Providers"
+            >
               Find More Providers
-            </Button>
+            </TrackedButton>
           </CardContent>
         </Card>
       </div>

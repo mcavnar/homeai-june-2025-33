@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { TrackedButton } from '@/components/TrackedButton';
 import { 
   CheckCircle,
   Clock,
@@ -50,13 +50,23 @@ const Landing = () => {
           </div>
           <div className="flex items-center gap-4">
             {user ? (
-              <Button onClick={() => navigate('/upload')} variant="outline" className="border-gray-200 text-gray-700 hover:bg-gray-50">
+              <TrackedButton 
+                onClick={() => navigate('/upload')} 
+                variant="outline" 
+                className="border-gray-200 text-gray-700 hover:bg-gray-50"
+                trackingLabel="Header Dashboard Button"
+              >
                 Dashboard
-              </Button>
+              </TrackedButton>
             ) : (
-              <Button variant="ghost" onClick={handleSignIn} className="text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+              <TrackedButton 
+                variant="ghost" 
+                onClick={handleSignIn} 
+                className="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                trackingLabel="Header Sign In Button"
+              >
                 Sign In
-              </Button>
+              </TrackedButton>
             )}
           </div>
         </div>
@@ -74,23 +84,25 @@ const Landing = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
+            <TrackedButton 
               onClick={handleViewDemo}
               size="lg" 
               className="bg-emerald-500 hover:bg-emerald-600 text-white px-10 py-6 text-lg font-medium h-auto rounded-lg shadow-none border-0"
+              trackingLabel="Hero View Demo Button"
             >
               <Eye className="mr-2 h-5 w-5" />
               View Demo Report
-            </Button>
-            <Button 
+            </TrackedButton>
+            <TrackedButton 
               onClick={handleGetStarted}
               variant="outline" 
               size="lg"
               className="border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 px-10 py-6 text-lg font-medium h-auto rounded-lg shadow-none"
+              trackingLabel="Hero Upload Report Button"
             >
               <Upload className="mr-2 h-5 w-5" />
               Upload Report for Free
-            </Button>
+            </TrackedButton>
           </div>
         </div>
       </div>

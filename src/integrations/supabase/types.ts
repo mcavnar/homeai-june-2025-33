@@ -311,6 +311,149 @@ export type Database = {
         }
         Relationships: []
       }
+      user_analytics_summary: {
+        Row: {
+          created_at: string
+          first_login: string | null
+          last_login: string | null
+          most_clicked_element: string | null
+          most_visited_page: string | null
+          total_interactions: number
+          total_page_visits: number
+          total_sessions: number
+          total_time_seconds: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          first_login?: string | null
+          last_login?: string | null
+          most_clicked_element?: string | null
+          most_visited_page?: string | null
+          total_interactions?: number
+          total_page_visits?: number
+          total_sessions?: number
+          total_time_seconds?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          first_login?: string | null
+          last_login?: string | null
+          most_clicked_element?: string | null
+          most_visited_page?: string | null
+          total_interactions?: number
+          total_page_visits?: number
+          total_sessions?: number
+          total_time_seconds?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_interactions: {
+        Row: {
+          element_class: string | null
+          element_id: string | null
+          element_text: string | null
+          id: string
+          interaction_type: Database["public"]["Enums"]["interaction_type"]
+          page_path: string
+          page_visit_id: string | null
+          session_id: string | null
+          timestamp: string
+          user_id: string
+        }
+        Insert: {
+          element_class?: string | null
+          element_id?: string | null
+          element_text?: string | null
+          id?: string
+          interaction_type: Database["public"]["Enums"]["interaction_type"]
+          page_path: string
+          page_visit_id?: string | null
+          session_id?: string | null
+          timestamp?: string
+          user_id: string
+        }
+        Update: {
+          element_class?: string | null
+          element_id?: string | null
+          element_text?: string | null
+          id?: string
+          interaction_type?: Database["public"]["Enums"]["interaction_type"]
+          page_path?: string
+          page_visit_id?: string | null
+          session_id?: string | null
+          timestamp?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_interactions_page_visit_id_fkey"
+            columns: ["page_visit_id"]
+            isOneToOne: false
+            referencedRelation: "user_page_visits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_interactions_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "user_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_page_visits: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          page_path: string
+          page_title: string | null
+          referrer: string | null
+          session_id: string | null
+          user_id: string
+          visit_end: string | null
+          visit_start: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          page_path: string
+          page_title?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_id: string
+          visit_end?: string | null
+          visit_start?: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          page_path?: string
+          page_title?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_id?: string
+          visit_end?: string | null
+          visit_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_page_visits_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "user_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_reports: {
         Row: {
           analysis_data: Json
@@ -362,6 +505,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          session_end: string | null
+          session_start: string
+          total_duration_seconds: number | null
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          session_end?: string | null
+          session_start?: string
+          total_duration_seconds?: number | null
+          updated_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          session_end?: string | null
+          session_start?: string
+          total_duration_seconds?: number | null
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -370,7 +549,12 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      interaction_type:
+        | "button_click"
+        | "link_click"
+        | "form_submit"
+        | "download"
+        | "navigation"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -497,6 +681,14 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      interaction_type: [
+        "button_click",
+        "link_click",
+        "form_submit",
+        "download",
+        "navigation",
+      ],
+    },
   },
 } as const
