@@ -7,6 +7,13 @@ import CostSummaryCards from '@/components/ServiceProviders/CostSummaryCards';
 const SharedServiceProviders = () => {
   const { analysis, propertyData } = useSharedReport();
 
+  // Create cost summary from analysis data
+  const costSummary = {
+    monthlyAverage: analysis?.costSummary?.monthlyAverage || 0,
+    annualTotal: analysis?.costSummary?.annualTotal || 0,
+    marketDifference: analysis?.costSummary?.marketDifference || 0,
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -17,10 +24,10 @@ const SharedServiceProviders = () => {
         </div>
       </div>
 
-      <CostSummaryCards analysis={analysis} />
+      <CostSummaryCards costSummary={costSummary} />
       
       <ServiceProvidersTable 
-        analysis={analysis} 
+        issues={analysis?.issues || []} 
         propertyData={propertyData}
         showRequestButtons={false}
       />

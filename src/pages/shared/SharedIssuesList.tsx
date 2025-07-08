@@ -16,7 +16,7 @@ const SharedIssuesList = () => {
         </div>
       </div>
 
-      <DetailedFindings findings={analysis} />
+      <DetailedFindings issues={analysis?.issues || []} />
     </div>
   );
 };

@@ -1,10 +1,13 @@
 
 import React from 'react';
-import { Outlet } from 'react-router-dom';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { useSharedReport } from '@/contexts/SharedReportContext';
 
-const SharedReportLayout = () => {
+interface SharedReportLayoutProps {
+  children: React.ReactNode;
+}
+
+const SharedReportLayout: React.FC<SharedReportLayoutProps> = ({ children }) => {
   const { isLoading, error } = useSharedReport();
 
   if (isLoading) {
@@ -53,7 +56,7 @@ const SharedReportLayout = () => {
       {/* Content */}
       <main className="flex-1 p-6">
         <div className="max-w-7xl mx-auto">
-          <Outlet />
+          {children}
         </div>
       </main>
 

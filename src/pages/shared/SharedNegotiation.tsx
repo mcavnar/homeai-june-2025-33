@@ -4,7 +4,7 @@ import { useSharedReport } from '@/contexts/SharedReportContext';
 import NegotiationStrategy from '@/components/NegotiationStrategy';
 
 const SharedNegotiation = () => {
-  const { analysis, propertyData, negotiationStrategy } = useSharedReport();
+  const { negotiationStrategy } = useSharedReport();
 
   return (
     <div className="space-y-6">
@@ -16,13 +16,9 @@ const SharedNegotiation = () => {
         </div>
       </div>
 
-      <NegotiationStrategy
-        analysis={analysis}
-        propertyData={propertyData}
-        negotiationStrategy={negotiationStrategy}
-        isGenerating={false}
-        error={null}
-      />
+      {negotiationStrategy && (
+        <NegotiationStrategy strategy={negotiationStrategy} />
+      )}
     </div>
   );
 };
