@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -130,7 +129,7 @@ const Landing = () => {
               <div className="text-6xl mb-8">⏰</div>
               <h3 className="text-2xl font-semibold text-gray-900 mb-6">Time Pressure</h3>
               <p className="text-gray-600 text-lg font-light leading-relaxed">
-                Need to make critical decisions quickly while emotions and stakes are high
+                We help you make critical decisions quickly while emotions and stakes are high
               </p>
             </div>
 
