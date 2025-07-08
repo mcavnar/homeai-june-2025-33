@@ -25,6 +25,13 @@ import DemoKeySystems from "./pages/demo/DemoKeySystems";
 import DemoServiceProviders from "./pages/demo/DemoServiceProviders";
 import DemoNegotiation from "./pages/demo/DemoNegotiation";
 import DemoInspectionReport from "./pages/demo/DemoInspectionReport";
+import SharedReport from "./pages/SharedReport";
+import SharedSynopsis from "./pages/shared/SharedSynopsis";
+import SharedIssuesList from "./pages/shared/SharedIssuesList";
+import SharedKeySystems from "./pages/shared/SharedKeySystems";
+import SharedServiceProviders from "./pages/shared/SharedServiceProviders";
+import SharedNegotiation from "./pages/shared/SharedNegotiation";
+import SharedInspectionReport from "./pages/shared/SharedInspectionReport";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
@@ -73,6 +80,16 @@ const App = () => (
                 <Route path="providers" element={<DemoServiceProviders />} />
                 <Route path="negotiation" element={<DemoNegotiation />} />
                 <Route path="report" element={<DemoInspectionReport />} />
+              </Route>
+              {/* Shared Report Routes */}
+              <Route path="/shared/:token" element={<SharedReport />}>
+                <Route index element={<Navigate to="synopsis" replace />} />
+                <Route path="synopsis" element={<SharedSynopsis />} />
+                <Route path="issues" element={<SharedIssuesList />} />
+                <Route path="systems" element={<SharedKeySystems />} />
+                <Route path="providers" element={<SharedServiceProviders />} />
+                <Route path="negotiation" element={<SharedNegotiation />} />
+                <Route path="report" element={<SharedInspectionReport />} />
               </Route>
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsAndConditions />} />
