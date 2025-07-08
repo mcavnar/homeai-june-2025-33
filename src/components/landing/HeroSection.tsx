@@ -25,11 +25,11 @@ const HeroSection = () => {
     <div className="bg-blue-50 py-24">
       <div className="container mx-auto px-6 text-center">
         <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight max-w-5xl mx-auto">
-          Turn Your Home Inspection Report Into Clear, Actionable Insights
+          Get Instant Repair Costs and Negotiation Advice From Your Inspection Report
         </h1>
         
         <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
-          Get instant repair estimates, maintenance costs, and negotiation strategies from your inspection report using AI-powered analysis.
+          We translate your inspection report into accurate repair estimates, recommend trusted service pros, and help you negotiate smartly with data about your area.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
