@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Copy, Check, ExternalLink, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { useShareReport } from '@/hooks/useShareReport';
 
 interface ShareReportModalProps {
   isOpen: boolean;
@@ -14,37 +14,14 @@ interface ShareReportModalProps {
 
 const ShareReportModal: React.FC<ShareReportModalProps> = ({ isOpen, onClose }) => {
   const [shareUrl, setShareUrl] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
   const { toast } = useToast();
+  const { generateShareLink, isLoading } = useShareReport();
 
-  const generateShareLink = async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-share-link', {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      setShareUrl(data.shareUrl);
-      toast({
-        title: "Share link generated",
-        description: "Your report is now ready to share!",
-      });
-    } catch (error) {
-      console.error('Error generating share link:', error);
-      toast({
-        title: "Error",
-        description: "Failed to generate share link. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+  const handleGenerateLink = async () => {
+    const url = await generateShareLink();
+    if (url) {
+      setShareUrl(url);
     }
   };
 
@@ -72,7 +49,7 @@ const ShareReportModal: React.FC<ShareReportModalProps> = ({ isOpen, onClose }) 
 
   React.useEffect(() => {
     if (isOpen && !shareUrl) {
-      generateShareLink();
+      handleGenerateLink();
     }
   }, [isOpen]);
 
@@ -137,7 +114,13 @@ const ShareReportModal: React.FC<ShareReportModalProps> = ({ isOpen, onClose }) 
                 </Button>
               </div>
             </div>
-          ) : null}
+          ) : (
+            <div className="flex justify-center">
+              <Button onClick={handleGenerateLink} disabled={isLoading}>
+                Generate Share Link
+              </Button>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

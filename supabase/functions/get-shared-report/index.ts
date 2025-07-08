@@ -16,11 +16,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log('Parsing request body...');
-    const requestBody = await req.json();
-    console.log('Request body parsed:', requestBody);
-    
-    const { token } = requestBody;
+    const { token } = await req.json();
     console.log('Token received:', token);
 
     if (!token) {
@@ -28,36 +24,29 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Token is required' }),
         { 
-          status: 200, 
+          status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
     }
 
-    console.log('Getting environment variables...');
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    
-    console.log('Supabase URL:', supabaseUrl ? 'present' : 'missing');
-    console.log('Service role key:', supabaseServiceKey ? 'present' : 'missing');
 
     if (!supabaseUrl || !supabaseServiceKey) {
       console.error('Missing environment variables');
       return new Response(
         JSON.stringify({ error: 'Server configuration error' }),
         { 
-          status: 200, 
+          status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
     }
 
-    console.log('Creating Supabase client...');
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
-    console.log('Supabase client created successfully');
 
     // Get the shared report by token
-    console.log('Querying shared_reports table with token:', token);
     const { data: sharedReport, error: shareError } = await supabaseClient
       .from('shared_reports')
       .select('*')
@@ -65,14 +54,12 @@ Deno.serve(async (req) => {
       .eq('is_active', true)
       .maybeSingle()
 
-    console.log('Shared report query result:', { sharedReport, shareError });
-
     if (shareError) {
       console.error('Error querying shared_reports:', shareError);
       return new Response(
-        JSON.stringify({ error: 'Database query error' }),
+        JSON.stringify({ error: 'Database error' }),
         { 
-          status: 200, 
+          status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
@@ -81,18 +68,15 @@ Deno.serve(async (req) => {
     if (!sharedReport) {
       console.log('No shared report found for token:', token);
       return new Response(
-        JSON.stringify({ error: 'Invalid or inactive share token' }),
+        JSON.stringify({ error: 'Share link not found or expired' }),
         { 
-          status: 200, 
+          status: 404, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
     }
 
-    console.log('Found shared report, user_id:', sharedReport.user_id);
-
     // Get the user's active report
-    console.log('Querying user_reports table for user_id:', sharedReport.user_id);
     const { data: userReport, error: reportError } = await supabaseClient
       .from('user_reports')
       .select('*')
@@ -100,14 +84,12 @@ Deno.serve(async (req) => {
       .eq('is_active', true)
       .maybeSingle()
 
-    console.log('User report query result:', { userReport, reportError });
-
     if (reportError) {
       console.error('Error querying user_reports:', reportError);
       return new Response(
-        JSON.stringify({ error: 'Database query error' }),
+        JSON.stringify({ error: 'Database error' }),
         { 
-          status: 200, 
+          status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
@@ -118,15 +100,13 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Report not found' }),
         { 
-          status: 200, 
+          status: 404, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
     }
 
-    console.log('Successfully found user report, returning data...');
-
-    // Return the report data (same structure as the private version)
+    // Return the report data
     const responseData = {
       analysis: userReport.analysis_data,
       propertyData: userReport.property_data,
@@ -137,8 +117,6 @@ Deno.serve(async (req) => {
       pdfPath: userReport.pdf_file_path
     };
 
-    console.log('Response data prepared:', Object.keys(responseData));
-
     return new Response(
       JSON.stringify(responseData),
       { 
@@ -148,12 +126,11 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Unexpected error in get-shared-report:', error);
-    console.error('Error stack:', error.stack);
+    console.error('Unexpected error:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { 
-        status: 200, 
+        status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     )
