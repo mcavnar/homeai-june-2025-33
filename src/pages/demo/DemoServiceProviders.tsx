@@ -4,6 +4,8 @@ import { useOutletContext } from 'react-router-dom';
 import CostSummaryCards from '@/components/ServiceProviders/CostSummaryCards';
 import ActionCards from '@/components/ServiceProviders/ActionCards';
 import ServiceProvidersTable from '@/components/ServiceProviders/ServiceProvidersTable';
+import { Card, CardContent } from '@/components/ui/card';
+import { TrackedButton } from '@/components/TrackedButton';
 
 interface DemoServiceProvidersContextType {
   analysis: any;
@@ -74,6 +76,27 @@ const DemoServiceProviders = () => {
       </div>
 
       <CostSummaryCards costSummary={costSummary} />
+      
+      {/* See Our Recommended Providers Section */}
+      <Card className="border-gray-200">
+        <CardContent className="p-6 text-center">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+            See Our Recommended Providers
+          </h3>
+          <p className="text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
+            We find the right providers for your area based on our database of millions of service provider transactions. Our algorithm analyzes quality ratings, pricing, availability, and local market conditions to match you with the most qualified professionals in your neighborhood.
+          </p>
+          <TrackedButton 
+            variant="default" 
+            size="lg" 
+            className="px-8"
+            trackingLabel="See Recommended Providers"
+          >
+            See Our Recommended Providers
+          </TrackedButton>
+        </CardContent>
+      </Card>
+
       <ActionCards />
       <ServiceProvidersTable providers={serviceProviders} />
     </div>

@@ -9,7 +9,7 @@ const ActionCards: React.FC = () => {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 gap-6 mb-8">
         <Card className="border-gray-200 h-full">
           <CardContent className="p-6 flex flex-col h-full">
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -26,25 +26,6 @@ const ActionCards: React.FC = () => {
               trackingLabel="Generate Provider Request Form"
             >
               Generate Provider Request Form
-            </TrackedButton>
-          </CardContent>
-        </Card>
-
-        <Card className="border-gray-200 h-full">
-          <CardContent className="p-6 flex flex-col h-full">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Get Our Recommended Providers
-            </h3>
-            <p className="text-gray-600 mb-4 flex-grow">
-              We use our database of the most qualified providers in your area to find the right options for you.
-            </p>
-            <TrackedButton 
-              variant="default" 
-              size="lg" 
-              className="w-full"
-              trackingLabel="Find More Providers"
-            >
-              Find More Providers
             </TrackedButton>
           </CardContent>
         </Card>
