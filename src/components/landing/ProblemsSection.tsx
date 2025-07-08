@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 const ProblemsSection = () => {
@@ -10,13 +9,13 @@ const ProblemsSection = () => {
     },
     {
       emoji: "⏰",
-      title: "Time Pressure",
+      title: "Time Pressure", 
       description: "We help you make important decisions quickly while emotions and stakes are high"
     },
     {
       emoji: "💸",
       title: "Financial Uncertainty",
-      description: "No idea what repairs actually cost or how to negotiate effectively"
+      description: "See accurate issue repair estimates and understand ongoing maintenance costs"
     }
   ];
 
