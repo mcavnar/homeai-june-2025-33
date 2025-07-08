@@ -47,8 +47,9 @@ const DemoSynopsis = () => {
       <div className="flex justify-center">
         <Button
           onClick={handleUploadReport}
-          className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 text-lg font-medium shadow-lg"
+          variant="green"
           size="lg"
+          className="px-8 py-3 text-lg font-medium shadow-lg"
         >
           Upload Your Report For Free
         </Button>
