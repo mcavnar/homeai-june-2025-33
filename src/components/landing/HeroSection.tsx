@@ -29,7 +29,7 @@ const HeroSection = () => {
         </h1>
         
         <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
-          Get instant repair costs, priority rankings, and negotiation strategies from your inspection report using AI-powered analysis.
+          Get instant repair estimates, maintenance costs, and negotiation strategies from your inspection report using AI-powered analysis.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
