@@ -6,7 +6,7 @@ const ProblemsSection = () => {
     {
       emoji: "😰",
       title: "40+ Page Reports",
-      description: "We provide more context on complicated issues and explain any technical jargon."
+      description: "Get critical context on complicated issues and explanations for technical jargon"
     },
     {
       emoji: "⏰",
