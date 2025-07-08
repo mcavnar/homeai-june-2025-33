@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { TrackedButton } from '@/components/TrackedButton';
 import { Input } from '@/components/ui/input';
 import { Search, X, ChevronUp, ChevronDown } from 'lucide-react';
 
@@ -37,14 +37,15 @@ const PDFSearchBar = ({
             className="pl-10 pr-10"
           />
           {searchQuery && (
-            <Button
+            <TrackedButton
               variant="ghost"
               size="sm"
               onClick={onClearSearch}
               className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+              trackingLabel={`PDF Search - Clear Search "${searchQuery}"`}
             >
               <X className="h-4 w-4" />
-            </Button>
+            </TrackedButton>
           )}
         </div>
         
@@ -54,22 +55,24 @@ const PDFSearchBar = ({
               {currentMatchIndex + 1} of {totalMatches}
             </span>
             <div className="flex gap-1">
-              <Button
+              <TrackedButton
                 variant="outline"
                 size="sm"
                 onClick={onPrevMatch}
                 disabled={totalMatches === 0}
+                trackingLabel={`PDF Search - Previous Match (${currentMatchIndex + 1}/${totalMatches})`}
               >
                 <ChevronUp className="h-4 w-4" />
-              </Button>
-              <Button
+              </TrackedButton>
+              <TrackedButton
                 variant="outline"
                 size="sm"
                 onClick={onNextMatch}
                 disabled={totalMatches === 0}
+                trackingLabel={`PDF Search - Next Match (${currentMatchIndex + 1}/${totalMatches})`}
               >
                 <ChevronDown className="h-4 w-4" />
-              </Button>
+              </TrackedButton>
             </div>
           </div>
         )}

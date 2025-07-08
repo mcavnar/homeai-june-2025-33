@@ -2,7 +2,7 @@
 import React from 'react';
 import { Share, Handshake, Users, Settings, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { TrackedButton } from '@/components/TrackedButton';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
@@ -76,14 +76,15 @@ const ModernStepper: React.FC = () => {
                   <step.icon className="h-8 w-8 text-green-500" />
                 </div>
                 <div className="space-y-3 text-center">
-                  <Button
+                  <TrackedButton
                     onClick={step.onClick}
                     variant="green"
                     size="default"
                     className="w-full font-semibold"
+                    trackingLabel={`Dashboard Navigation - ${step.action}`}
                   >
                     {step.action}
-                  </Button>
+                  </TrackedButton>
                   <p className="text-sm text-gray-600 leading-relaxed">{step.description}</p>
                 </div>
               </div>

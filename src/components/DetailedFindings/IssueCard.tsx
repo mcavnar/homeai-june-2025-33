@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { MapPin, FileText, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { TrackedButton } from '@/components/TrackedButton';
 import {
   Collapsible,
   CollapsibleContent,
@@ -66,15 +66,16 @@ const IssueCard: React.FC<IssueCardProps> = ({
               {formatCurrency(issue.estimatedCost.min)} - {formatCurrency(issue.estimatedCost.max)}
             </p>
           </div>
-          <Button
+          <TrackedButton
             onClick={() => onSeeInReport(issue)}
             variant="outline"
             size="sm"
             className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+            trackingLabel={`See in Report - ${issue.category}: ${issue.description.slice(0, 30)}...`}
           >
             <FileText className="h-4 w-4" />
             See in Report
-          </Button>
+          </TrackedButton>
         </div>
       </div>
       <h4 className="font-semibold text-gray-900 mb-1">{issue.description}</h4>

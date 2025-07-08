@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { TrackedButton } from '@/components/TrackedButton';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -50,14 +50,15 @@ The form should only take a few minutes to complete and will help both of us ens
               Form Generated Successfully!
             </DialogTitle>
           </div>
-          <Button
+          <TrackedButton
             variant="ghost"
             size="sm"
             className="absolute right-0 top-0 text-gray-400 hover:text-gray-600"
             onClick={onClose}
+            trackingLabel="Provider Request Modal - Close"
           >
             <X className="h-4 w-4" />
-          </Button>
+          </TrackedButton>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -73,14 +74,15 @@ The form should only take a few minutes to complete and will help both of us ens
                 readOnly
                 className="flex-1 bg-gray-50"
               />
-              <Button
+              <TrackedButton
                 variant="outline"
                 size="sm"
                 onClick={() => copyToClipboard(shareableUrl, 'Form URL')}
                 className="px-3"
+                trackingLabel="Provider Request Modal - Copy Form URL"
               >
                 <Copy className="h-4 w-4" />
-              </Button>
+              </TrackedButton>
             </div>
           </div>
 
@@ -94,35 +96,42 @@ The form should only take a few minutes to complete and will help both of us ens
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Button
+            <TrackedButton
               variant="outline"
               onClick={() => copyToClipboard(emailTemplate, 'Email template')}
               className="flex items-center gap-2"
+              trackingLabel="Provider Request Modal - Copy Email Template"
             >
               <Copy className="h-4 w-4" />
               Copy Email
-            </Button>
-            <Button
+            </TrackedButton>
+            <TrackedButton
               onClick={openEmailClient}
               className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white"
+              trackingLabel="Provider Request Modal - Open Email Client"
             >
               <Mail className="h-4 w-4" />
               Open in Email Client
-            </Button>
+            </TrackedButton>
           </div>
 
           <div className="flex justify-between pt-4 border-t">
-            <Button
+            <TrackedButton
               variant="outline"
               className="flex items-center gap-2"
               onClick={() => window.open(shareableUrl, '_blank')}
+              trackingLabel="Provider Request Modal - Preview Form"
             >
               <Eye className="h-4 w-4" />
               Preview Form
-            </Button>
-            <Button variant="outline" onClick={onClose}>
+            </TrackedButton>
+            <TrackedButton 
+              variant="outline" 
+              onClick={onClose}
+              trackingLabel="Provider Request Modal - Close Bottom"
+            >
               Close
-            </Button>
+            </TrackedButton>
           </div>
         </div>
       </DialogContent>

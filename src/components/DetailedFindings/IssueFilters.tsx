@@ -2,7 +2,7 @@
 import React from 'react';
 import { Filter, Search, Download } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { TrackedButton } from '@/components/TrackedButton';
 import {
   Select,
   SelectContent,
@@ -111,16 +111,17 @@ const IssueFilters: React.FC<IssueFiltersProps> = ({
           )}
         </div>
 
-        <Button 
+        <TrackedButton 
           onClick={onExportCSV}
           variant="green"
           size="sm"
           className="flex items-center gap-2"
           disabled={filteredIssuesCount === 0}
+          trackingLabel={`Export Issues List - ${filteredIssuesCount} issues`}
         >
           <Download className="h-4 w-4" />
           Export List
-        </Button>
+        </TrackedButton>
       </div>
     </div>
   );
