@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -96,14 +95,23 @@ export const useUserReport = () => {
     if (!user) throw new Error('User not authenticated');
 
     try {
+      console.log('Starting to save user report for user:', user.id);
+      
       // First, mark any existing reports as inactive
-      await supabase
+      console.log('Deactivating existing active reports...');
+      const { error: deactivateError } = await supabase
         .from('user_reports')
         .update({ is_active: false })
         .eq('user_id', user.id)
         .eq('is_active', true);
 
+      if (deactivateError) {
+        console.error('Error deactivating existing reports:', deactivateError);
+        throw deactivateError;
+      }
+
       // Create new active report
+      console.log('Creating new active report...');
       const insertData: UserReportInsert = {
         user_id: user.id,
         analysis_data: reportData.analysis_data as any,
@@ -125,14 +133,17 @@ export const useUserReport = () => {
         .single();
 
       if (insertError) {
+        console.error('Error inserting new report:', insertError);
         throw insertError;
       }
 
+      console.log('Successfully saved user report:', data.id);
       const convertedReport = convertRowToUserReport(data);
       setUserReport(convertedReport);
       return convertedReport;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to save user report';
+      console.error('Critical error saving to user_reports:', err);
       setError(errorMessage);
       throw new Error(errorMessage);
     }
