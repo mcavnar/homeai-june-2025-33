@@ -14,6 +14,16 @@ const SharedServiceProviders = () => {
     marketDifference: analysis?.costSummary?.marketDifference || 0,
   };
 
+  // Create placeholder service providers from analysis issues
+  const providers = analysis?.issues?.map((issue: any, index: number) => ({
+    id: index + 1,
+    serviceType: issue.category || 'General Repair',
+    company: `Service Provider ${index + 1}`,
+    frequency: 'As-needed',
+    monthlyCost: issue.estimatedCost ? Math.round(issue.estimatedCost / 12) : 0,
+    annualCost: issue.estimatedCost || 0,
+  })) || [];
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -27,9 +37,7 @@ const SharedServiceProviders = () => {
       <CostSummaryCards costSummary={costSummary} />
       
       <ServiceProvidersTable 
-        issues={analysis?.issues || []} 
-        propertyData={propertyData}
-        showRequestButtons={false}
+        providers={providers}
       />
     </div>
   );
