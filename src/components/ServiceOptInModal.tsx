@@ -10,14 +10,7 @@ import {
 import { TrackedButton } from '@/components/TrackedButton';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
-
-export type ServiceType = 
-  | 'recommended_providers'
-  | 'hvac_technicians'
-  | 'roofing_experts'
-  | 'plumbers'
-  | 'electricians'
-  | 'concierge_negotiation';
+import { ServiceType } from '@/hooks/useServiceOptIn';
 
 interface ServiceOptInModalProps {
   isOpen: boolean;

@@ -2,7 +2,14 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ServiceType } from '@/components/ServiceOptInModal';
+
+export type ServiceType = 
+  | 'recommended_providers'
+  | 'hvac_technicians'
+  | 'roofing_experts'
+  | 'plumbers'
+  | 'electricians'
+  | 'concierge_negotiation';
 
 interface ServiceConfig {
   title: string;

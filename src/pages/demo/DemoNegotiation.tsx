@@ -18,6 +18,7 @@ const DemoNegotiation = () => {
     openOptInModal,
     closeModal,
     confirmOptIn,
+    currentService,
     getCurrentServiceConfig
   } = useServiceOptIn();
 
@@ -60,11 +61,11 @@ const DemoNegotiation = () => {
         </CardContent>
       </Card>
 
-      {config && (
+      {config && currentService && (
         <ServiceOptInModal
           isOpen={isModalOpen}
           onClose={closeModal}
-          serviceType={getCurrentServiceConfig()?.columnName.replace('_opted_in_at', '') as any}
+          serviceType={currentService}
           title={config.title}
           description={config.description}
           onConfirm={confirmOptIn}

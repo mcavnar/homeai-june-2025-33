@@ -5,6 +5,7 @@ import { TrackedButton } from '@/components/TrackedButton';
 import { formatCurrency } from '@/utils/formatters';
 import { useServiceOptIn } from '@/hooks/useServiceOptIn';
 import ServiceOptInModal from '@/components/ServiceOptInModal';
+import { ServiceType } from '@/hooks/useServiceOptIn';
 
 interface SystemCardProps {
   title: string;
@@ -33,10 +34,11 @@ const SystemCard: React.FC<SystemCardProps> = ({
     openOptInModal,
     closeModal,
     confirmOptIn,
+    currentService,
     getCurrentServiceConfig
   } = useServiceOptIn();
 
-  const getServiceType = (type: string) => {
+  const getServiceType = (type: string): ServiceType => {
     switch (type) {
       case 'hvac':
         return 'hvac_technicians';
@@ -53,7 +55,7 @@ const SystemCard: React.FC<SystemCardProps> = ({
 
   const handleCTAClick = () => {
     const serviceType = getServiceType(ctaType);
-    openOptInModal(serviceType as any);
+    openOptInModal(serviceType);
   };
 
   const config = getCurrentServiceConfig();
@@ -102,11 +104,11 @@ const SystemCard: React.FC<SystemCardProps> = ({
         </CardContent>
       </Card>
 
-      {config && (
+      {config && currentService && (
         <ServiceOptInModal
           isOpen={isModalOpen}
           onClose={closeModal}
-          serviceType={getCurrentServiceConfig()?.columnName.replace('_opted_in_at', '') as any}
+          serviceType={currentService}
           title={config.title}
           description={config.description}
           onConfirm={confirmOptIn}
