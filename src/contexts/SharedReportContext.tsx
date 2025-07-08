@@ -40,18 +40,38 @@ export const SharedReportProvider: React.FC<SharedReportProviderProps> = ({ chil
         setIsLoading(true);
         setError(null);
 
-        const { data, error } = await supabase.functions.invoke('get-shared-report', {
+        console.log('Fetching shared report with token:', token);
+
+        const { data, error: invokeError } = await supabase.functions.invoke('get-shared-report', {
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ token })
         });
 
-        if (error) {
-          throw error;
+        console.log('Edge function response:', { data, invokeError });
+
+        // Check for network/invoke errors first
+        if (invokeError) {
+          console.error('Network/invoke error:', invokeError);
+          throw invokeError;
         }
 
-        setReportData(data);
+        // Check for application-level errors in the data response
+        if (data?.error) {
+          console.error('Application error from edge function:', data.error);
+          setError(data.error);
+          return;
+        }
+
+        // If we get here, the response should be successful
+        if (data) {
+          console.log('Successfully fetched shared report data');
+          setReportData(data);
+        } else {
+          console.error('No data received from edge function');
+          setError('No data received from server');
+        }
       } catch (err) {
         console.error('Error fetching shared report:', err);
         setError('Failed to load shared report');
