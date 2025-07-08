@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Token is required' }),
         { 
-          status: 400, 
+          status: 200, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Server configuration error' }),
         { 
-          status: 500, 
+          status: 200, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
@@ -47,6 +47,7 @@ Deno.serve(async (req) => {
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get the shared report by token
+    console.log('Querying shared_reports table with token:', token);
     const { data: sharedReport, error: shareError } = await supabaseClient
       .from('shared_reports')
       .select('*')
@@ -57,9 +58,9 @@ Deno.serve(async (req) => {
     if (shareError) {
       console.error('Error querying shared_reports:', shareError);
       return new Response(
-        JSON.stringify({ error: 'Database error' }),
+        JSON.stringify({ error: 'Database error while fetching shared report' }),
         { 
-          status: 500, 
+          status: 200, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
@@ -70,11 +71,13 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Share link not found or expired' }),
         { 
-          status: 404, 
+          status: 200, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
     }
+
+    console.log('Found shared report for user_id:', sharedReport.user_id);
 
     // Get the user's active report
     const { data: userReport, error: reportError } = await supabaseClient
@@ -87,9 +90,9 @@ Deno.serve(async (req) => {
     if (reportError) {
       console.error('Error querying user_reports:', reportError);
       return new Response(
-        JSON.stringify({ error: 'Database error' }),
+        JSON.stringify({ error: 'Database error while fetching user report' }),
         { 
-          status: 500, 
+          status: 200, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
@@ -100,11 +103,13 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Report not found' }),
         { 
-          status: 404, 
+          status: 200, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
     }
+
+    console.log('Successfully found user report, returning data');
 
     // Return the report data
     const responseData = {
@@ -130,7 +135,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { 
-        status: 500, 
+        status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     )

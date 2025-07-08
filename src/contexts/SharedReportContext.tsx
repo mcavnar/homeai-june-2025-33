@@ -54,7 +54,8 @@ export const SharedReportProvider: React.FC<SharedReportProviderProps> = ({ chil
         // Check for network/invoke errors first
         if (invokeError) {
           console.error('Network/invoke error:', invokeError);
-          throw invokeError;
+          setError('Network error occurred while fetching report');
+          return;
         }
 
         // Check for application-level errors in the data response
