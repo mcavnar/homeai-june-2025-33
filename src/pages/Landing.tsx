@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -119,9 +120,9 @@ const Landing = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <div className="bg-white rounded-2xl p-10 text-center shadow-sm border border-gray-100">
               <div className="text-6xl mb-8">😰</div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-6">15+ Page Reports</h3>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-6">40+ Page Reports</h3>
               <p className="text-gray-600 text-lg font-light leading-relaxed">
-                Dense technical jargon that leaves you more confused than when you started
+                We can translate and provide more context on technical jargon that might not make sense
               </p>
             </div>
 
