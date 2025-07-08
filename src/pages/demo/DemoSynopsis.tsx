@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import AtAGlance from '@/components/AtAGlance';
 import ModernStepper from '@/components/ModernStepper';
 import MostExpensiveIssues from '@/components/MostExpensiveIssues';
@@ -13,10 +14,15 @@ interface DemoSynopsisContextType {
 
 const DemoSynopsis = () => {
   const { analysis, propertyData } = useOutletContext<DemoSynopsisContextType>();
+  const navigate = useNavigate();
 
   const displayAddress = analysis.propertyInfo?.address 
     ? cleanAddressForDisplay(analysis.propertyInfo.address) 
     : undefined;
+
+  const handleUploadReport = () => {
+    navigate('/auth');
+  };
 
   return (
     <div className="space-y-6">
@@ -36,6 +42,17 @@ const DemoSynopsis = () => {
 
       {/* At a Glance Section */}
       <AtAGlance analysis={analysis} propertyData={propertyData} />
+
+      {/* Upload Report Button */}
+      <div className="flex justify-center">
+        <Button
+          onClick={handleUploadReport}
+          className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 text-lg font-medium shadow-lg"
+          size="lg"
+        >
+          Upload Your Report For Free
+        </Button>
+      </div>
 
       {/* Modern Stepper Next Steps */}
       <ModernStepper />
