@@ -1,9 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useUserReport } from '@/hooks/useUserReport';
 import { usePropertyData } from '@/hooks/usePropertyData';
 import { useNegotiationStrategy } from '@/hooks/useNegotiationStrategy';
+import { usePDFStorage } from '@/hooks/usePDFStorage';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import ResultsSidebar from '@/components/ResultsSidebar';
 import { Loader2 } from 'lucide-react';
@@ -20,6 +20,14 @@ const Results = () => {
     pdfText?: string;
   } | null;
   
+  // Use PDF storage hook to download PDF if not available from location state
+  const shouldDownloadPDF = !state?.pdfArrayBuffer && userReport?.pdf_file_path;
+  const { 
+    pdfArrayBuffer: storagePdfArrayBuffer, 
+    isLoading: isDownloadingPDF, 
+    error: pdfDownloadError 
+  } = usePDFStorage(shouldDownloadPDF ? userReport.pdf_file_path : undefined);
+
   const {
     propertyData,
     isLoadingProperty,
@@ -36,11 +44,13 @@ const Results = () => {
   } = useNegotiationStrategy(userReport?.analysis_data || null, propertyData);
 
   useEffect(() => {
-    // If coming from upload flow with state, use that ArrayBuffer
+    // Priority: location state PDF > storage PDF
     if (state?.pdfArrayBuffer) {
       setPdfArrayBuffer(state.pdfArrayBuffer);
+    } else if (storagePdfArrayBuffer) {
+      setPdfArrayBuffer(storagePdfArrayBuffer);
     }
-  }, [state]);
+  }, [state?.pdfArrayBuffer, storagePdfArrayBuffer]);
 
   useEffect(() => {
     if (!userReport) {
@@ -75,13 +85,15 @@ const Results = () => {
     }
   }, [userReport, propertyData, isLoadingProperty, fetchPropertyDetails, setPropertyDataFromDatabase, setNegotiationStrategyFromDatabase]);
 
-  // Show loading state while fetching user report
-  if (isLoadingReport) {
+  // Show loading state while fetching user report or downloading PDF
+  if (isLoadingReport || isDownloadingPDF) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="flex items-center gap-3">
           <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
-          <p className="text-gray-600">Loading your report...</p>
+          <p className="text-gray-600">
+            {isLoadingReport ? 'Loading your report...' : 'Loading PDF...'}
+          </p>
         </div>
       </div>
     );
@@ -99,6 +111,11 @@ const Results = () => {
     console.error('Error loading user report:', reportError);
     navigate('/upload');
     return null;
+  }
+
+  // Log PDF download error but don't block the page
+  if (pdfDownloadError) {
+    console.error('Error downloading PDF:', pdfDownloadError);
   }
 
   const contextValue = {

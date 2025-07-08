@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useOutletContext, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText } from 'lucide-react';
+import { FileText, Loader2 } from 'lucide-react';
 import PDFViewer from '@/components/PDFViewer';
 
 interface InspectionReportContextType {
@@ -38,9 +38,12 @@ const InspectionReport = () => {
 
         <Card>
           <CardContent className="text-center py-12">
-            <p className="text-gray-500">Original PDF is not available for viewing.</p>
-            <p className="text-gray-400 text-sm mt-2">
-              Please upload an inspection report to view it here.
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+              <p className="text-gray-600">Loading PDF...</p>
+            </div>
+            <p className="text-gray-400 text-sm">
+              If this continues loading, the PDF may not be available for viewing.
             </p>
           </CardContent>
         </Card>
