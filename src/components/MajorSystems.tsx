@@ -46,6 +46,14 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
       maintenanceTips: system.maintenanceTips || ['Regular inspection recommended'],
       ctaText: `See Local ${key.charAt(0).toUpperCase() + key.slice(1)} Experts`,
       ctaType: key.toLowerCase() as 'hvac' | 'roofing' | 'plumbing' | 'electrical',
+      // Pass detailed system information
+      age: system.age,
+      yearsLeft: system.yearsLeft,
+      brand: system.brand,
+      type: system.type,
+      replacementCost: system.replacementCost,
+      maintenanceCosts: system.maintenanceCosts,
+      anticipatedRepairs: system.anticipatedRepairs,
     };
   };
 

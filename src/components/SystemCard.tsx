@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { TrackedButton } from '@/components/TrackedButton';
 import { formatCurrency } from '@/utils/formatters';
 import { useServiceOptIn } from '@/hooks/useServiceOptIn';
@@ -19,6 +20,29 @@ interface SystemCardProps {
   maintenanceTips: string[];
   ctaText: string;
   ctaType: 'hvac' | 'roofing' | 'plumbing' | 'electrical';
+  // Additional props for detailed information
+  age?: string;
+  yearsLeft?: string;
+  brand?: string;
+  type?: string;
+  replacementCost?: {
+    min: number;
+    max: number;
+  };
+  maintenanceCosts?: {
+    fiveYear: {
+      min: number;
+      max: number;
+    };
+    tenYear: {
+      min: number;
+      max: number;
+    };
+  };
+  anticipatedRepairs?: {
+    fiveYear: string[];
+    tenYear: string[];
+  };
 }
 
 const SystemCard: React.FC<SystemCardProps> = ({
@@ -28,7 +52,14 @@ const SystemCard: React.FC<SystemCardProps> = ({
   repairCost,
   maintenanceTips,
   ctaText,
-  ctaType
+  ctaType,
+  age,
+  yearsLeft,
+  brand,
+  type,
+  replacementCost,
+  maintenanceCosts,
+  anticipatedRepairs
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -70,6 +101,9 @@ const SystemCard: React.FC<SystemCardProps> = ({
 
   const config = getCurrentServiceConfig();
 
+  // Check if we have detailed information to show
+  const hasDetailedInfo = age || yearsLeft || brand || type || replacementCost || maintenanceCosts || anticipatedRepairs;
+
   return (
     <>
       <Card className="border-gray-200">
@@ -94,7 +128,7 @@ const SystemCard: React.FC<SystemCardProps> = ({
             </p>
           </div>
           
-          <div className="mb-6">
+          <div className="mb-4">
             <h4 className="font-medium text-gray-900 mb-2">Maintenance Tips</h4>
             <ul className="list-disc list-inside space-y-1 text-gray-600">
               {maintenanceTips.map((tip, index) => (
@@ -102,6 +136,94 @@ const SystemCard: React.FC<SystemCardProps> = ({
               ))}
             </ul>
           </div>
+
+          {hasDetailedInfo && (
+            <div className="mb-4">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="details">
+                  <AccordionTrigger className="text-left hover:no-underline">
+                    <span className="font-medium text-gray-900">More Details</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-4">
+                    <div className="space-y-4">
+                      {/* System Specifications */}
+                      {(age || yearsLeft || brand || type) && (
+                        <div>
+                          <h5 className="font-medium text-gray-900 mb-2">System Specifications</h5>
+                          <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                            {age && <div><span className="font-medium">Age:</span> {age}</div>}
+                            {yearsLeft && <div><span className="font-medium">Years Left:</span> {yearsLeft}</div>}
+                            {brand && <div><span className="font-medium">Brand:</span> {brand}</div>}
+                            {type && <div><span className="font-medium">Type:</span> {type}</div>}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Replacement Costs */}
+                      {replacementCost && (
+                        <div>
+                          <h5 className="font-medium text-gray-900 mb-2">Replacement Costs</h5>
+                          <p className="text-sm text-gray-600">
+                            {formatCurrency(replacementCost.min)} - {formatCurrency(replacementCost.max)}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* 5-Year Projections */}
+                      {(maintenanceCosts?.fiveYear || anticipatedRepairs?.fiveYear) && (
+                        <div>
+                          <h5 className="font-medium text-gray-900 mb-2">5-Year Projections</h5>
+                          {maintenanceCosts?.fiveYear && (
+                            <div className="mb-2">
+                              <span className="text-sm font-medium text-gray-700">Maintenance Costs: </span>
+                              <span className="text-sm text-gray-600">
+                                {formatCurrency(maintenanceCosts.fiveYear.min)} - {formatCurrency(maintenanceCosts.fiveYear.max)}
+                              </span>
+                            </div>
+                          )}
+                          {anticipatedRepairs?.fiveYear && anticipatedRepairs.fiveYear.length > 0 && (
+                            <div>
+                              <span className="text-sm font-medium text-gray-700">Anticipated Repairs:</span>
+                              <ul className="list-disc list-inside mt-1 text-sm text-gray-600">
+                                {anticipatedRepairs.fiveYear.map((repair, index) => (
+                                  <li key={index}>{repair}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* 10-Year Projections */}
+                      {(maintenanceCosts?.tenYear || anticipatedRepairs?.tenYear) && (
+                        <div>
+                          <h5 className="font-medium text-gray-900 mb-2">10-Year Projections</h5>
+                          {maintenanceCosts?.tenYear && (
+                            <div className="mb-2">
+                              <span className="text-sm font-medium text-gray-700">Maintenance Costs: </span>
+                              <span className="text-sm text-gray-600">
+                                {formatCurrency(maintenanceCosts.tenYear.min)} - {formatCurrency(maintenanceCosts.tenYear.max)}
+                              </span>
+                            </div>
+                          )}
+                          {anticipatedRepairs?.tenYear && anticipatedRepairs.tenYear.length > 0 && (
+                            <div>
+                              <span className="text-sm font-medium text-gray-700">Anticipated Repairs:</span>
+                              <ul className="list-disc list-inside mt-1 text-sm text-gray-600">
+                                {anticipatedRepairs.tenYear.map((repair, index) => (
+                                  <li key={index}>{repair}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          )}
           
           <TrackedButton 
             variant="green" 
