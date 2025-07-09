@@ -120,9 +120,6 @@ const SystemCard: React.FC<SystemCardProps> = ({
   // Check if we have detailed information to show
   const hasDetailedInfo = description || repairCost || maintenanceTips || maintenanceCosts || anticipatedRepairs;
 
-  // Check if we have any system specifications to show
-  const hasSystemSpecs = brand || type || age || yearsLeft || replacementCost;
-
   return (
     <>
       <Card className="border-gray-200 h-full flex flex-col hover:shadow-lg transition-shadow duration-200">
@@ -141,58 +138,41 @@ const SystemCard: React.FC<SystemCardProps> = ({
             </span>
           </div>
           
-          {/* System Specifications */}
-          {hasSystemSpecs && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-100">
-              <h4 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">System Details</h4>
-              <div className="space-y-3">
-                {/* Brand - Full Width */}
-                {brand && (
-                  <div className="flex flex-col">
-                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Brand</span>
-                    <span className="text-sm text-gray-900 font-medium">{brand}</span>
-                  </div>
-                )}
+          {/* System Specifications - Always shown with fixed structure */}
+          <div className="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-100">
+            <h4 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">System Details</h4>
+            <div className="space-y-3">
+              {/* Type - Full Width - Always shown */}
+              <div className="flex flex-col">
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Type</span>
+                <span className="text-sm text-gray-900 font-medium">{type || '-'}</span>
+              </div>
+              
+              {/* Age and Years Left - Two Columns - Always shown */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Age</span>
+                  <span className="text-sm text-gray-900 font-medium">{age || '-'}</span>
+                </div>
                 
-                {/* Type - Full Width */}
-                {type && (
-                  <div className="flex flex-col">
-                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Type</span>
-                    <span className="text-sm text-gray-900 font-medium">{type}</span>
-                  </div>
-                )}
-                
-                {/* Age and Years Left - Two Columns */}
-                {(age || yearsLeft) && (
-                  <div className="grid grid-cols-2 gap-3">
-                    {age && (
-                      <div className="flex flex-col">
-                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Age</span>
-                        <span className="text-sm text-gray-900 font-medium">{age}</span>
-                      </div>
-                    )}
-                    
-                    {yearsLeft && (
-                      <div className="flex flex-col">
-                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Years Left</span>
-                        <span className="text-sm text-gray-900 font-medium">{yearsLeft}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                {/* Replacement Cost - Full Width */}
-                {replacementCost && (
-                  <div className="flex flex-col">
-                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Replacement Cost</span>
-                    <span className="text-sm text-gray-900 font-semibold">
-                      {formatCurrency(replacementCost.min)} - {formatCurrency(replacementCost.max)}
-                    </span>
-                  </div>
-                )}
+                <div className="flex flex-col">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Years Left</span>
+                  <span className="text-sm text-gray-900 font-medium">{yearsLeft || '-'}</span>
+                </div>
+              </div>
+              
+              {/* Replacement Cost - Full Width - Always shown */}
+              <div className="flex flex-col">
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Replacement Cost</span>
+                <span className="text-sm text-gray-900 font-semibold">
+                  {replacementCost ? 
+                    `${formatCurrency(replacementCost.min)} - ${formatCurrency(replacementCost.max)}` : 
+                    '-'
+                  }
+                </span>
               </div>
             </div>
-          )}
+          </div>
 
           {/* Flexible spacer to push content to bottom */}
           <div className="flex-grow"></div>
