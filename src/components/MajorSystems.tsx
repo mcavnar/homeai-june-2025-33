@@ -46,7 +46,6 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
       // Pass detailed system information
       age: system.age,
       yearsLeft: system.yearsLeft,
-      brand: system.brand,
       type: system.type,
       replacementCost: system.replacementCost,
       maintenanceCosts: system.maintenanceCosts,
@@ -62,14 +61,47 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
         tenYearTotal={totalCosts.tenYear}
       />
 
-      {/* Systems Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {Object.entries(systems).map(([key, system]) => (
-          <SystemCard
-            key={key}
-            {...mapSystemToCardProps(key, system)}
-          />
-        ))}
+      {/* Systems Grid - Structured Layout */}
+      <div className="space-y-6">
+        {/* Row 1: HVAC and Roof */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {systems.hvac && (
+            <SystemCard
+              {...mapSystemToCardProps('hvac', systems.hvac)}
+            />
+          )}
+          {systems.roof && (
+            <SystemCard
+              {...mapSystemToCardProps('roof', systems.roof)}
+              ctaType="roofing"
+            />
+          )}
+        </div>
+
+        {/* Row 2: Plumbing and Electrical */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {systems.plumbing && (
+            <SystemCard
+              {...mapSystemToCardProps('plumbing', systems.plumbing)}
+            />
+          )}
+          {systems.electrical && (
+            <SystemCard
+              {...mapSystemToCardProps('electrical', systems.electrical)}
+            />
+          )}
+        </div>
+
+        {/* Row 3: Foundation (Full Width) */}
+        <div className="grid grid-cols-1 gap-6">
+          {systems.foundation && (
+            <SystemCard
+              {...mapSystemToCardProps('foundation', systems.foundation)}
+              ctaType="recommended_providers"
+              ctaText="See Local Foundation Experts"
+            />
+          )}
+        </div>
       </div>
     </div>
   );
