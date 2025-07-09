@@ -8,6 +8,7 @@ import { formatCurrency } from '@/utils/formatters';
 import { useServiceOptIn } from '@/hooks/useServiceOptIn';
 import ServiceOptInModal from '@/components/ServiceOptInModal';
 import { ServiceType } from '@/hooks/useServiceOptIn';
+import { Wrench, Hammer, Droplets, Zap } from 'lucide-react';
 
 interface SystemCardProps {
   title: string;
@@ -89,6 +90,21 @@ const SystemCard: React.FC<SystemCardProps> = ({
     }
   };
 
+  const getServiceIcon = (type: string) => {
+    switch (type) {
+      case 'hvac':
+        return <Wrench className="h-4 w-4" />;
+      case 'roofing':
+        return <Hammer className="h-4 w-4" />;
+      case 'plumbing':
+        return <Droplets className="h-4 w-4" />;
+      case 'electrical':
+        return <Zap className="h-4 w-4" />;
+      default:
+        return null;
+    }
+  };
+
   const handleCTAClick = () => {
     if (isDemoMode) {
       navigate('/auth');
@@ -104,83 +120,99 @@ const SystemCard: React.FC<SystemCardProps> = ({
   // Check if we have detailed information to show
   const hasDetailedInfo = description || repairCost || maintenanceTips || maintenanceCosts || anticipatedRepairs;
 
+  // Check if we have any system specifications to show
+  const hasSystemSpecs = brand || type || age || yearsLeft || replacementCost;
+
   return (
     <>
-      <Card className="border-gray-200">
-        <CardContent className="p-6">
-          <div className="flex justify-between items-start mb-4">
-            <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-              status === 'Good' ? 'bg-green-100 text-green-800' :
-              status === 'Fair' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-red-100 text-red-800'
+      <Card className="border-gray-200 h-full flex flex-col hover:shadow-lg transition-shadow duration-200">
+        <CardContent className="p-6 flex flex-col h-full">
+          {/* Header Section */}
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
+            </div>
+            <span className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${
+              status === 'Good' ? 'bg-green-50 text-green-700 border-green-200' :
+              status === 'Fair' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+              'bg-red-50 text-red-700 border-red-200'
             }`}>
               {status}
             </span>
           </div>
           
-          {/* System Specifications in Main Card */}
-          <div className="space-y-3 mb-4">
-            {brand && (
-              <div>
-                <span className="font-medium text-gray-900">Brand: </span>
-                <span className="text-gray-600">{brand}</span>
+          {/* System Specifications Grid */}
+          {hasSystemSpecs && (
+            <div className="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-100">
+              <h4 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">System Details</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {brand && (
+                  <div className="flex flex-col">
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Brand</span>
+                    <span className="text-sm text-gray-900 font-medium">{brand}</span>
+                  </div>
+                )}
+                
+                {type && (
+                  <div className="flex flex-col">
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Type</span>
+                    <span className="text-sm text-gray-900 font-medium">{type}</span>
+                  </div>
+                )}
+                
+                {age && (
+                  <div className="flex flex-col">
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Age</span>
+                    <span className="text-sm text-gray-900 font-medium">{age}</span>
+                  </div>
+                )}
+                
+                {yearsLeft && (
+                  <div className="flex flex-col">
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Years Left</span>
+                    <span className="text-sm text-gray-900 font-medium">{yearsLeft}</span>
+                  </div>
+                )}
+                
+                {replacementCost && (
+                  <div className="flex flex-col sm:col-span-2">
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Replacement Cost</span>
+                    <span className="text-sm text-gray-900 font-semibold">
+                      {formatCurrency(replacementCost.min)} - {formatCurrency(replacementCost.max)}
+                    </span>
+                  </div>
+                )}
               </div>
-            )}
-            
-            {type && (
-              <div>
-                <span className="font-medium text-gray-900">Type: </span>
-                <span className="text-gray-600">{type}</span>
-              </div>
-            )}
-            
-            {age && (
-              <div>
-                <span className="font-medium text-gray-900">Age: </span>
-                <span className="text-gray-600">{age}</span>
-              </div>
-            )}
-            
-            {yearsLeft && (
-              <div>
-                <span className="font-medium text-gray-900">Years Left: </span>
-                <span className="text-gray-600">{yearsLeft}</span>
-              </div>
-            )}
-            
-            {replacementCost && (
-              <div>
-                <span className="font-medium text-gray-900">Replacement Cost: </span>
-                <span className="text-gray-600">
-                  {formatCurrency(replacementCost.min)} - {formatCurrency(replacementCost.max)}
-                </span>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
-          {hasDetailedInfo && (
-            <div className="mb-4">
+          {/* Flexible spacer to push content to bottom */}
+          <div className="flex-grow"></div>
+
+          {/* Bottom Section - Accordion and CTA */}
+          <div className="mt-auto space-y-4">
+            {/* More Details Accordion */}
+            {hasDetailedInfo && (
               <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="details">
-                  <AccordionTrigger className="text-left hover:no-underline">
-                    <span className="font-medium text-gray-900">More Details</span>
+                <AccordionItem value="details" className="border border-gray-200 rounded-lg">
+                  <AccordionTrigger className="px-4 py-3 hover:bg-gray-50 rounded-lg hover:no-underline transition-colors">
+                    <span className="font-medium text-gray-900 text-sm">More Details</span>
                   </AccordionTrigger>
-                  <AccordionContent className="pt-4">
-                    <div className="space-y-4">
+                  <AccordionContent className="px-4 pb-4">
+                    <div className="space-y-4 border-t border-gray-100 pt-4">
                       {/* Description */}
                       {description && (
                         <div>
-                          <h5 className="font-medium text-gray-900 mb-2">Overview</h5>
-                          <p className="text-gray-600 text-sm">{description}</p>
+                          <h5 className="font-semibold text-gray-900 mb-2 text-sm">Overview</h5>
+                          <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
                         </div>
                       )}
 
                       {/* Repair Costs */}
                       {repairCost && (
                         <div>
-                          <h5 className="font-medium text-gray-900 mb-2">Estimated Repair Costs</h5>
-                          <p className="text-sm text-gray-600">
+                          <h5 className="font-semibold text-gray-900 mb-2 text-sm">Estimated Repair Costs</h5>
+                          <p className="text-sm text-gray-900 font-medium">
                             {formatCurrency(repairCost.min)} - {formatCurrency(repairCost.max)}
                           </p>
                         </div>
@@ -189,10 +221,10 @@ const SystemCard: React.FC<SystemCardProps> = ({
                       {/* Maintenance Tips */}
                       {maintenanceTips && maintenanceTips.length > 0 && (
                         <div>
-                          <h5 className="font-medium text-gray-900 mb-2">Maintenance Tips</h5>
+                          <h5 className="font-semibold text-gray-900 mb-2 text-sm">Maintenance Tips</h5>
                           <ul className="list-disc list-inside space-y-1 text-gray-600">
                             {maintenanceTips.map((tip, index) => (
-                              <li key={index} className="text-sm">{tip}</li>
+                              <li key={index} className="text-sm leading-relaxed">{tip}</li>
                             ))}
                           </ul>
                         </div>
@@ -201,11 +233,11 @@ const SystemCard: React.FC<SystemCardProps> = ({
                       {/* 5-Year Projections */}
                       {(maintenanceCosts?.fiveYear || anticipatedRepairs?.fiveYear) && (
                         <div>
-                          <h5 className="font-medium text-gray-900 mb-2">5-Year Projections</h5>
+                          <h5 className="font-semibold text-gray-900 mb-2 text-sm">5-Year Projections</h5>
                           {maintenanceCosts?.fiveYear && (
                             <div className="mb-2">
                               <span className="text-sm font-medium text-gray-700">Maintenance Costs: </span>
-                              <span className="text-sm text-gray-600">
+                              <span className="text-sm text-gray-900 font-medium">
                                 {formatCurrency(maintenanceCosts.fiveYear.min)} - {formatCurrency(maintenanceCosts.fiveYear.max)}
                               </span>
                             </div>
@@ -215,7 +247,7 @@ const SystemCard: React.FC<SystemCardProps> = ({
                               <span className="text-sm font-medium text-gray-700">Anticipated Repairs:</span>
                               <ul className="list-disc list-inside mt-1 text-sm text-gray-600">
                                 {anticipatedRepairs.fiveYear.map((repair, index) => (
-                                  <li key={index}>{repair}</li>
+                                  <li key={index} className="leading-relaxed">{repair}</li>
                                 ))}
                               </ul>
                             </div>
@@ -226,11 +258,11 @@ const SystemCard: React.FC<SystemCardProps> = ({
                       {/* 10-Year Projections */}
                       {(maintenanceCosts?.tenYear || anticipatedRepairs?.tenYear) && (
                         <div>
-                          <h5 className="font-medium text-gray-900 mb-2">10-Year Projections</h5>
+                          <h5 className="font-semibold text-gray-900 mb-2 text-sm">10-Year Projections</h5>
                           {maintenanceCosts?.tenYear && (
                             <div className="mb-2">
                               <span className="text-sm font-medium text-gray-700">Maintenance Costs: </span>
-                              <span className="text-sm text-gray-600">
+                              <span className="text-sm text-gray-900 font-medium">
                                 {formatCurrency(maintenanceCosts.tenYear.min)} - {formatCurrency(maintenanceCosts.tenYear.max)}
                               </span>
                             </div>
@@ -240,7 +272,7 @@ const SystemCard: React.FC<SystemCardProps> = ({
                               <span className="text-sm font-medium text-gray-700">Anticipated Repairs:</span>
                               <ul className="list-disc list-inside mt-1 text-sm text-gray-600">
                                 {anticipatedRepairs.tenYear.map((repair, index) => (
-                                  <li key={index}>{repair}</li>
+                                  <li key={index} className="leading-relaxed">{repair}</li>
                                 ))}
                               </ul>
                             </div>
@@ -251,17 +283,21 @@ const SystemCard: React.FC<SystemCardProps> = ({
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
-            </div>
-          )}
-          
-          <TrackedButton 
-            variant="green" 
-            className="w-full"
-            onClick={handleCTAClick}
-            trackingLabel={ctaText}
-          >
-            {ctaText}
-          </TrackedButton>
+            )}
+            
+            {/* CTA Button */}
+            <TrackedButton 
+              variant="green" 
+              className="w-full shadow-md hover:shadow-lg transition-shadow duration-200"
+              onClick={handleCTAClick}
+              trackingLabel={ctaText}
+            >
+              <div className="flex items-center justify-center gap-2">
+                {getServiceIcon(ctaType)}
+                <span>{ctaText}</span>
+              </div>
+            </TrackedButton>
+          </div>
         </CardContent>
       </Card>
 
