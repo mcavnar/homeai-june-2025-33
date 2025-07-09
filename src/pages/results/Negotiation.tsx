@@ -86,7 +86,7 @@ const Negotiation = () => {
             Take the stress out of negotiations with our expert concierge service. Our experienced negotiation specialists will guide you through every step, help you craft compelling arguments, and ensure you maximize your leverage while maintaining positive relationships with all parties involved.
           </p>
           <TrackedButton 
-            variant="default" 
+            variant="green" 
             size="lg" 
             className="px-8"
             onClick={handleConciergeClick}

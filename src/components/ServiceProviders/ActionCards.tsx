@@ -19,7 +19,7 @@ const ActionCards: React.FC = () => {
               Generate a shareable form link to send to the seller or their agent. This will allow them to provide detailed information about all current service providers for this property.
             </p>
             <TrackedButton 
-              variant="default"
+              variant="green"
               size="lg"
               className="w-full"
               onClick={() => setIsFormModalOpen(true)}

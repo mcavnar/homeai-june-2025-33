@@ -94,7 +94,7 @@ const SystemCard: React.FC<SystemCardProps> = ({
           </div>
           
           <TrackedButton 
-            variant="default" 
+            variant="green" 
             className="w-full"
             onClick={handleCTAClick}
             trackingLabel={ctaText}
