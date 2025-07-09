@@ -13,11 +13,11 @@ interface SystemCardProps {
   title: string;
   status: string;
   description: string;
-  repairCost: {
+  repairCost?: {
     min: number;
     max: number;
   };
-  maintenanceTips: string[];
+  maintenanceTips?: string[];
   ctaText: string;
   ctaType: 'hvac' | 'roofing' | 'plumbing' | 'electrical';
   // Additional props for detailed information
@@ -102,7 +102,7 @@ const SystemCard: React.FC<SystemCardProps> = ({
   const config = getCurrentServiceConfig();
 
   // Check if we have detailed information to show
-  const hasDetailedInfo = age || yearsLeft || brand || type || replacementCost || maintenanceCosts || anticipatedRepairs;
+  const hasDetailedInfo = description || repairCost || maintenanceTips || maintenanceCosts || anticipatedRepairs;
 
   return (
     <>
@@ -119,22 +119,44 @@ const SystemCard: React.FC<SystemCardProps> = ({
             </span>
           </div>
           
-          <p className="text-gray-600 mb-4">{description}</p>
-          
-          <div className="mb-4">
-            <h4 className="font-medium text-gray-900 mb-2">Estimated Repair Costs</h4>
-            <p className="text-lg font-semibold text-gray-900">
-              {formatCurrency(repairCost.min)} - {formatCurrency(repairCost.max)}
-            </p>
-          </div>
-          
-          <div className="mb-4">
-            <h4 className="font-medium text-gray-900 mb-2">Maintenance Tips</h4>
-            <ul className="list-disc list-inside space-y-1 text-gray-600">
-              {maintenanceTips.map((tip, index) => (
-                <li key={index} className="text-sm">{tip}</li>
-              ))}
-            </ul>
+          {/* System Specifications in Main Card */}
+          <div className="space-y-3 mb-4">
+            {brand && (
+              <div>
+                <span className="font-medium text-gray-900">Brand: </span>
+                <span className="text-gray-600">{brand}</span>
+              </div>
+            )}
+            
+            {type && (
+              <div>
+                <span className="font-medium text-gray-900">Type: </span>
+                <span className="text-gray-600">{type}</span>
+              </div>
+            )}
+            
+            {age && (
+              <div>
+                <span className="font-medium text-gray-900">Age: </span>
+                <span className="text-gray-600">{age}</span>
+              </div>
+            )}
+            
+            {yearsLeft && (
+              <div>
+                <span className="font-medium text-gray-900">Years Left: </span>
+                <span className="text-gray-600">{yearsLeft}</span>
+              </div>
+            )}
+            
+            {replacementCost && (
+              <div>
+                <span className="font-medium text-gray-900">Replacement Cost: </span>
+                <span className="text-gray-600">
+                  {formatCurrency(replacementCost.min)} - {formatCurrency(replacementCost.max)}
+                </span>
+              </div>
+            )}
           </div>
 
           {hasDetailedInfo && (
@@ -146,26 +168,33 @@ const SystemCard: React.FC<SystemCardProps> = ({
                   </AccordionTrigger>
                   <AccordionContent className="pt-4">
                     <div className="space-y-4">
-                      {/* System Specifications */}
-                      {(age || yearsLeft || brand || type) && (
+                      {/* Description */}
+                      {description && (
                         <div>
-                          <h5 className="font-medium text-gray-900 mb-2">System Specifications</h5>
-                          <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                            {age && <div><span className="font-medium">Age:</span> {age}</div>}
-                            {yearsLeft && <div><span className="font-medium">Years Left:</span> {yearsLeft}</div>}
-                            {brand && <div><span className="font-medium">Brand:</span> {brand}</div>}
-                            {type && <div><span className="font-medium">Type:</span> {type}</div>}
-                          </div>
+                          <h5 className="font-medium text-gray-900 mb-2">Overview</h5>
+                          <p className="text-gray-600 text-sm">{description}</p>
                         </div>
                       )}
 
-                      {/* Replacement Costs */}
-                      {replacementCost && (
+                      {/* Repair Costs */}
+                      {repairCost && (
                         <div>
-                          <h5 className="font-medium text-gray-900 mb-2">Replacement Costs</h5>
+                          <h5 className="font-medium text-gray-900 mb-2">Estimated Repair Costs</h5>
                           <p className="text-sm text-gray-600">
-                            {formatCurrency(replacementCost.min)} - {formatCurrency(replacementCost.max)}
+                            {formatCurrency(repairCost.min)} - {formatCurrency(repairCost.max)}
                           </p>
+                        </div>
+                      )}
+
+                      {/* Maintenance Tips */}
+                      {maintenanceTips && maintenanceTips.length > 0 && (
+                        <div>
+                          <h5 className="font-medium text-gray-900 mb-2">Maintenance Tips</h5>
+                          <ul className="list-disc list-inside space-y-1 text-gray-600">
+                            {maintenanceTips.map((tip, index) => (
+                              <li key={index} className="text-sm">{tip}</li>
+                            ))}
+                          </ul>
                         </div>
                       )}
 

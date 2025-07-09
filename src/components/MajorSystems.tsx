@@ -38,12 +38,9 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
     return {
       title: system.name || key.charAt(0).toUpperCase() + key.slice(1),
       status: system.condition || 'Unknown',
-      description: system.summary || 'No details available',
-      repairCost: {
-        min: system.repairCost?.min || 0,
-        max: system.repairCost?.max || 5000,
-      },
-      maintenanceTips: system.maintenanceTips || ['Regular inspection recommended'],
+      description: system.summary,
+      repairCost: system.repairCost,
+      maintenanceTips: system.maintenanceTips,
       ctaText: `See Local ${key.charAt(0).toUpperCase() + key.slice(1)} Experts`,
       ctaType: key.toLowerCase() as 'hvac' | 'roofing' | 'plumbing' | 'electrical',
       // Pass detailed system information
