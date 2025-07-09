@@ -141,11 +141,12 @@ const SystemCard: React.FC<SystemCardProps> = ({
             </span>
           </div>
           
-          {/* System Specifications Grid */}
+          {/* System Specifications */}
           {hasSystemSpecs && (
             <div className="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-100">
               <h4 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">System Details</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-3">
+                {/* Brand - Full Width */}
                 {brand && (
                   <div className="flex flex-col">
                     <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Brand</span>
@@ -153,6 +154,7 @@ const SystemCard: React.FC<SystemCardProps> = ({
                   </div>
                 )}
                 
+                {/* Type - Full Width */}
                 {type && (
                   <div className="flex flex-col">
                     <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Type</span>
@@ -160,22 +162,28 @@ const SystemCard: React.FC<SystemCardProps> = ({
                   </div>
                 )}
                 
-                {age && (
-                  <div className="flex flex-col">
-                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Age</span>
-                    <span className="text-sm text-gray-900 font-medium">{age}</span>
+                {/* Age and Years Left - Two Columns */}
+                {(age || yearsLeft) && (
+                  <div className="grid grid-cols-2 gap-3">
+                    {age && (
+                      <div className="flex flex-col">
+                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Age</span>
+                        <span className="text-sm text-gray-900 font-medium">{age}</span>
+                      </div>
+                    )}
+                    
+                    {yearsLeft && (
+                      <div className="flex flex-col">
+                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Years Left</span>
+                        <span className="text-sm text-gray-900 font-medium">{yearsLeft}</span>
+                      </div>
+                    )}
                   </div>
                 )}
                 
-                {yearsLeft && (
-                  <div className="flex flex-col">
-                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Years Left</span>
-                    <span className="text-sm text-gray-900 font-medium">{yearsLeft}</span>
-                  </div>
-                )}
-                
+                {/* Replacement Cost - Full Width */}
                 {replacementCost && (
-                  <div className="flex flex-col sm:col-span-2">
+                  <div className="flex flex-col">
                     <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Replacement Cost</span>
                     <span className="text-sm text-gray-900 font-semibold">
                       {formatCurrency(replacementCost.min)} - {formatCurrency(replacementCost.max)}
