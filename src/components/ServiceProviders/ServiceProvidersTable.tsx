@@ -136,7 +136,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
           </div>
           <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
             <DialogTrigger asChild>
-              <Button variant="default" size="lg">
+              <Button variant="green" size="lg">
                 <Plus className="mr-2 h-4 w-4" />
                 Add Service Provider
               </Button>

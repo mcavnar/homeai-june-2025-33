@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import CostSummaryCards from '@/components/ServiceProviders/CostSummaryCards';
@@ -138,7 +137,7 @@ const ServiceProviders = () => {
             We find the right providers for your area based on our database of millions of service provider transactions. Our algorithm analyzes quality ratings, pricing, availability, and local market conditions to match you with the most qualified professionals in your neighborhood.
           </p>
           <TrackedButton 
-            variant="default" 
+            variant="green" 
             size="lg" 
             className="px-8"
             onClick={handleRecommendedProvidersClick}
