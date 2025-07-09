@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -51,6 +51,17 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
     notes: ''
   });
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isDemoMode = location.pathname.includes('/demo/');
+
+  const handleAddProviderClick = () => {
+    if (isDemoMode) {
+      navigate('/auth');
+      return;
+    }
+    setIsAddModalOpen(true);
+  };
 
   const toggleDetails = (providerId: number) => {
     setOpenDetails(openDetails === providerId ? null : providerId);
@@ -102,12 +113,10 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
     );
   };
 
-  // Helper function to determine if a provider is a placeholder (no rating)
   const isPlaceholderProvider = (provider: ServiceProvider) => {
     return provider.rating === undefined || provider.rating === null;
   };
 
-  // Helper function to format cost with "Est." for placeholders
   const formatProviderCost = (cost: number, isPlaceholder: boolean) => {
     if (cost === 0) return '-';
     const formattedCost = formatCurrency(cost);
@@ -134,9 +143,9 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
               We've analyzed your property and recommend the following service types. We've pre-populated the list with estimated costs for your area. You can add your own service providers or request information about existing providers from the seller.
             </p>
           </div>
-          <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+          <Dialog open={!isDemoMode && isAddModalOpen} onOpenChange={setIsAddModalOpen}>
             <DialogTrigger asChild>
-              <Button variant="green" size="lg">
+              <Button variant="green" size="lg" onClick={handleAddProviderClick}>
                 <Plus className="mr-2 h-4 w-4" />
                 Add Service Provider
               </Button>

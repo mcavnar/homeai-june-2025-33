@@ -1,11 +1,23 @@
 
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { TrackedButton } from '@/components/TrackedButton';
 import ProviderRequestFormModal from './ProviderRequestFormModal';
 
 const ActionCards: React.FC = () => {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isDemoMode = location.pathname.includes('/demo/');
+
+  const handleGenerateFormClick = () => {
+    if (isDemoMode) {
+      navigate('/auth');
+      return;
+    }
+    setIsFormModalOpen(true);
+  };
 
   return (
     <>
@@ -22,7 +34,7 @@ const ActionCards: React.FC = () => {
               variant="green"
               size="lg"
               className="w-full"
-              onClick={() => setIsFormModalOpen(true)}
+              onClick={handleGenerateFormClick}
               trackingLabel="Generate Provider Request Form"
             >
               Generate Provider Request Form
@@ -31,10 +43,12 @@ const ActionCards: React.FC = () => {
         </Card>
       </div>
 
-      <ProviderRequestFormModal 
-        isOpen={isFormModalOpen}
-        onClose={() => setIsFormModalOpen(false)}
-      />
+      {!isDemoMode && (
+        <ProviderRequestFormModal 
+          isOpen={isFormModalOpen}
+          onClose={() => setIsFormModalOpen(false)}
+        />
+      )}
     </>
   );
 };
