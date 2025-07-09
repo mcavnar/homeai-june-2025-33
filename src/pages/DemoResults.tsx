@@ -2,7 +2,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import ResultsSidebar from '@/components/ResultsSidebar';
+import DemoResultsSidebar from '@/components/DemoResultsSidebar';
 import { demoAnalysis, demoPropertyData, demoNegotiationStrategy } from '@/data/demoData';
 
 const DemoResults = () => {
@@ -24,7 +24,7 @@ const DemoResults = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-blue-50 to-indigo-100">
-        <ResultsSidebar />
+        <DemoResultsSidebar />
         
         <main className="flex-1 flex flex-col">
           <div className="flex-1 p-6">

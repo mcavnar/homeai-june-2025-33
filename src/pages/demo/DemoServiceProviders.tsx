@@ -1,13 +1,11 @@
 
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import CostSummaryCards from '@/components/ServiceProviders/CostSummaryCards';
 import ActionCards from '@/components/ServiceProviders/ActionCards';
 import ServiceProvidersTable from '@/components/ServiceProviders/ServiceProvidersTable';
 import { Card, CardContent } from '@/components/ui/card';
-import { TrackedButton } from '@/components/TrackedButton';
-import { useServiceOptIn } from '@/hooks/useServiceOptIn';
-import ServiceOptInModal from '@/components/ServiceOptInModal';
 
 interface DemoServiceProvidersContextType {
   analysis: any;
@@ -15,14 +13,7 @@ interface DemoServiceProvidersContextType {
 
 const DemoServiceProviders = () => {
   const { analysis } = useOutletContext<DemoServiceProvidersContextType>();
-  const {
-    isModalOpen,
-    openOptInModal,
-    closeModal,
-    confirmOptIn,
-    currentService,
-    getCurrentServiceConfig
-  } = useServiceOptIn();
+  const navigate = useNavigate();
 
   // Demo cost summary
   const costSummary = {
@@ -75,11 +66,9 @@ const DemoServiceProviders = () => {
     },
   ];
 
-  const handleRecommendedProvidersClick = () => {
-    openOptInModal('recommended_providers');
+  const handleUploadReport = () => {
+    navigate('/auth');
   };
-
-  const config = getCurrentServiceConfig();
 
   return (
     <div className="space-y-6">
@@ -93,40 +82,28 @@ const DemoServiceProviders = () => {
 
       <CostSummaryCards costSummary={costSummary} />
       
-      {/* See Our Recommended Providers Section */}
+      {/* Upload Report CTA Section */}
       <Card className="border-gray-200">
         <CardContent className="p-6 text-center">
           <h3 className="text-xl font-semibold text-gray-900 mb-4">
-            See Our Recommended Providers
+            Get Real Provider Recommendations
           </h3>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
-            We find the right providers for your area based on our database of millions of service provider transactions. Our algorithm analyzes quality ratings, pricing, availability, and local market conditions to match you with the most qualified professionals in your neighborhood.
+            Upload your actual inspection report to get personalized provider recommendations based on your specific property needs, location, and the issues identified in your inspection.
           </p>
-          <TrackedButton 
-            variant="default" 
+          <Button 
+            variant="green" 
             size="lg" 
-            className="px-8"
-            onClick={handleRecommendedProvidersClick}
-            trackingLabel="See Recommended Providers"
+            className="px-8 py-3 text-lg font-medium shadow-lg"
+            onClick={handleUploadReport}
           >
-            See Our Recommended Providers
-          </TrackedButton>
+            Upload Your Report For Free
+          </Button>
         </CardContent>
       </Card>
 
       <ActionCards />
       <ServiceProvidersTable providers={serviceProviders} />
-
-      {config && currentService && (
-        <ServiceOptInModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          serviceType={currentService}
-          title={config.title}
-          description={config.description}
-          onConfirm={confirmOptIn}
-        />
-      )}
     </div>
   );
 };

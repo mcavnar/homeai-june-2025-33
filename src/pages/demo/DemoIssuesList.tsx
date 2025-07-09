@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import DetailedFindings from '@/components/DetailedFindings';
 
 interface DemoIssuesListContextType {
@@ -9,6 +10,11 @@ interface DemoIssuesListContextType {
 
 const DemoIssuesList = () => {
   const { analysis } = useOutletContext<DemoIssuesListContextType>();
+  const navigate = useNavigate();
+
+  const handleUploadReport = () => {
+    navigate('/auth');
+  };
 
   return (
     <div className="space-y-6">
@@ -21,6 +27,18 @@ const DemoIssuesList = () => {
       </div>
 
       <DetailedFindings issues={analysis.issues} />
+
+      {/* Upload Report Button */}
+      <div className="flex justify-center">
+        <Button
+          onClick={handleUploadReport}
+          variant="green"
+          size="lg"
+          className="px-8 py-3 text-lg font-medium shadow-lg"
+        >
+          Upload Your Report For Free
+        </Button>
+      </div>
     </div>
   );
 };

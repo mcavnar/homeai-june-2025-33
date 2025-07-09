@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import MajorSystems from '@/components/MajorSystems';
 
 interface DemoKeySystemsContextType {
@@ -9,6 +10,11 @@ interface DemoKeySystemsContextType {
 
 const DemoKeySystems = () => {
   const { analysis } = useOutletContext<DemoKeySystemsContextType>();
+  const navigate = useNavigate();
+
+  const handleUploadReport = () => {
+    navigate('/auth');
+  };
 
   return (
     <div className="space-y-6">
@@ -21,6 +27,18 @@ const DemoKeySystems = () => {
       </div>
 
       <MajorSystems systems={analysis.majorSystems} />
+
+      {/* Upload Report Button */}
+      <div className="flex justify-center">
+        <Button
+          onClick={handleUploadReport}
+          variant="green"
+          size="lg"
+          className="px-8 py-3 text-lg font-medium shadow-lg"
+        >
+          Upload Your Report For Free
+        </Button>
+      </div>
     </div>
   );
 };

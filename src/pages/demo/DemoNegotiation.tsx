@@ -1,11 +1,9 @@
 
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import NegotiationStrategy from '@/components/NegotiationStrategy';
 import { Card, CardContent } from '@/components/ui/card';
-import { TrackedButton } from '@/components/TrackedButton';
-import { useServiceOptIn } from '@/hooks/useServiceOptIn';
-import ServiceOptInModal from '@/components/ServiceOptInModal';
 
 interface DemoNegotiationContextType {
   negotiationStrategy: any;
@@ -13,20 +11,11 @@ interface DemoNegotiationContextType {
 
 const DemoNegotiation = () => {
   const { negotiationStrategy } = useOutletContext<DemoNegotiationContextType>();
-  const {
-    isModalOpen,
-    openOptInModal,
-    closeModal,
-    confirmOptIn,
-    currentService,
-    getCurrentServiceConfig
-  } = useServiceOptIn();
+  const navigate = useNavigate();
 
-  const handleConciergeClick = () => {
-    openOptInModal('concierge_negotiation');
+  const handleUploadReport = () => {
+    navigate('/auth');
   };
-
-  const config = getCurrentServiceConfig();
 
   return (
     <div className="space-y-6">
@@ -40,37 +29,25 @@ const DemoNegotiation = () => {
 
       <NegotiationStrategy strategy={negotiationStrategy} />
 
-      {/* Get Concierge Negotiation Help Section */}
+      {/* Upload Report CTA Section */}
       <Card className="border-gray-200">
         <CardContent className="p-6 text-center">
           <h3 className="text-xl font-semibold text-gray-900 mb-4">
-            Get Concierge Negotiation Help
+            Get Your Personalized Negotiation Strategy
           </h3>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
-            Take the stress out of negotiations with our expert concierge service. Our experienced negotiation specialists will guide you through every step, help you craft compelling arguments, and ensure you maximize your leverage while maintaining positive relationships with all parties involved.
+            Upload your actual inspection report to receive a customized negotiation strategy based on your specific property issues, local market conditions, and proven negotiation tactics that maximize your leverage.
           </p>
-          <TrackedButton 
-            variant="default" 
+          <Button 
+            variant="green" 
             size="lg" 
-            className="px-8"
-            onClick={handleConciergeClick}
-            trackingLabel="Get Concierge Negotiation Help"
+            className="px-8 py-3 text-lg font-medium shadow-lg"
+            onClick={handleUploadReport}
           >
-            Get Concierge Negotiation Help
-          </TrackedButton>
+            Upload Your Report For Free
+          </Button>
         </CardContent>
       </Card>
-
-      {config && currentService && (
-        <ServiceOptInModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          serviceType={currentService}
-          title={config.title}
-          description={config.description}
-          onConfirm={confirmOptIn}
-        />
-      )}
     </div>
   );
 };
