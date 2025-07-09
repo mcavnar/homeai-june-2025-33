@@ -3,7 +3,7 @@ import React from 'react';
 import { Share, Handshake, Users, Settings, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { TrackedButton } from '@/components/TrackedButton';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 interface Step {
@@ -17,7 +17,10 @@ interface Step {
 
 const ModernStepper: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+  const isDemoMode = location.pathname.includes('/demo/');
+  const basePath = isDemoMode ? '/demo' : '/results';
 
   const steps: Step[] = [
     {
@@ -26,7 +29,7 @@ const ModernStepper: React.FC = () => {
       description: "Review every identified issue with detailed locations, priorities, and estimated repair costs",
       action: "Review Issues List",
       icon: AlertTriangle,
-      onClick: () => navigate('/results/issues')
+      onClick: () => navigate(`${basePath}/issues`)
     },
     {
       id: 2,
@@ -34,7 +37,7 @@ const ModernStepper: React.FC = () => {
       description: "Understand the condition and expected maintenance costs of the property's major systems (e.g. HVAC, electrical, etc.).",
       action: "See Key Systems",
       icon: Settings,
-      onClick: () => navigate('/results/systems')
+      onClick: () => navigate(`${basePath}/systems`)
     },
     {
       id: 3,
@@ -42,7 +45,7 @@ const ModernStepper: React.FC = () => {
       description: "Explore monthly service provider costs and connect with qualified area vendors.",
       action: "Get Service Providers",
       icon: Users,
-      onClick: () => navigate('/results/providers')
+      onClick: () => navigate(`${basePath}/providers`)
     },
     {
       id: 4,
@@ -50,7 +53,7 @@ const ModernStepper: React.FC = () => {
       description: "Receive strategic guidance on how to use your inspection findings in purchase negotiations",
       action: "Negotiate Effectively",
       icon: Handshake,
-      onClick: () => navigate('/results/negotiation')
+      onClick: () => navigate(`${basePath}/negotiation`)
     }
   ];
 
