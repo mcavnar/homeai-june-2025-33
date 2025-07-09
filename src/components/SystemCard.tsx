@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { TrackedButton } from '@/components/TrackedButton';
 import { formatCurrency } from '@/utils/formatters';
@@ -29,6 +30,10 @@ const SystemCard: React.FC<SystemCardProps> = ({
   ctaText,
   ctaType
 }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isDemoMode = location.pathname.includes('/demo/');
+
   const {
     isModalOpen,
     openOptInModal,
@@ -54,6 +59,11 @@ const SystemCard: React.FC<SystemCardProps> = ({
   };
 
   const handleCTAClick = () => {
+    if (isDemoMode) {
+      navigate('/auth');
+      return;
+    }
+
     const serviceType = getServiceType(ctaType);
     openOptInModal(serviceType);
   };
@@ -104,7 +114,7 @@ const SystemCard: React.FC<SystemCardProps> = ({
         </CardContent>
       </Card>
 
-      {config && currentService && (
+      {config && currentService && !isDemoMode && (
         <ServiceOptInModal
           isOpen={isModalOpen}
           onClose={closeModal}
