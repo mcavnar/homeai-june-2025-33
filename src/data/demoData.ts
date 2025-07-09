@@ -1,4 +1,3 @@
-
 import { HomeInspectionAnalysis } from '@/types/inspection';
 import { RedfinPropertyData } from '@/types/redfin';
 
@@ -81,6 +80,7 @@ export const demoAnalysis: HomeInspectionAnalysis = {
       age: "12 years",
       yearsLeft: "8-12 years",
       replacementCost: { min: 12000, max: 18000 },
+      repairCost: { min: 1500, max: 3500 },
       maintenanceCosts: {
         fiveYear: { min: 1500, max: 2500 },
         tenYear: { min: 3500, max: 5500 }
@@ -97,6 +97,7 @@ export const demoAnalysis: HomeInspectionAnalysis = {
       age: "18 years",
       yearsLeft: "5-8 years",
       replacementCost: { min: 3500, max: 6000 },
+      repairCost: { min: 800, max: 2200 },
       maintenanceCosts: {
         fiveYear: { min: 800, max: 1200 },
         tenYear: { min: 2000, max: 3500 }
@@ -113,6 +114,7 @@ export const demoAnalysis: HomeInspectionAnalysis = {
       age: "8 years",
       yearsLeft: "15-20 years",
       replacementCost: { min: 8000, max: 12000 },
+      repairCost: { min: 300, max: 800 },
       maintenanceCosts: {
         fiveYear: { min: 600, max: 1000 },
         tenYear: { min: 1500, max: 2500 }
@@ -130,6 +132,7 @@ export const demoAnalysis: HomeInspectionAnalysis = {
       age: "6 years",
       yearsLeft: "12-15 years",
       replacementCost: { min: 6000, max: 10000 },
+      repairCost: { min: 400, max: 1200 },
       maintenanceCosts: {
         fiveYear: { min: 1200, max: 1800 },
         tenYear: { min: 2800, max: 4200 }
@@ -146,6 +149,7 @@ export const demoAnalysis: HomeInspectionAnalysis = {
       age: "25 years",
       yearsLeft: "50+ years",
       replacementCost: { min: 25000, max: 40000 },
+      repairCost: { min: 200, max: 600 },
       maintenanceCosts: {
         fiveYear: { min: 500, max: 800 },
         tenYear: { min: 1200, max: 2000 }
