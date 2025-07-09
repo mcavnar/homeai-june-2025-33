@@ -29,7 +29,7 @@ const HeroSection = () => {
         </h1>
         
         <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
-          We translate your inspection report into accurate repair estimates, recommend trusted service pros, and help you negotiate smartly with data about your area.
+          We translate your inspection report into accurate repair estimates, recommend trusted service pros, and help you negotiate smartly with data about your area. You can delete your report at any time and the platform is entirely free to use.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
