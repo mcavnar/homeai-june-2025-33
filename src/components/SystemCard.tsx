@@ -21,7 +21,7 @@ interface SystemCardProps {
   };
   maintenanceTips?: string[];
   ctaText: string;
-  ctaType: 'hvac' | 'roofing' | 'plumbing' | 'electrical';
+  ctaType: 'hvac' | 'roofing' | 'plumbing' | 'electrical' | 'recommended_providers';
   // Additional props for detailed information
   age?: string;
   yearsLeft?: string;
@@ -84,6 +84,8 @@ const SystemCard: React.FC<SystemCardProps> = ({
         return 'plumbers';
       case 'electrical':
         return 'electricians';
+      case 'recommended_providers':
+        return 'recommended_providers';
       default:
         return 'recommended_providers';
     }

@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { TrackedButton } from '@/components/TrackedButton';
-import { Wrench, Hammer, Droplets, Zap } from 'lucide-react';
+import { Wrench, Hammer, Droplets, Zap, Users } from 'lucide-react';
 
 interface SystemCTAProps {
   ctaText: string;
-  ctaType: 'hvac' | 'roofing' | 'plumbing' | 'electrical';
+  ctaType: 'hvac' | 'roofing' | 'plumbing' | 'electrical' | 'recommended_providers';
   onClick: () => void;
 }
 
@@ -20,6 +20,8 @@ const SystemCTA: React.FC<SystemCTAProps> = ({ ctaText, ctaType, onClick }) => {
         return <Droplets className="h-4 w-4" />;
       case 'electrical':
         return <Zap className="h-4 w-4" />;
+      case 'recommended_providers':
+        return <Users className="h-4 w-4" />;
       default:
         return null;
     }
