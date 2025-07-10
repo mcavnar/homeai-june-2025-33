@@ -26,6 +26,38 @@ interface ConversionData {
   action_source: string;
 }
 
+// Helper function to extract client IP from request headers
+function getClientIP(request: Request): string | null {
+  // Try multiple header sources for client IP
+  const cfConnectingIP = request.headers.get('cf-connecting-ip');
+  const xForwardedFor = request.headers.get('x-forwarded-for');
+  const xRealIP = request.headers.get('x-real-ip');
+  const forwarded = request.headers.get('forwarded');
+  
+  if (cfConnectingIP) {
+    return cfConnectingIP;
+  }
+  
+  if (xForwardedFor) {
+    // X-Forwarded-For can contain multiple IPs, take the first one
+    return xForwardedFor.split(',')[0].trim();
+  }
+  
+  if (xRealIP) {
+    return xRealIP;
+  }
+  
+  if (forwarded) {
+    // Parse forwarded header format: for=ip
+    const match = forwarded.match(/for=([^;,]+)/);
+    if (match) {
+      return match[1].replace(/"/g, '');
+    }
+  }
+  
+  return null;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -34,6 +66,7 @@ serve(async (req) => {
   try {
     const metaPixelId = Deno.env.get('HOMEAI_META_PIXEL_ID');
     const metaAccessToken = Deno.env.get('HOMEAI_META_ACCESS_TOKEN');
+    const testEventCode = Deno.env.get('META_TEST_EVENT_CODE');
 
     if (!metaPixelId || !metaAccessToken) {
       console.error('Meta credentials not configured');
@@ -48,14 +81,22 @@ serve(async (req) => {
       eventId,
       userEmail,
       userAgent,
-      clientIp,
       value,
       currency = 'USD',
       contentName,
       eventSourceUrl
     } = await req.json();
 
-    console.log('Processing Meta conversion:', { eventName, eventId, hasEmail: !!userEmail });
+    // Extract client IP from request headers
+    const clientIp = getClientIP(req);
+
+    console.log('Processing Meta conversion:', { 
+      eventName, 
+      eventId, 
+      hasEmail: !!userEmail,
+      clientIp,
+      testEventCode: !!testEventCode
+    });
 
     // Hash email if provided (SHA-256)
     let hashedEmail;
@@ -89,28 +130,41 @@ serve(async (req) => {
       };
     }
 
-    // Send to Meta Conversions API
+    // Prepare request body for Meta API
+    const requestBody = {
+      data: [conversionData],
+      ...(testEventCode && { test_event_code: testEventCode })
+    };
+
+    console.log('Sending to Meta API:', JSON.stringify(requestBody, null, 2));
+
+    // Send to Meta Conversions API (updated to v20.0)
     const metaResponse = await fetch(
-      `https://graph.facebook.com/v18.0/${metaPixelId}/events`,
+      `https://graph.facebook.com/v20.0/${metaPixelId}/events`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${metaAccessToken}`,
         },
-        body: JSON.stringify({
-          data: [conversionData],
-          test_event_code: Deno.env.get('META_TEST_EVENT_CODE') // Optional for testing
-        }),
+        body: JSON.stringify(requestBody),
       }
     );
 
     const metaResult = await metaResponse.json();
 
+    console.log('Meta API Response Status:', metaResponse.status);
+    console.log('Meta API Response:', JSON.stringify(metaResult, null, 2));
+
     if (!metaResponse.ok) {
       console.error('Meta API error:', metaResult);
       return new Response(
-        JSON.stringify({ error: 'Meta API error', details: metaResult }),
+        JSON.stringify({ 
+          error: 'Meta API error', 
+          details: metaResult,
+          status: metaResponse.status,
+          requestSent: requestBody
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -121,7 +175,12 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         eventId,
-        metaResponse: metaResult 
+        metaResponse: metaResult,
+        debugInfo: {
+          clientIp,
+          hasTestEventCode: !!testEventCode,
+          apiVersion: 'v20.0'
+        }
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
