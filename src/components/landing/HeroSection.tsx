@@ -2,14 +2,22 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMetaConversions } from '@/hooks/useMetaConversions';
 import { TrackedButton } from '@/components/TrackedButton';
 import { Eye, Upload } from 'lucide-react';
 
 const HeroSection = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { trackConversion } = useMetaConversions();
 
-  const handleGetStarted = () => {
+  const handleGetStarted = async () => {
+    // Track upload button click
+    await trackConversion({
+      eventName: 'Lead',
+      contentName: 'Upload Report for Free Button'
+    });
+
     if (user) {
       navigate('/upload');
     } else {
@@ -17,7 +25,13 @@ const HeroSection = () => {
     }
   };
 
-  const handleViewDemo = () => {
+  const handleViewDemo = async () => {
+    // Track demo view click
+    await trackConversion({
+      eventName: 'ViewContent',
+      contentName: 'View Demo Report Button'
+    });
+
     navigate('/demo');
   };
 

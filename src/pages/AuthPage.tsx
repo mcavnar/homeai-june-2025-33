@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMetaConversions } from '@/hooks/useMetaConversions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,6 +15,7 @@ const AuthPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { user, signUp, signIn, signInWithGoogle, hasExistingReport } = useAuth();
+  const { trackConversion } = useMetaConversions();
   
   // Check if mode=signin is in URL params, otherwise default to signup
   const [isSignUp, setIsSignUp] = useState(searchParams.get('mode') !== 'signin');
@@ -54,8 +56,15 @@ const AuthPage = () => {
 
       if (error) {
         setError(error.message);
-      } else if (isSignUp) {
-        setError('Check your email for a confirmation link');
+      } else {
+        // Track successful registration for sign-up
+        if (isSignUp) {
+          await trackConversion({
+            eventName: 'CompleteRegistration',
+            contentName: 'Email Signup'
+          });
+          setError('Check your email for a confirmation link');
+        }
       }
     } catch (err) {
       setError('Something went wrong. Please try again.');
@@ -72,6 +81,12 @@ const AuthPage = () => {
       const { error } = await signInWithGoogle();
       if (error) {
         setError(error.message);
+      } else {
+        // Track successful Google registration
+        await trackConversion({
+          eventName: 'CompleteRegistration',
+          contentName: 'Google OAuth'
+        });
       }
     } catch (err) {
       setError('Google sign-in failed. Please try again.');

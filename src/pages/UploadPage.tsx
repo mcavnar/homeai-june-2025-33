@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMetaConversions } from '@/hooks/useMetaConversions';
 import FileUploadSection from '@/components/FileUploadSection';
 import ProcessingStatus from '@/components/ProcessingStatus';
 import { usePDFProcessor } from '@/hooks/usePDFProcessor';
@@ -9,6 +10,7 @@ import { usePDFProcessor } from '@/hooks/usePDFProcessor';
 const UploadPage = () => {
   const navigate = useNavigate();
   const { user, checkForExistingReport } = useAuth();
+  const { trackConversion } = useMetaConversions();
   
   const {
     file,
@@ -22,6 +24,17 @@ const UploadPage = () => {
     getEstimatedTimeRemaining,
   } = usePDFProcessor();
 
+  const handleFileSelectWithTracking = (selectedFile: File) => {
+    // Track the PDF upload started event
+    trackConversion({
+      eventName: 'AnalyzeReport',
+      contentName: 'PDF Upload Started'
+    });
+
+    // Call the original file select handler
+    handleFileSelect(selectedFile);
+  };
+
   const handleProcessPDF = async () => {
     if (!user) return;
     
@@ -30,6 +43,14 @@ const UploadPage = () => {
     console.log('Analysis result in UploadPage:', result);
     
     if (result) {
+      // Track analysis completion with repair cost value
+      const totalRepairCosts = result.analysis?.costSummary?.totalEstimatedCost || 0;
+      await trackConversion({
+        eventName: 'AnalysisComplete',
+        value: totalRepairCosts,
+        contentName: 'PDF Analysis Complete'
+      });
+
       // Update auth context to reflect that user now has a report
       await checkForExistingReport();
 
@@ -63,7 +84,7 @@ const UploadPage = () => {
           overallProgress={overallProgress}
           phaseMessage={getPhaseMessage()}
           error={error}
-          onFileSelect={handleFileSelect}
+          onFileSelect={handleFileSelectWithTracking}
           onProcess={handleProcessPDF}
           onReset={resetProcessor}
         />
