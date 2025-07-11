@@ -26,9 +26,9 @@ const HeroSection = () => {
   };
 
   const handleViewDemo = async () => {
-    // Track demo view click
+    // Track demo view click as Lead instead of ViewContent
     await trackConversion({
-      eventName: 'ViewContent',
+      eventName: 'Lead',
       contentName: 'View Demo Report Button'
     });
 
