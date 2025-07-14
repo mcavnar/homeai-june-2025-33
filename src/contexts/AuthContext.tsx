@@ -10,20 +10,12 @@ interface AuthContextType {
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
-  signOut: () => Promise<{ error: any }>;
-  checkForExistingReport: () => Promise<boolean>;
-  requestAccountDeletion: () => Promise<{ error: any }>;
+  signOut: () => Promise<void>;
+  checkForExistingReport: () => Promise<void>;
+  associateAnonymousData: (userId: string) => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -31,28 +23,79 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [hasExistingReport, setHasExistingReport] = useState<boolean | null>(null);
 
-  const checkForExistingReport = async (): Promise<boolean> => {
-    if (!user) return false;
+  const checkForExistingReport = async () => {
+    if (!user) {
+      setHasExistingReport(false);
+      return;
+    }
 
     try {
       const { data, error } = await supabase
         .from('user_reports')
-        .select('id')
+        .select('*')
         .eq('user_id', user.id)
         .eq('is_active', true)
         .maybeSingle();
 
       if (error) {
-        console.error('Error checking for existing report:', error);
-        return false;
+        console.error('Error fetching user report:', error);
+        setHasExistingReport(false);
+      } else {
+        setHasExistingReport(!!data);
       }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      setHasExistingReport(false);
+    }
+  };
 
-      const exists = !!data;
-      setHasExistingReport(exists);
-      return exists;
-    } catch (err) {
-      console.error('Error checking for existing report:', err);
-      return false;
+  // New function to associate anonymous data with authenticated user
+  const associateAnonymousData = async (userId: string) => {
+    try {
+      const storedData = sessionStorage.getItem('anonymousAnalysisData');
+      if (storedData) {
+        const data = JSON.parse(storedData);
+        
+        console.log('Associating anonymous data with user:', userId);
+        
+        // Save the analysis to user_reports table
+        const { data: reportData, error: saveError } = await supabase
+          .from('user_reports')
+          .insert({
+            user_id: userId,
+            analysis_data: data.analysis,
+            property_address: data.analysis?.propertyInfo?.address,
+            inspection_date: data.analysis?.propertyInfo?.inspectionDate,
+            pdf_text: data.pdfText,
+            pdf_metadata: {
+              sessionId: data.sessionId,
+              timestamp: data.timestamp
+            },
+            is_active: true,
+            processing_status: 'completed'
+          })
+          .select()
+          .single();
+
+        if (saveError) {
+          console.error('Error saving anonymous data:', saveError);
+          throw saveError;
+        }
+
+        console.log('Successfully associated anonymous data:', reportData?.id);
+        
+        // Clear the temporary storage
+        sessionStorage.removeItem('anonymousAnalysisData');
+        sessionStorage.removeItem('anonymousSessionId');
+        
+        // Update the hasExistingReport state
+        setHasExistingReport(true);
+        
+        return reportData;
+      }
+    } catch (error) {
+      console.error('Failed to associate anonymous data:', error);
+      throw error;
     }
   };
 
@@ -60,27 +103,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         
-        if (session?.user) {
-          // Check for existing report when user logs in
-          await checkForExistingReport();
-        } else {
+        // Handle successful authentication
+        if (event === 'SIGNED_IN' && session?.user) {
+          try {
+            // Try to associate any anonymous data
+            await associateAnonymousData(session.user.id);
+          } catch (error) {
+            console.error('Failed to associate anonymous data:', error);
+          }
+          
+          // Check for existing report
+          setTimeout(() => {
+            checkForExistingReport();
+          }, 100);
+        } else if (event === 'SIGNED_OUT') {
           setHasExistingReport(null);
         }
         
-        setLoading(false);
+        if (event !== 'INITIAL_SESSION') {
+          setLoading(false);
+        }
       }
     );
 
-    // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        await checkForExistingReport();
+        checkForExistingReport();
       }
       
       setLoading(false);
@@ -89,74 +145,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  // Update hasExistingReport when user changes
-  useEffect(() => {
-    if (user) {
-      checkForExistingReport();
-    } else {
-      setHasExistingReport(null);
-    }
-  }, [user]);
-
   const signUp = async (email: string, password: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl
-      }
-    });
-    return { error };
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+      });
+      if (error) throw error;
+      return { error: null };
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      return { error: error };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+      if (error) throw error;
+      return { error: null };
+    } catch (error: any) {
+      console.error('Signin error:', error);
+      return { error: error };
+    }
   };
 
   const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/upload`
-      }
-    });
-    return { error };
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      });
+      if (error) throw error;
+      return { error: null };
+    } catch (error: any) {
+      console.error('Google signin error:', error);
+      return { error: error };
+    }
   };
 
   const signOut = async () => {
-    // Clear session storage before signing out
-    sessionStorage.clear();
-    setHasExistingReport(null);
-    const { error } = await supabase.auth.signOut();
-    return { error };
-  };
-
-  const requestAccountDeletion = async () => {
-    if (!user) {
-      return { error: { message: 'No user logged in' } };
-    }
-
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ deletion_requested_at: new Date().toISOString() })
-        .eq('id', user.id);
-
-      if (error) {
-        console.error('Error requesting account deletion:', error);
-        return { error };
-      }
-
-      return { error: null };
-    } catch (err) {
-      console.error('Error requesting account deletion:', err);
-      return { error: err };
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Signout error:', error);
     }
   };
 
@@ -170,8 +204,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signInWithGoogle,
     signOut,
     checkForExistingReport,
-    requestAccountDeletion,
+    associateAnonymousData,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };
