@@ -99,20 +99,6 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
           )}
         </div>
 
-        {/* Analysis Info Banner */}
-        <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg">
-          <div className="flex items-start gap-3">
-            <Zap className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-            <div className="text-sm">
-              <p className="font-semibold text-blue-900 mb-1">Quick AI-Powered Analysis</p>
-              <p className="text-blue-800">
-                Our advanced AI will review your entire report in 1-2 minutes, identifying repair costs, 
-                safety issues, and negotiation opportunities you might have missed.
-              </p>
-            </div>
-          </div>
-        </div>
-
         {error && (
           <Alert className="mt-4" variant="destructive">
             <AlertCircle className="h-4 w-4" />
