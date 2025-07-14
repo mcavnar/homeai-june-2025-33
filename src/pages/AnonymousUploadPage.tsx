@@ -52,7 +52,7 @@ const AnonymousUploadPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="max-w-5xl mx-auto p-6 space-y-8">
+      <div className="max-w-4xl mx-auto p-6 space-y-8">
         
         {/* Value Proposition Header */}
         <ValuePropositionBanner />
@@ -61,32 +61,27 @@ const AnonymousUploadPage = () => {
         <ProcessSteps currentStep={1} />
 
         {/* Main Upload Section */}
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Upload Form - Takes up 2 columns */}
-          <div className="lg:col-span-2">
-            <FileUploadSection
-              file={file}
-              isProcessing={isProcessing}
-              overallProgress={overallProgress}
-              phaseMessage={getPhaseMessage()}
-              error={error}
-              onFileSelect={handleFileSelect}
-              onProcess={handleProcessPDF}
-              onReset={resetProcessor}
-            />
+        <div className="space-y-6">
+          <FileUploadSection
+            file={file}
+            isProcessing={isProcessing}
+            overallProgress={overallProgress}
+            phaseMessage={getPhaseMessage()}
+            error={error}
+            onFileSelect={handleFileSelect}
+            onProcess={handleProcessPDF}
+            onReset={resetProcessor}
+          />
 
-            <ProcessingStatus
-              isProcessing={isProcessing}
-              overallProgress={overallProgress}
-              phaseMessage={getPhaseMessage()}
-              estimatedTimeRemaining={getEstimatedTimeRemaining()}
-            />
-          </div>
+          <ProcessingStatus
+            isProcessing={isProcessing}
+            overallProgress={overallProgress}
+            phaseMessage={getPhaseMessage()}
+            estimatedTimeRemaining={getEstimatedTimeRemaining()}
+          />
 
-          {/* Trust Signals Sidebar - Takes up 1 column */}
-          <div className="lg:col-span-1">
-            <TrustSignals />
-          </div>
+          {/* Trust Signals Below Upload */}
+          <TrustSignals />
         </div>
 
         {/* Bottom "As Seen In" Section */}
