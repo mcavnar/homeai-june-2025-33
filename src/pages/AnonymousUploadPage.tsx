@@ -57,9 +57,6 @@ const AnonymousUploadPage = () => {
         {/* Value Proposition Header */}
         <ValuePropositionBanner />
 
-        {/* Process Steps */}
-        <ProcessSteps currentStep={1} />
-
         {/* Main Upload Section */}
         <div className="space-y-6">
           <FileUploadSection
@@ -72,6 +69,9 @@ const AnonymousUploadPage = () => {
             onProcess={handleProcessPDF}
             onReset={resetProcessor}
           />
+
+          {/* Process Steps - moved here after upload section */}
+          <ProcessSteps currentStep={1} />
 
           <ProcessingStatus
             isProcessing={isProcessing}
