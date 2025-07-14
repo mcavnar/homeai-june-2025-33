@@ -21,18 +21,6 @@ const TrustSignals = () => {
         </div>
       </div>
 
-      {/* Privacy Statement */}
-      <div className="text-center p-4 bg-gray-50 border border-gray-200 rounded-lg">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <Shield className="h-5 w-5 text-gray-600" />
-          <span className="font-semibold text-gray-800">Your Privacy Guaranteed</span>
-        </div>
-        <p className="text-sm text-gray-600">
-          Your report is completely private and will never be shared. We automatically delete all files after analysis. 
-          No spam, no calls - just your results.
-        </p>
-      </div>
-
       {/* Social Proof */}
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
