@@ -43,8 +43,8 @@ const AnonymousUploadPage = () => {
         sessionId: result.sessionId
       });
 
-      // Track analysis completion
-      const totalRepairCosts = result.analysis?.costSummary?.totalEstimatedCost || 0;
+      // Track analysis completion - use grandTotal.max instead of totalEstimatedCost
+      const totalRepairCosts = result.analysis?.costSummary?.grandTotal?.max || 0;
       await trackConversion({
         eventName: 'AnalysisComplete',
         value: totalRepairCosts,
