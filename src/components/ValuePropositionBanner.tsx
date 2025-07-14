@@ -6,7 +6,7 @@ const ValuePropositionBanner = () => {
   const benefits = [
     {
       icon: DollarSign,
-      text: "Instant repair costs",
+      text: "Accurate repair estimates",
       highlight: true
     },
     {
