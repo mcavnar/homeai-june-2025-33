@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
@@ -42,11 +43,11 @@ const AnonymousUploadPage = () => {
         sessionId: result.sessionId
       });
 
-      // Track analysis completion - use grandTotal.max instead of totalEstimatedCost
+      // Track analysis completion - use grandTotal.max as a number
       const totalRepairCosts = result.analysis?.costSummary?.grandTotal?.max || 0;
       await trackConversion({
         eventName: 'AnalysisComplete',
-        value: totalRepairCosts.toString(),
+        value: totalRepairCosts,
         contentName: 'Anonymous PDF Analysis Complete'
       });
 
