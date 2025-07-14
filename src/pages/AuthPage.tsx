@@ -1,8 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
+import { useGoogleAnalytics } from '@/hooks/useGoogleAnalytics';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +16,7 @@ const AuthPage = () => {
   const [searchParams] = useSearchParams();
   const { user, signUp, signIn, signInWithGoogle, hasExistingReport } = useAuth();
   const { trackConversion } = useMetaConversions();
+  const { trackEvent } = useGoogleAnalytics();
   
   // Check if mode=signin is in URL params, otherwise default to signup
   const [isSignUp, setIsSignUp] = useState(searchParams.get('mode') !== 'signin');
@@ -50,6 +51,15 @@ const AuthPage = () => {
     }
 
     try {
+      // Track Google Analytics event for email account creation
+      if (isSignUp) {
+        trackEvent('create_account_click', {
+          event_category: 'auth',
+          event_label: 'email_signup',
+          value: 1
+        });
+      }
+
       const { error } = isSignUp 
         ? await signUp(email, password)
         : await signIn(email, password);
@@ -78,6 +88,13 @@ const AuthPage = () => {
     setLoading(true);
 
     try {
+      // Track Google Analytics event
+      trackEvent('signup_google_click', {
+        event_category: 'auth',
+        event_label: 'google_oauth',
+        value: 1
+      });
+
       const { error } = await signInWithGoogle();
       if (error) {
         setError(error.message);

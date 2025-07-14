@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
+import { useGoogleAnalytics } from '@/hooks/useGoogleAnalytics';
 import { TrackedButton } from '@/components/TrackedButton';
 import { Eye, Upload } from 'lucide-react';
 
@@ -10,8 +11,16 @@ const HeroSection = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { trackConversion } = useMetaConversions();
+  const { trackEvent } = useGoogleAnalytics();
 
   const handleGetStarted = async () => {
+    // Track Google Analytics event
+    trackEvent('upload_report_free_click', {
+      event_category: 'engagement',
+      event_label: 'homepage',
+      value: 1
+    });
+
     // Track upload button click
     await trackConversion({
       eventName: 'Lead',
@@ -26,6 +35,13 @@ const HeroSection = () => {
   };
 
   const handleViewDemo = async () => {
+    // Track Google Analytics event
+    trackEvent('view_demo_report_click', {
+      event_category: 'engagement',
+      event_label: 'homepage',
+      value: 1
+    });
+
     // Track demo view click as Lead instead of ViewContent
     await trackConversion({
       eventName: 'Lead',
