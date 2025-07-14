@@ -54,47 +54,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // New function to associate anonymous data with authenticated user
   const associateAnonymousData = async (userId: string) => {
     try {
+      console.log('Looking for anonymous analysis data in sessionStorage');
       const storedData = sessionStorage.getItem('anonymousAnalysisData');
-      if (storedData) {
-        const data = JSON.parse(storedData);
-        
-        console.log('Associating anonymous data with user:', userId);
-        
-        // Save the analysis to user_reports table
-        const { data: reportData, error: saveError } = await supabase
-          .from('user_reports')
-          .insert({
-            user_id: userId,
-            analysis_data: data.analysis,
-            property_address: data.analysis?.propertyInfo?.address,
-            inspection_date: data.analysis?.propertyInfo?.inspectionDate,
-            pdf_text: data.pdfText,
-            pdf_metadata: {
-              sessionId: data.sessionId,
-              timestamp: data.timestamp
-            },
-            is_active: true,
-            processing_status: 'completed'
-          })
-          .select()
-          .single();
-
-        if (saveError) {
-          console.error('Error saving anonymous data:', saveError);
-          throw saveError;
-        }
-
-        console.log('Successfully associated anonymous data:', reportData?.id);
-        
-        // Clear the temporary storage
-        sessionStorage.removeItem('anonymousAnalysisData');
-        sessionStorage.removeItem('anonymousSessionId');
-        
-        // Update the hasExistingReport state
-        setHasExistingReport(true);
-        
-        return reportData;
+      
+      if (!storedData) {
+        console.log('No anonymous analysis data found in sessionStorage');
+        return null;
       }
+
+      const data = JSON.parse(storedData);
+      console.log('Found anonymous data to associate:', data);
+      
+      // Save the analysis to user_reports table
+      const { data: reportData, error: saveError } = await supabase
+        .from('user_reports')
+        .insert({
+          user_id: userId,
+          analysis_data: data.analysis,
+          property_address: data.analysis?.propertyInfo?.address,
+          inspection_date: data.analysis?.propertyInfo?.inspectionDate,
+          pdf_text: data.pdfText,
+          pdf_metadata: {
+            sessionId: data.sessionId,
+            timestamp: data.timestamp
+          },
+          is_active: true,
+          processing_status: 'completed'
+        })
+        .select()
+        .single();
+
+      if (saveError) {
+        console.error('Error saving anonymous data:', saveError);
+        throw saveError;
+      }
+
+      console.log('Successfully associated anonymous data:', reportData?.id);
+      
+      // Clear the temporary storage
+      sessionStorage.removeItem('anonymousAnalysisData');
+      sessionStorage.removeItem('anonymousSessionId');
+      
+      // Update the hasExistingReport state
+      setHasExistingReport(true);
+      
+      return reportData;
     } catch (error) {
       console.error('Failed to associate anonymous data:', error);
       throw error;
@@ -135,25 +139,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Handle successful authentication
         if (event === 'SIGNED_IN' && session?.user) {
-          try {
-            // Try to associate any anonymous data
-            const reportData = await associateAnonymousData(session.user.id);
-            
-            // If we successfully associated anonymous data, redirect to results
-            if (reportData) {
-              console.log('Redirecting to results after anonymous data association');
-              window.location.href = '/results/synopsis';
-              return;
+          console.log('User signed in, checking for anonymous data and existing reports');
+          
+          // Check if we have anonymous data to associate first
+          const anonymousData = sessionStorage.getItem('anonymousAnalysisData');
+          console.log('Anonymous data in storage:', !!anonymousData);
+          
+          if (anonymousData) {
+            try {
+              const reportData = await associateAnonymousData(session.user.id);
+              if (reportData) {
+                console.log('Successfully associated anonymous data, redirecting to results');
+                // Use setTimeout to ensure state updates are processed
+                setTimeout(() => {
+                  window.location.href = '/results/synopsis';
+                }, 100);
+                return;
+              }
+            } catch (error) {
+              console.error('Failed to associate anonymous data:', error);
             }
-          } catch (error) {
-            console.error('Failed to associate anonymous data:', error);
           }
           
-          // Check for existing report and redirect accordingly
+          // If no anonymous data, check for existing reports
           setTimeout(async () => {
-            await checkForExistingReport();
-            
-            // If user has an existing report, redirect to results
             const { data, error } = await supabase
               .from('user_reports')
               .select('*')
@@ -163,7 +172,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             
             if (!error && data) {
               console.log('User has existing report, redirecting to results');
+              setHasExistingReport(true);
               window.location.href = '/results/synopsis';
+            } else {
+              console.log('No existing report found');
+              setHasExistingReport(false);
             }
           }, 100);
         } else if (event === 'SIGNED_OUT') {

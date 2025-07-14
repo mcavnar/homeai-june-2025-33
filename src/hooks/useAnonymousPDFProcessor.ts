@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -176,6 +175,18 @@ export const useAnonymousPDFProcessor = () => {
         title: "Analysis complete!",
         description: `Processed ${extractionResult.pageCount} pages and generated comprehensive insights.`,
       });
+
+      // Store analysis data for anonymous users with consistent key name
+      const sessionData = {
+        analysis: analysisData,
+        pdfText: data.cleanedText || '',
+        address: analysisData.propertyInfo?.address,
+        sessionId: sessionId,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log('Storing anonymous analysis data:', sessionData);
+      sessionStorage.setItem('anonymousAnalysisData', JSON.stringify(sessionData));
 
       // Return the structured data
       return {
