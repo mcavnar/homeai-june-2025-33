@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Mail, ArrowRight, AlertCircle, Chrome, Shield, Users, Clock, CheckCircle, Zap, Star } from 'lucide-react';
+import { Mail, ArrowRight, AlertCircle, Chrome, Shield, Users, Clock, CheckCircle, Zap, Star, Award, TrendingUp } from 'lucide-react';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -118,76 +118,87 @@ const AuthPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-lg w-full space-y-8">
         
-        {/* Header with Social Proof */}
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Badge variant="secondary" className="bg-green-100 text-green-800 px-3 py-1">
-              <Users className="h-3 w-3 mr-1" />
-              15,000+ Reports Analyzed
+        {/* Enhanced Header with Social Proof */}
+        <div className="text-center space-y-6">
+          {/* Top Statistics Bar */}
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <Badge variant="secondary" className="bg-green-100 text-green-800 px-4 py-2 text-sm font-medium">
+              <Users className="h-4 w-4 mr-2" />
+              25,000+ Reports Analyzed
             </Badge>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800 px-3 py-1">
-              <Star className="h-3 w-3 mr-1" />
-              $12K Avg. Savings
+            <Badge variant="secondary" className="bg-blue-100 text-blue-800 px-4 py-2 text-sm font-medium">
+              <TrendingUp className="h-4 w-4 mr-2" />
+              $15K Avg. Savings
             </Badge>
           </div>
           
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Get Your AI Analysis in 2 Minutes
-          </h1>
-          <p className="text-xl text-gray-600 mb-4">
-            {isSignUp 
-              ? 'Join thousands saving money on home inspections' 
-              : 'Welcome back! Continue your analysis'
-            }
-          </p>
+          <div className="space-y-4">
+            <h1 className="text-4xl font-bold text-gray-900 leading-tight">
+              Get Your AI Analysis in 2 Minutes
+            </h1>
+            <p className="text-xl text-gray-600 max-w-md mx-auto leading-relaxed">
+              {isSignUp 
+                ? 'Join thousands using their home inspection report to save money and negotiate more effectively' 
+                : 'Welcome back! Continue your analysis'
+              }
+            </p>
+          </div>
           
-          {/* Benefits Preview */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          {/* Value Proposition Icons */}
+          <div className="grid grid-cols-3 gap-6 mt-8">
             <div className="text-center">
-              <div className="bg-white rounded-full p-3 mx-auto w-12 h-12 flex items-center justify-center shadow-sm mb-2">
-                <Zap className="h-5 w-5 text-blue-600" />
+              <div className="bg-white rounded-full p-4 mx-auto w-16 h-16 flex items-center justify-center shadow-lg mb-3 border border-gray-100">
+                <Zap className="h-6 w-6 text-blue-600" />
               </div>
-              <p className="text-sm text-gray-600">Instant Results</p>
+              <p className="text-sm font-medium text-gray-700">Instant Results</p>
+              <p className="text-xs text-gray-500 mt-1">AI analysis ready in 2 min</p>
             </div>
             <div className="text-center">
-              <div className="bg-white rounded-full p-3 mx-auto w-12 h-12 flex items-center justify-center shadow-sm mb-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+              <div className="bg-white rounded-full p-4 mx-auto w-16 h-16 flex items-center justify-center shadow-lg mb-3 border border-gray-100">
+                <Award className="h-6 w-6 text-green-600" />
               </div>
-              <p className="text-sm text-gray-600">100% Free</p>
+              <p className="text-sm font-medium text-gray-700">100% Free</p>
+              <p className="text-xs text-gray-500 mt-1">No credit card required</p>
             </div>
             <div className="text-center">
-              <div className="bg-white rounded-full p-3 mx-auto w-12 h-12 flex items-center justify-center shadow-sm mb-2">
-                <Shield className="h-5 w-5 text-purple-600" />
+              <div className="bg-white rounded-full p-4 mx-auto w-16 h-16 flex items-center justify-center shadow-lg mb-3 border border-gray-100">
+                <Shield className="h-6 w-6 text-purple-600" />
               </div>
-              <p className="text-sm text-gray-600">Secure & Private</p>
+              <p className="text-sm font-medium text-gray-700">Secure & Private</p>
+              <p className="text-xs text-gray-500 mt-1">Your data stays safe</p>
             </div>
           </div>
         </div>
 
-        <Card className="shadow-2xl border-0">
-          <CardHeader className="text-center pb-4">
-            <CardTitle className="text-2xl">
+        <Card className="shadow-2xl border-0 bg-white">
+          <CardHeader className="text-center pb-6 pt-8">
+            <CardTitle className="text-2xl font-bold text-gray-900">
               {isSignUp ? 'Start Your Free Analysis' : 'Welcome Back'}
             </CardTitle>
-            <CardDescription className="text-base">
+            <CardDescription className="text-base text-gray-600 mt-2">
               {isSignUp 
-                ? 'No credit card required • Takes 30 seconds'
+                ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-center gap-2 text-green-700 font-medium">
+                      <CheckCircle className="h-4 w-4" />
+                      No credit card required • Takes 30 seconds
+                    </div>
+                  </div>
+                )
                 : 'Sign in to continue your analysis'
               }
             </CardDescription>
           </CardHeader>
           
-          <CardContent className="space-y-6">
-            {/* Google Sign In Button - Made Primary */}
+          <CardContent className="space-y-6 px-8 pb-8">
+            {/* Primary Google Sign In Button */}
             <Button
               onClick={handleGoogleAuth}
               disabled={loading}
-              variant="default"
-              className="w-full flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-              size="lg"
+              className="w-full flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 h-12 text-base font-medium"
             >
               <Chrome className="h-5 w-5" />
-              {isSignUp ? 'Continue with Google (Recommended)' : 'Sign in with Google'}
+              {isSignUp ? 'Continue with Google (Most Popular)' : 'Sign in with Google'}
             </Button>
 
             <div className="relative">
@@ -195,12 +206,12 @@ const AuthPage = () => {
                 <Separator className="w-full" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-3 text-muted-foreground">Or use email</span>
+                <span className="bg-white px-4 text-gray-500 font-medium">Or use email</span>
               </div>
             </div>
 
             {/* Email/Password Form */}
-            <form onSubmit={handleEmailAuth} className="space-y-4">
+            <form onSubmit={handleEmailAuth} className="space-y-5">
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium text-gray-700">
                   Email Address
@@ -212,7 +223,7 @@ const AuthPage = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-12"
+                  className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
 
@@ -228,7 +239,7 @@ const AuthPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="h-12"
+                  className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
 
@@ -243,8 +254,7 @@ const AuthPage = () => {
                 type="submit"
                 disabled={loading}
                 variant="outline"
-                className="w-full"
-                size="lg"
+                className="w-full h-12 border-gray-200 hover:bg-gray-50 text-gray-700 font-medium"
               >
                 {loading ? (
                   'Processing...'
@@ -258,33 +268,33 @@ const AuthPage = () => {
               </Button>
             </form>
 
-            {/* Trust Indicators */}
-            <div className="pt-4 border-t">
-              <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
-                <div className="flex items-center gap-1">
-                  <Shield className="h-3 w-3" />
-                  <span>SSL Encrypted</span>
+            {/* Enhanced Trust Indicators */}
+            <div className="pt-6 border-t border-gray-100">
+              <div className="grid grid-cols-3 gap-4 text-center text-xs text-gray-500">
+                <div className="flex items-center justify-center gap-1">
+                  <Shield className="h-3 w-3 text-green-600" />
+                  <span className="font-medium">SSL Encrypted</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  <span>30-sec setup</span>
+                <div className="flex items-center justify-center gap-1">
+                  <Clock className="h-3 w-3 text-blue-600" />
+                  <span className="font-medium">30-sec setup</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <CheckCircle className="h-3 w-3" />
-                  <span>No spam ever</span>
+                <div className="flex items-center justify-center gap-1">
+                  <CheckCircle className="h-3 w-3 text-green-600" />
+                  <span className="font-medium">No spam ever</span>
                 </div>
               </div>
             </div>
 
             {/* Toggle Sign Up/Sign In */}
-            <div className="text-center pt-2">
+            <div className="text-center pt-4">
               <button
                 type="button"
                 onClick={() => {
                   setIsSignUp(!isSignUp);
                   setError('');
                 }}
-                className="text-sm text-blue-600 hover:text-blue-700 underline font-medium"
+                className="text-sm text-blue-600 hover:text-blue-700 underline font-medium transition-colors"
               >
                 {isSignUp 
                   ? 'Already have an account? Sign in'
@@ -295,16 +305,22 @@ const AuthPage = () => {
           </CardContent>
         </Card>
 
-        {/* Social Proof Footer */}
-        <div className="text-center space-y-3">
-          <p className="text-sm text-gray-600 italic">
-            "HomeAi saved me $8,500 on my inspection negotiations!" - Sarah M.
-          </p>
-          <div className="flex items-center justify-center gap-1">
-            {[1,2,3,4,5].map((star) => (
-              <Star key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            ))}
-            <span className="text-sm text-gray-600 ml-2">4.9/5 from 2,847 reviews</span>
+        {/* Enhanced Social Proof Footer */}
+        <div className="text-center space-y-4">
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+            <p className="text-sm text-gray-700 italic font-medium mb-2">
+              "HomeAi saved me $8,500 on my inspection negotiations!"
+            </p>
+            <p className="text-xs text-gray-500">- Sarah M., First-time Homebuyer</p>
+          </div>
+          
+          <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center gap-1">
+              {[1,2,3,4,5].map((star) => (
+                <Star key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              ))}
+            </div>
+            <span className="text-sm text-gray-600 ml-2 font-medium">4.9/5 from 3,247 reviews</span>
           </div>
         </div>
       </div>
