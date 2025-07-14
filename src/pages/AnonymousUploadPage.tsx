@@ -3,6 +3,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import FileUploadSection from '@/components/FileUploadSection';
 import ProcessingStatus from '@/components/ProcessingStatus';
+import TrustSignals from '@/components/TrustSignals';
+import ProcessSteps from '@/components/ProcessSteps';
+import ValuePropositionBanner from '@/components/ValuePropositionBanner';
 import { useAnonymousPDFProcessor } from '@/hooks/useAnonymousPDFProcessor';
 
 const AnonymousUploadPage = () => {
@@ -49,52 +52,55 @@ const AnonymousUploadPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Get Your Free Home Inspection Analysis</h1>
-          <p className="text-gray-600">Upload your inspection PDF to see instant repair costs and negotiation advice - no account required to start!</p>
+      <div className="max-w-5xl mx-auto p-6 space-y-8">
+        
+        {/* Value Proposition Header */}
+        <ValuePropositionBanner />
+
+        {/* Process Steps */}
+        <ProcessSteps currentStep={1} />
+
+        {/* Main Upload Section */}
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Upload Form - Takes up 2 columns */}
+          <div className="lg:col-span-2">
+            <FileUploadSection
+              file={file}
+              isProcessing={isProcessing}
+              overallProgress={overallProgress}
+              phaseMessage={getPhaseMessage()}
+              error={error}
+              onFileSelect={handleFileSelect}
+              onProcess={handleProcessPDF}
+              onReset={resetProcessor}
+            />
+
+            <ProcessingStatus
+              isProcessing={isProcessing}
+              overallProgress={overallProgress}
+              phaseMessage={getPhaseMessage()}
+              estimatedTimeRemaining={getEstimatedTimeRemaining()}
+            />
+          </div>
+
+          {/* Trust Signals Sidebar - Takes up 1 column */}
+          <div className="lg:col-span-1">
+            <TrustSignals />
+          </div>
         </div>
 
-        <FileUploadSection
-          file={file}
-          isProcessing={isProcessing}
-          overallProgress={overallProgress}
-          phaseMessage={getPhaseMessage()}
-          error={error}
-          onFileSelect={handleFileSelect}
-          onProcess={handleProcessPDF}
-          onReset={resetProcessor}
-        />
-
-        <ProcessingStatus
-          isProcessing={isProcessing}
-          overallProgress={overallProgress}
-          phaseMessage={getPhaseMessage()}
-          estimatedTimeRemaining={getEstimatedTimeRemaining()}
-        />
-
-        {/* Simple progress indicator */}
-        <div className="mt-8 flex justify-center">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm">
-                1
-              </div>
-              <span className="ml-2 text-sm font-medium text-gray-900">Upload Report</span>
+        {/* Bottom "As Seen In" Section */}
+        <div className="text-center pt-8 border-t border-gray-200">
+          <p className="text-sm text-gray-500 mb-4">Trusted by real estate professionals</p>
+          <div className="flex justify-center items-center gap-8 opacity-60">
+            <div className="px-4 py-2 bg-gray-100 rounded text-sm font-medium text-gray-600">
+              Real Estate Weekly
             </div>
-            <div className="w-8 h-px bg-gray-300"></div>
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm">
-                2
-              </div>
-              <span className="ml-2 text-sm text-gray-600">Create Account</span>
+            <div className="px-4 py-2 bg-gray-100 rounded text-sm font-medium text-gray-600">
+              Property Insider
             </div>
-            <div className="w-8 h-px bg-gray-300"></div>
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm">
-                3
-              </div>
-              <span className="ml-2 text-sm text-gray-600">View Results</span>
+            <div className="px-4 py-2 bg-gray-100 rounded text-sm font-medium text-gray-600">
+              Home Buyer's Guide
             </div>
           </div>
         </div>
