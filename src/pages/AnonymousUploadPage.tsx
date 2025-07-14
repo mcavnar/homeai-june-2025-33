@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
@@ -47,7 +46,7 @@ const AnonymousUploadPage = () => {
       const totalRepairCosts = result.analysis?.costSummary?.grandTotal?.max || 0;
       await trackConversion({
         eventName: 'AnalysisComplete',
-        value: totalRepairCosts,
+        value: totalRepairCosts.toString(),
         contentName: 'Anonymous PDF Analysis Complete'
       });
 
