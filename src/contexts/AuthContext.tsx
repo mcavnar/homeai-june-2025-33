@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -136,14 +137,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (event === 'SIGNED_IN' && session?.user) {
           try {
             // Try to associate any anonymous data
-            await associateAnonymousData(session.user.id);
+            const reportData = await associateAnonymousData(session.user.id);
+            
+            // If we successfully associated anonymous data, redirect to results
+            if (reportData) {
+              console.log('Redirecting to results after anonymous data association');
+              window.location.href = '/results/synopsis';
+              return;
+            }
           } catch (error) {
             console.error('Failed to associate anonymous data:', error);
           }
           
-          // Check for existing report
-          setTimeout(() => {
-            checkForExistingReport();
+          // Check for existing report and redirect accordingly
+          setTimeout(async () => {
+            await checkForExistingReport();
+            
+            // If user has an existing report, redirect to results
+            const { data, error } = await supabase
+              .from('user_reports')
+              .select('*')
+              .eq('user_id', session.user.id)
+              .eq('is_active', true)
+              .maybeSingle();
+            
+            if (!error && data) {
+              console.log('User has existing report, redirecting to results');
+              window.location.href = '/results/synopsis';
+            }
           }, 100);
         } else if (event === 'SIGNED_OUT') {
           setHasExistingReport(null);
@@ -175,6 +196,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.signUp({
         email: email,
         password: password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/results/synopsis`
+        }
       });
       if (error) throw error;
       return { error: null };
@@ -202,6 +226,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/results/synopsis`
+        }
       });
       if (error) throw error;
       return { error: null };
