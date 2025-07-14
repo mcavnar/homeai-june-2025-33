@@ -13,6 +13,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   checkForExistingReport: () => Promise<void>;
   associateAnonymousData: (userId: string) => Promise<any>;
+  requestAccountDeletion: () => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -96,6 +97,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Failed to associate anonymous data:', error);
       throw error;
+    }
+  };
+
+  const requestAccountDeletion = async () => {
+    if (!user) {
+      return { error: { message: 'No user found' } };
+    }
+
+    try {
+      // Update the user's profile to mark deletion as requested  
+      const { error } = await supabase
+        .from('profiles')
+        .update({ deletion_requested_at: new Date().toISOString() })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error requesting account deletion:', error);
+        return { error };
+      }
+
+      return { error: null };
+    } catch (error: any) {
+      console.error('Unexpected error requesting account deletion:', error);
+      return { error: error };
     }
   };
 
@@ -205,6 +230,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signOut,
     checkForExistingReport,
     associateAnonymousData,
+    requestAccountDeletion,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
