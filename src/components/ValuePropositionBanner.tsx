@@ -46,11 +46,6 @@ const ValuePropositionBanner = () => {
           </div>
         ))}
       </div>
-      
-      <p className="text-gray-600 mt-4 text-lg max-w-2xl mx-auto">
-        Upload your home inspection PDF to discover hidden costs and get expert negotiation strategies - 
-        all before you even create an account!
-      </p>
     </div>
   );
 };
