@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { DollarSign, MessageSquareText, Clock, CheckCircle } from 'lucide-react';
+import { DollarSign, MessageSquareText, CheckCircle } from 'lucide-react';
 
 const ValuePropositionBanner = () => {
   const benefits = [
@@ -15,13 +15,9 @@ const ValuePropositionBanner = () => {
       highlight: true
     },
     {
-      icon: Clock,
-      text: "No account required",
-      highlight: true
-    },
-    {
       icon: CheckCircle,
-      text: "100% free analysis"
+      text: "100% free analysis",
+      highlight: true
     }
   ];
 
