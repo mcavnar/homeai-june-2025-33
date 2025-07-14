@@ -42,8 +42,8 @@ const AnonymousUploadPage = () => {
         sessionId: result.sessionId
       });
 
-      // Track analysis completion - use grandTotal.max as a number
-      const totalRepairCosts = result.analysis?.costSummary?.grandTotal?.max || 0;
+      // Track analysis completion - ensure value is a number
+      const totalRepairCosts = Number(result.analysis?.costSummary?.grandTotal?.max || 0);
       await trackConversion({
         eventName: 'AnalysisComplete',
         value: totalRepairCosts,
