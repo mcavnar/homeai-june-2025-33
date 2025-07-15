@@ -259,7 +259,7 @@ const AnonymousUpload = () => {
         {/* Privacy Protection Box - Centered at Bottom */}
         <div className="flex justify-center mt-16 mb-8">
           <div className="bg-green-50 border border-green-200 rounded-lg p-6 max-w-2xl w-full">
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3 mb-3 justify-center text-center">
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                 <CheckCircle className="h-5 w-5 text-green-600" />
               </div>
