@@ -88,9 +88,6 @@ const AnonymousUpload = () => {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Upload Home Inspection Report
           </h1>
-          <p className="text-lg text-gray-600 max-w-4xl mx-auto">
-            Get AI-powered analysis with prioritized findings, accurate cost estimates, and negotiation guidance in minutes.
-          </p>
         </div>
 
         {/* Main Content - Two Column Layout */}
