@@ -1,19 +1,25 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useUserReport } from '@/hooks/useUserReport';
 import { usePropertyData } from '@/hooks/usePropertyData';
 import { useNegotiationStrategy } from '@/hooks/useNegotiationStrategy';
 import { usePDFStorage } from '@/hooks/usePDFStorage';
+import { useServerUserReport } from '@/hooks/useServerUserReport';
+import { useAuth } from '@/contexts/AuthContext';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import ResultsSidebar from '@/components/ResultsSidebar';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { userReport, isLoading: isLoadingReport, error: reportError } = useUserReport();
+  const { user } = useAuth();
+  const { userReport, isLoading: isLoadingReport, error: reportError, saveUserReport } = useUserReport();
+  const { saveUserReportViaServer } = useServerUserReport();
+  const { toast } = useToast();
   const [pdfArrayBuffer, setPdfArrayBuffer] = useState<ArrayBuffer | null>(null);
+  const [isProcessingOAuthData, setIsProcessingOAuthData] = useState(false);
   
   const state = location.state as { 
     analysis: any; 
@@ -43,6 +49,96 @@ const Results = () => {
     strategyError,
     setNegotiationStrategyFromDatabase,
   } = useNegotiationStrategy(userReport?.analysis_data || null, propertyData);
+
+  // Handle sessionStorage data from OAuth flow
+  useEffect(() => {
+    const handleOAuthData = async () => {
+      if (!user || userReport || isProcessingOAuthData) return;
+
+      // Check for stored data from OAuth flow
+      const storedData = sessionStorage.getItem('pendingAccountCreationData');
+      if (!storedData) return;
+
+      try {
+        setIsProcessingOAuthData(true);
+        const parsedData = JSON.parse(storedData);
+        
+        console.log('Found stored OAuth data:', parsedData);
+        
+        // Check if data is recent (within 10 minutes)
+        const isRecent = Date.now() - parsedData.timestamp < 600000;
+        if (!isRecent) {
+          console.log('Stored data is too old, clearing it');
+          sessionStorage.removeItem('pendingAccountCreationData');
+          return;
+        }
+
+        // Extract property address
+        const extractPropertyAddress = (analysisData: any): string | undefined => {
+          if (!analysisData) return undefined;
+
+          if (parsedData.address && typeof parsedData.address === 'string') {
+            return parsedData.address;
+          }
+
+          const possibleAddresses = [
+            analysisData?.propertyInfo?.address,
+            analysisData?.address,
+            analysisData?.property?.address,
+            analysisData?.propertyDetails?.address,
+            analysisData?.location?.address,
+          ];
+
+          for (const addr of possibleAddresses) {
+            if (addr && typeof addr === 'string' && addr.trim().length > 0) {
+              return addr;
+            }
+          }
+
+          return undefined;
+        };
+
+        const propertyAddress = extractPropertyAddress(parsedData.analysis);
+        
+        // Save the report using the stored data
+        const reportData = {
+          analysis_data: parsedData.analysis,
+          pdf_text: parsedData.pdfText,
+          property_address: propertyAddress,
+          inspection_date: parsedData.analysis?.propertyInfo?.inspectionDate || parsedData.analysis?.inspectionDate,
+          property_data: parsedData.propertyData,
+          negotiation_strategy: parsedData.negotiationStrategy,
+        };
+
+        console.log('Saving OAuth user report with data:', reportData);
+        await saveUserReportViaServer(reportData);
+        
+        // Clear stored data after successful save
+        sessionStorage.removeItem('pendingAccountCreationData');
+        
+        toast({
+          title: "Account created successfully!",
+          description: "Your inspection report has been saved to your account.",
+        });
+
+        // Force a refresh of the user report
+        window.location.reload();
+
+      } catch (error) {
+        console.error('Error processing OAuth data:', error);
+        sessionStorage.removeItem('pendingAccountCreationData');
+        toast({
+          title: "Error saving report",
+          description: "There was an issue saving your report. Please try uploading again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsProcessingOAuthData(false);
+      }
+    };
+
+    handleOAuthData();
+  }, [user, userReport, isProcessingOAuthData, saveUserReportViaServer, toast]);
 
   useEffect(() => {
     // Priority: location state PDF > storage PDF
@@ -154,14 +250,16 @@ const Results = () => {
     }
   }, [userReport, propertyData, isLoadingProperty, fetchPropertyDetails, setPropertyDataFromDatabase, setNegotiationStrategyFromDatabase]);
 
-  // Show loading state while fetching user report or downloading PDF
-  if (isLoadingReport || isDownloadingPDF) {
+  // Show loading state while fetching user report, downloading PDF, or processing OAuth data
+  if (isLoadingReport || isDownloadingPDF || isProcessingOAuthData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="flex items-center gap-3">
           <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
           <p className="text-gray-600">
-            {isLoadingReport ? 'Loading your report...' : 'Loading PDF...'}
+            {isLoadingReport ? 'Loading your report...' : 
+             isDownloadingPDF ? 'Loading PDF...' : 
+             'Setting up your account...'}
           </p>
         </div>
       </div>

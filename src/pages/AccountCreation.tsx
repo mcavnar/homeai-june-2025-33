@@ -109,6 +109,21 @@ const AccountCreation = () => {
     return undefined;
   };
 
+  const storeDataInSessionStorage = () => {
+    const storageData = {
+      analysis: analysisData,
+      pdfText,
+      propertyData,
+      negotiationStrategy,
+      address,
+      pdfArrayBuffer: null, // Can't store ArrayBuffer in sessionStorage
+      timestamp: Date.now()
+    };
+    
+    console.log('Storing data in sessionStorage for OAuth flow:', storageData);
+    sessionStorage.setItem('pendingAccountCreationData', JSON.stringify(storageData));
+  };
+
   const saveReportForUser = async () => {
     if (!analysisData) {
       throw new Error('Analysis data not found. Please upload your report again.');
@@ -151,18 +166,24 @@ const AccountCreation = () => {
     setIsCreatingAccount(true);
 
     try {
+      // Store data in sessionStorage before OAuth redirect
+      storeDataInSessionStorage();
+      
       console.log('Starting Google authentication with redirect to /results/synopsis');
       const { error } = await signInWithGoogle('/results/synopsis');
       
       if (error) {
         setAuthError(error.message);
+        // Clear stored data if OAuth fails
+        sessionStorage.removeItem('pendingAccountCreationData');
         return;
       }
 
-      // The rest will be handled by the useEffect that detects user change
+      // The rest will be handled by the Results component after OAuth redirect
     } catch (err) {
       console.error('Google auth error:', err);
       setAuthError('Google sign-in failed. Please try again.');
+      sessionStorage.removeItem('pendingAccountCreationData');
     } finally {
       setIsCreatingAccount(false);
     }
@@ -220,10 +241,10 @@ const AccountCreation = () => {
     }
   };
 
-  // Handle successful authentication (both Google and email)
+  // Handle successful authentication (email signup only - Google OAuth is handled in Results component)
   useEffect(() => {
-    if (user && !accountCreated && !isCreatingAccount) {
-      // This means authentication was successful, now save the report
+    if (user && !accountCreated && !isCreatingAccount && !location.state?.fromOAuth) {
+      // This means email authentication was successful, now save the report
       const handleSuccessfulAuth = async () => {
         try {
           setIsCreatingAccount(true);
