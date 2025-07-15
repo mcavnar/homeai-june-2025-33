@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserReport } from '@/hooks/useUserReport';
+import { useServerUserReport } from '@/hooks/useServerUserReport';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +14,7 @@ const AccountCreation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { signUp, signIn } = useAuth();
-  const { saveUserReport } = useUserReport();
+  const { saveUserReportViaServer } = useServerUserReport();
   const { trackConversion } = useMetaConversions();
   
   const [isSignUp, setIsSignUp] = useState(true);
@@ -29,96 +28,22 @@ const AccountCreation = () => {
   // Get the analysis data from location state
   const analysisData = location.state;
 
-  // Verify database session by testing a query that uses auth.uid()
-  const verifyDatabaseSession = async () => {
-    try {
-      // Try to query the profiles table with a condition that uses auth.uid()
-      // This will fail if auth.uid() is not available in the database context
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', 'test-non-existent-id')
-        .limit(1);
-      
-      // If we get here without an RLS error, the database session is working
-      // (even if no data is returned, that's fine - we're just testing auth context)
-      if (error && error.message?.includes('row-level security')) {
-        console.log('Database session not ready - RLS indicates no auth context');
-        return false;
-      }
-      
-      console.log('Database session test successful');
-      return true;
-    } catch (err) {
-      console.error('Database session test failed:', err);
-      return false;
-    }
-  };
-
-  // Wait for both client and database sessions to be ready
-  const waitForSession = async (maxRetries = 8, delay = 1000) => {
-    for (let i = 0; i < maxRetries; i++) {
-      try {
-        // Check client session
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error('Client session error:', error);
-          continue;
-        }
-        
-        if (session?.user?.id) {
-          console.log('Client session ready, user ID:', session.user.id);
-          
-          // Also verify database session
-          const dbSessionReady = await verifyDatabaseSession();
-          if (dbSessionReady) {
-            console.log('Both client and database sessions are ready');
-            return session;
-          } else {
-            console.log('Client session ready but database session not yet available');
-          }
-        } else {
-          console.log('Client session not ready');
-        }
-      } catch (err) {
-        console.error('Error checking session:', err);
-      }
-      
-      if (i < maxRetries - 1) {
-        console.log(`Session not fully ready, retrying in ${delay}ms... (attempt ${i + 1}/${maxRetries})`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-        delay = Math.min(delay * 1.2, 3000); // Exponential backoff with cap
-      }
-    }
-    throw new Error('Session not ready after maximum retries');
-  };
-
   const saveAnalysisData = async () => {
     if (!analysisData) return;
 
     setSavingReport(true);
     try {
-      // Wait for both client and database sessions to be fully established
-      console.log('Waiting for session to be ready...');
-      await waitForSession();
+      console.log('Saving analysis data via server...');
       
-      // Add a small additional delay to ensure session propagation
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Now try to save the report
-      console.log('Session ready, saving user report...');
-      await saveUserReport({
+      await saveUserReportViaServer({
         analysis_data: analysisData,
         property_address: analysisData.propertyInfo?.address,
         inspection_date: analysisData.propertyInfo?.inspectionDate
       });
-      console.log('Successfully saved user report to database');
+      
+      console.log('Successfully saved user report via server');
     } catch (saveError) {
-      console.error('Error saving user report:', saveError);
-      // Check if it's specifically an RLS error
-      if (saveError.message?.includes('row-level security policy')) {
-        throw new Error('Session not properly authenticated. Please refresh the page and try again.');
-      }
+      console.error('Error saving user report via server:', saveError);
       throw new Error('Failed to save report. Please try uploading again.');
     } finally {
       setSavingReport(false);
@@ -157,7 +82,7 @@ const AccountCreation = () => {
           contentName: 'Account Created from Anonymous Upload'
         });
 
-        // Save the analysis data to the user's database record
+        // Save the analysis data using the server-side function
         try {
           await saveAnalysisData();
         } catch (saveError) {
