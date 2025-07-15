@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserReport } from '@/hooks/useUserReport';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ const AccountCreation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { signUp, signIn } = useAuth();
+  const { saveUserReport } = useUserReport();
   const { trackConversion } = useMetaConversions();
   
   const [isSignUp, setIsSignUp] = useState(true);
@@ -21,6 +22,7 @@ const AccountCreation = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [savingReport, setSavingReport] = useState(false);
   const [error, setError] = useState('');
 
   // Get the analysis data from location state
@@ -58,11 +60,28 @@ const AccountCreation = () => {
           contentName: 'Account Created from Anonymous Upload'
         });
 
-        // Navigate to results with the analysis data
-        navigate('/results/synopsis', { 
-          state: analysisData,
-          replace: true
-        });
+        // Save the analysis data to the user's database record
+        if (analysisData) {
+          setSavingReport(true);
+          try {
+            await saveUserReport({
+              analysis_data: analysisData,
+              property_address: analysisData.propertyInfo?.address,
+              inspection_date: analysisData.propertyInfo?.inspectionDate
+            });
+            console.log('Successfully saved user report to database');
+          } catch (saveError) {
+            console.error('Error saving user report:', saveError);
+            setError('Account created but failed to save report. Please try uploading again.');
+            setSavingReport(false);
+            setLoading(false);
+            return;
+          }
+          setSavingReport(false);
+        }
+
+        // Navigate to results without passing state (data is now in database)
+        navigate('/results/synopsis', { replace: true });
 
       } else {
         const { error: signInError } = await signIn(email, password);
@@ -72,15 +91,33 @@ const AccountCreation = () => {
           return;
         }
 
+        // For existing users signing in, save the analysis data if provided
+        if (analysisData) {
+          setSavingReport(true);
+          try {
+            await saveUserReport({
+              analysis_data: analysisData,
+              property_address: analysisData.propertyInfo?.address,
+              inspection_date: analysisData.propertyInfo?.inspectionDate
+            });
+            console.log('Successfully saved user report to database');
+          } catch (saveError) {
+            console.error('Error saving user report:', saveError);
+            setError('Signed in but failed to save report. Please try uploading again.');
+            setSavingReport(false);
+            setLoading(false);
+            return;
+          }
+          setSavingReport(false);
+        }
+
         // Navigate to results
-        navigate('/results/synopsis', { 
-          state: analysisData,
-          replace: true
-        });
+        navigate('/results/synopsis', { replace: true });
       }
     } catch (err) {
       setError('An unexpected error occurred');
       setLoading(false);
+      setSavingReport(false);
     }
   };
 
@@ -255,12 +292,12 @@ const AccountCreation = () => {
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={loading}
+                    disabled={loading || savingReport}
                   >
-                    {loading ? (
+                    {loading || savingReport ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                        {savingReport ? 'Saving Your Report...' : (isSignUp ? 'Creating Account...' : 'Signing In...')}
                       </>
                     ) : (
                       <>
@@ -274,6 +311,7 @@ const AccountCreation = () => {
                       type="button"
                       onClick={() => setIsSignUp(!isSignUp)}
                       className="text-sm text-blue-600 hover:text-blue-800"
+                      disabled={loading || savingReport}
                     >
                       {isSignUp 
                         ? 'Already have an account? Sign in' 
