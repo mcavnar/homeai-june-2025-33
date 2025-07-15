@@ -8,11 +8,13 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   hasExistingReport: boolean | null;
+  isCheckingForReport: boolean;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: (redirectTo?: string) => Promise<{ error: any }>;
   signOut: () => Promise<{ error: any }>;
   checkForExistingReport: () => Promise<boolean>;
+  refreshExistingReportCheck: () => Promise<void>;
   requestAccountDeletion: () => Promise<{ error: any }>;
 }
 
@@ -31,9 +33,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasExistingReport, setHasExistingReport] = useState<boolean | null>(null);
+  const [isCheckingForReport, setIsCheckingForReport] = useState(false);
+
+  const checkForOAuthData = (): boolean => {
+    const storedData = sessionStorage.getItem('pendingAccountCreationData');
+    if (!storedData) return false;
+    
+    try {
+      const parsedData = JSON.parse(storedData);
+      const isRecent = Date.now() - parsedData.timestamp < 600000; // 10 minutes
+      return isRecent;
+    } catch (error) {
+      console.error('Error parsing OAuth data:', error);
+      sessionStorage.removeItem('pendingAccountCreationData');
+      return false;
+    }
+  };
 
   const checkForExistingReport = async (): Promise<boolean> => {
     if (!user) return false;
+
+    console.log('=== AUTH CONTEXT: CHECKING FOR EXISTING REPORT ===');
+    console.log('User ID:', user.id);
+    
+    // Check if there's pending OAuth data - if so, return true temporarily
+    const hasPendingOAuth = checkForOAuthData();
+    if (hasPendingOAuth) {
+      console.log('OAuth data pending, reporting hasExistingReport as true temporarily');
+      setHasExistingReport(true);
+      return true;
+    }
+
+    setIsCheckingForReport(true);
 
     try {
       const { data, error } = await supabase
@@ -45,15 +76,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error('Error checking for existing report:', error);
+        setIsCheckingForReport(false);
         return false;
       }
 
       const exists = !!data;
+      console.log('Report check result:', exists);
       setHasExistingReport(exists);
+      setIsCheckingForReport(false);
       return exists;
     } catch (err) {
       console.error('Error checking for existing report:', err);
+      setHasExistingReport(false);
+      setIsCheckingForReport(false);
       return false;
+    }
+  };
+
+  const refreshExistingReportCheck = async (): Promise<void> => {
+    console.log('=== AUTH CONTEXT: REFRESHING REPORT CHECK ===');
+    if (user) {
+      await checkForExistingReport();
     }
   };
 
@@ -61,6 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('=== AUTH STATE CHANGE ===', event);
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -69,6 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           await checkForExistingReport();
         } else {
           setHasExistingReport(null);
+          setIsCheckingForReport(false);
         }
         
         setLoading(false);
@@ -77,6 +122,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Check for existing session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      console.log('=== INITIAL SESSION CHECK ===', !!session);
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -96,6 +142,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       checkForExistingReport();
     } else {
       setHasExistingReport(null);
+      setIsCheckingForReport(false);
     }
   }, [user]);
 
@@ -134,6 +181,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Clear session storage before signing out
     sessionStorage.clear();
     setHasExistingReport(null);
+    setIsCheckingForReport(false);
     const { error } = await supabase.auth.signOut();
     return { error };
   };
@@ -166,11 +214,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     session,
     loading,
     hasExistingReport,
+    isCheckingForReport,
     signUp,
     signIn,
     signInWithGoogle,
     signOut,
     checkForExistingReport,
+    refreshExistingReportCheck,
     requestAccountDeletion,
   };
 
