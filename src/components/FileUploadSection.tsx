@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { Upload, FileText, Loader2, Zap, Shield, Star } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -53,22 +54,6 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
         <CardDescription className="text-base text-gray-600">
           Get your personalized analysis in under 2 minutes • PDF files up to 10MB
         </CardDescription>
-        
-        {/* Trust indicators */}
-        <div className="flex items-center justify-center gap-6 mt-4 text-sm text-gray-600">
-          <div className="flex items-center gap-1">
-            <Shield className="h-4 w-4 text-green-500" />
-            <span>Bank-level security</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <CheckCircle className="h-4 w-4 text-blue-500" />
-            <span>100% confidential</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <TrendingUp className="h-4 w-4 text-purple-500" />
-            <span>97% accuracy rate</span>
-          </div>
-        </div>
       </CardHeader>
       
       <CardContent>
