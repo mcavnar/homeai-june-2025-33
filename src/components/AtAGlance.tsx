@@ -14,33 +14,54 @@ interface AtAGlanceProps {
 }
 
 const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
-  const conditionResult = calculateConditionScore(analysis, propertyData);
   const totalRepairCost = analysis.costSummary?.grandTotal?.max || 0;
+  
+  // Check data availability for each card
+  const hasAnalysis = analysis && analysis.issues;
+  const hasPropertyData = propertyData && Object.keys(propertyData).length > 0;
+  const hasBothAnalysisAndProperty = hasAnalysis && hasPropertyData;
+  
+  // Calculate condition score only when both data sources are available
+  const conditionResult = hasBothAnalysisAndProperty 
+    ? calculateConditionScore(analysis, propertyData)
+    : null;
 
   return (
     <div className="space-y-6">
-      <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
-        <ConditionScoreCard 
-          score={conditionResult.score} 
-          rating={conditionResult.rating}
-          analysis={analysis}
-          propertyData={propertyData}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {/* Show condition score card only when both analysis and property data are available */}
+        {hasBothAnalysisAndProperty && conditionResult && (
+          <ConditionScoreCard 
+            score={conditionResult.score} 
+            rating={conditionResult.rating}
+            analysis={analysis}
+            propertyData={propertyData}
+          />
+        )}
         
-        <RepairCostsCard 
-          totalRepairCost={totalRepairCost}
-          analysis={analysis}
-        />
+        {/* Show repair costs card when analysis is available */}
+        {hasAnalysis && (
+          <RepairCostsCard 
+            totalRepairCost={totalRepairCost}
+            analysis={analysis}
+          />
+        )}
         
-        <IssuesFoundCard 
-          issues={analysis.issues || []} 
-        />
+        {/* Show issues found card when analysis is available */}
+        {hasAnalysis && (
+          <IssuesFoundCard 
+            issues={analysis.issues || []} 
+          />
+        )}
       </div>
       
-      <BottomLineSummary 
-        analysis={analysis} 
-        propertyData={propertyData} 
-      />
+      {/* Show bottom line summary only when both analysis and property data are available */}
+      {hasBothAnalysisAndProperty && (
+        <BottomLineSummary 
+          analysis={analysis} 
+          propertyData={propertyData} 
+        />
+      )}
     </div>
   );
 };
