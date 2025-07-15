@@ -1,6 +1,6 @@
 
 import React, { useRef } from 'react';
-import { Upload, FileText, Loader2, Clock, Zap, Shield, Star } from 'lucide-react';
+import { Upload, FileText, Loader2, Zap, Shield, Star } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -122,21 +122,6 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
               </div>
             </div>
           )}
-        </div>
-
-        {/* Enhanced Processing Time Notice */}
-        <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg">
-          <div className="flex items-start gap-3">
-            <Clock className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-            <div className="text-sm text-blue-800">
-              <p className="font-semibold mb-2">⚡ Lightning-fast AI analysis</p>
-              <p className="leading-relaxed">
-                Our advanced AI thoroughly analyzes your entire inspection report in 1-2 minutes, 
-                extracting critical findings, calculating precise repair costs, and generating 
-                actionable negotiation strategies. This normally takes professionals 3-5 hours.
-              </p>
-            </div>
-          </div>
         </div>
 
         {error && (
