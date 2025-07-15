@@ -1,337 +1,246 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useServerUserReport } from '@/hooks/useServerUserReport';
-import { useMetaConversions } from '@/hooks/useMetaConversions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle, FileText, Clock, Shield, TrendingUp, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const AccountCreation = () => {
-  const navigate = useNavigate();
   const location = useLocation();
-  const { signUp, signIn } = useAuth();
-  const { saveUserReportViaServer } = useServerUserReport();
-  const { trackConversion } = useMetaConversions();
+  const navigate = useNavigate();
+  const { user, signUp } = useAuth();
+  const { saveUserReportViaServer, isLoading, error } = useServerUserReport();
+  const { toast } = useToast();
   
-  const [isSignUp, setIsSignUp] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [savingReport, setSavingReport] = useState(false);
-  const [error, setError] = useState('');
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [accountCreated, setAccountCreated] = useState(false);
 
-  // Get the analysis data from location state
-  const analysisData = location.state;
+  // Get analysis data from location state
+  const analysisData = location.state?.analysisData;
+  const pdfArrayBuffer = location.state?.pdfArrayBuffer;
+  const pdfText = location.state?.pdfText;
 
-  const saveAnalysisData = async () => {
-    if (!analysisData) return;
+  useEffect(() => {
+    if (!analysisData) {
+      console.log('No analysis data found, redirecting to upload');
+      navigate('/upload');
+    }
+  }, [analysisData, navigate]);
 
-    setSavingReport(true);
+  const extractPropertyAddress = (analysisData: any): string | undefined => {
+    // Try multiple ways to extract the property address
+    if (analysisData.propertyInfo?.address) {
+      return analysisData.propertyInfo.address;
+    }
+    
+    if (analysisData.address) {
+      return analysisData.address;
+    }
+    
+    // Try to find address in the analysis data structure
+    if (analysisData.property?.address) {
+      return analysisData.property.address;
+    }
+    
+    return undefined;
+  };
+
+  const handleCreateAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (password !== confirmPassword) {
+      toast({
+        title: "Password mismatch",
+        description: "Please make sure your passwords match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!analysisData) {
+      toast({
+        title: "Missing data",
+        description: "Analysis data not found. Please upload your report again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsCreatingAccount(true);
+    
     try {
-      console.log('Saving analysis data via server...');
+      console.log('Creating account for:', email);
+      await signUp(email, password);
       
-      await saveUserReportViaServer({
+      // Wait a moment for the user to be fully created
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Extract property address from analysis data
+      const propertyAddress = extractPropertyAddress(analysisData);
+      console.log('Extracted property address:', propertyAddress);
+      
+      // Save the user report with proper property address
+      const reportData = {
         analysis_data: analysisData,
-        property_address: analysisData.propertyInfo?.address,
-        inspection_date: analysisData.propertyInfo?.inspectionDate
+        pdf_text: pdfText,
+        property_address: propertyAddress,
+        inspection_date: analysisData.propertyInfo?.inspectionDate,
+      };
+      
+      console.log('Saving user report with data:', {
+        hasAnalysisData: !!reportData.analysis_data,
+        propertyAddress: reportData.property_address,
+        inspectionDate: reportData.inspection_date,
       });
       
-      console.log('Successfully saved user report via server');
-    } catch (saveError) {
-      console.error('Error saving user report via server:', saveError);
-      throw new Error('Failed to save report. Please try uploading again.');
-    } finally {
-      setSavingReport(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      if (isSignUp) {
-        if (password !== confirmPassword) {
-          setError('Passwords do not match');
-          setLoading(false);
-          return;
-        }
-
-        if (password.length < 6) {
-          setError('Password must be at least 6 characters');
-          setLoading(false);
-          return;
-        }
-
-        const { error: signUpError } = await signUp(email, password);
-        if (signUpError) {
-          setError(signUpError.message);
-          setLoading(false);
-          return;
-        }
-
-        // Track account creation conversion
-        await trackConversion({
-          eventName: 'CompleteRegistration',
-          contentName: 'Account Created from Anonymous Upload'
+      await saveUserReportViaServer(reportData);
+      
+      setAccountCreated(true);
+      
+      toast({
+        title: "Account created successfully!",
+        description: "Your inspection report has been saved to your account.",
+      });
+      
+      // Navigate to results after a short delay
+      setTimeout(() => {
+        navigate('/results/synopsis', {
+          state: {
+            analysis: analysisData,
+            pdfArrayBuffer,
+            pdfText,
+          }
         });
-
-        // Save the analysis data using the server-side function
-        try {
-          await saveAnalysisData();
-        } catch (saveError) {
-          setError(saveError.message);
-          setLoading(false);
-          return;
-        }
-
-        // Navigate to results without passing state (data is now in database)
-        navigate('/results/synopsis', { replace: true });
-
-      } else {
-        const { error: signInError } = await signIn(email, password);
-        if (signInError) {
-          setError(signInError.message);
-          setLoading(false);
-          return;
-        }
-
-        // For existing users signing in, save the analysis data if provided
-        try {
-          await saveAnalysisData();
-        } catch (saveError) {
-          setError(`Signed in but ${saveError.message.toLowerCase()}`);
-          setLoading(false);
-          return;
-        }
-
-        // Navigate to results
-        navigate('/results/synopsis', { replace: true });
-      }
+      }, 2000);
+      
     } catch (err) {
-      setError('An unexpected error occurred');
-      setLoading(false);
-      setSavingReport(false);
+      console.error('Error creating account:', err);
+      toast({
+        title: "Account creation failed",
+        description: err instanceof Error ? err.message : "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingAccount(false);
     }
   };
 
-  const benefits = [
-    {
-      icon: <FileText className="h-5 w-5 text-blue-500" />,
-      title: "Save Your Report Forever",
-      description: "Access your detailed inspection analysis anytime, anywhere"
-    },
-    {
-      icon: <Clock className="h-5 w-5 text-green-500" />,
-      title: "Track Property Over Time",
-      description: "Compare multiple inspections and see property condition trends"
-    },
-    {
-      icon: <Shield className="h-5 w-5 text-purple-500" />,
-      title: "Secure & Private",
-      description: "Your data is encrypted and only accessible to you"
-    },
-    {
-      icon: <TrendingUp className="h-5 w-5 text-orange-500" />,
-      title: "Enhanced Analytics",
-      description: "Get deeper insights and personalized recommendations"
-    }
-  ];
+  if (!analysisData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+              <p className="text-gray-600">Loading...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (accountCreated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-4">
+              <CheckCircle className="h-12 w-12 text-green-500 mx-auto" />
+              <h2 className="text-xl font-semibold text-gray-900">Account Created!</h2>
+              <p className="text-gray-600">Redirecting to your inspection report...</p>
+              <div className="flex items-center justify-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                <span className="text-sm text-gray-500">Loading dashboard...</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="max-w-6xl mx-auto p-6">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Your Report is Ready! 🎉
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Create a free account to access your complete inspection analysis
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">Create Your Account</CardTitle>
+          <p className="text-gray-600 text-center">
+            Save your inspection report and access it anytime
           </p>
-        </div>
-
-        {/* Progress Indicator */}
-        <div className="mb-12 flex justify-center">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm">
-                ✓
-              </div>
-              <span className="ml-2 text-sm text-gray-600">Upload Complete</span>
+        </CardHeader>
+        
+        <CardContent>
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          
+          <form onSubmit={handleCreateAccount} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="your@email.com"
+              />
             </div>
-            <div className="w-8 h-px bg-gray-300"></div>
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm">
-                2
-              </div>
-              <span className="ml-2 text-sm font-medium text-gray-900">Create Account</span>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Enter password"
+              />
             </div>
-            <div className="w-8 h-px bg-gray-300"></div>
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm">
-                3
-              </div>
-              <span className="ml-2 text-sm text-gray-600">View Results</span>
+            
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                placeholder="Confirm password"
+              />
             </div>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Benefits Section */}
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Why Create an Account?
-              </h2>
-              <div className="space-y-4">
-                {benefits.map((benefit, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 mt-1">
-                      {benefit.icon}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{benefit.title}</h3>
-                      <p className="text-gray-600 text-sm">{benefit.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* What You Get Preview */}
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <h3 className="font-semibold text-gray-900 mb-3">
-                Your Report Includes:
-              </h3>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-sm text-gray-600">Executive Summary</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-sm text-gray-600">Detailed Issue Analysis</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-sm text-gray-600">Cost Estimates</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-sm text-gray-600">Negotiation Strategy</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-sm text-gray-600">System Evaluations</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Account Creation Form */}
-          <div>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-center">
-                  {isSignUp ? 'Create Your Free Account' : 'Sign In to Your Account'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter your password"
-                      required
-                    />
-                  </div>
-
-                  {isSignUp && (
-                    <div>
-                      <Label htmlFor="confirmPassword">Confirm Password</Label>
-                      <Input
-                        id="confirmPassword"
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm your password"
-                        required
-                      />
-                    </div>
-                  )}
-
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
-
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={loading || savingReport}
-                  >
-                    {loading || savingReport ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        {savingReport ? 'Saving Your Report...' : (isSignUp ? 'Creating Account...' : 'Signing In...')}
-                      </>
-                    ) : (
-                      <>
-                        {isSignUp ? 'Create Account & View Results' : 'Sign In & View Results'}
-                      </>
-                    )}
-                  </Button>
-
-                  <div className="text-center">
-                    <button
-                      type="button"
-                      onClick={() => setIsSignUp(!isSignUp)}
-                      className="text-sm text-blue-600 hover:text-blue-800"
-                      disabled={loading || savingReport}
-                    >
-                      {isSignUp 
-                        ? 'Already have an account? Sign in' 
-                        : 'Need an account? Sign up'
-                      }
-                    </button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-
-            {/* Trust Indicators */}
-            <div className="mt-6 text-center">
-              <p className="text-xs text-gray-500">
-                🔒 We never spam. Your data is secure and private.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+            
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isCreatingAccount || isLoading}
+            >
+              {isCreatingAccount || isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating Account...
+                </>
+              ) : (
+                'Create Account & Save Report'
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };

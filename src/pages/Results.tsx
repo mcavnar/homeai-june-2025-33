@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useUserReport } from '@/hooks/useUserReport';
@@ -52,6 +53,23 @@ const Results = () => {
     }
   }, [state?.pdfArrayBuffer, storagePdfArrayBuffer]);
 
+  // Helper function to extract property address from analysis data
+  const extractPropertyAddress = (analysisData: any): string | undefined => {
+    if (analysisData?.propertyInfo?.address) {
+      return analysisData.propertyInfo.address;
+    }
+    
+    if (analysisData?.address) {
+      return analysisData.address;
+    }
+    
+    if (analysisData?.property?.address) {
+      return analysisData.property.address;
+    }
+    
+    return undefined;
+  };
+
   useEffect(() => {
     if (!userReport) {
       console.log('UserReport not yet available, waiting...');
@@ -69,13 +87,22 @@ const Results = () => {
     if (userReport.property_data) {
       console.log('Loading existing property data from database');
       setPropertyDataFromDatabase(userReport.property_data as any);
-    } else if (userReport.property_address && !propertyData && !isLoadingProperty) {
-      // Only fetch if we don't have property data in database and aren't already loading
-      console.log('No property data in database, fetching from API for:', userReport.property_address);
-      // Add a small delay to ensure userReport state is fully settled
-      setTimeout(() => {
-        fetchPropertyDetails(userReport.property_address!);
-      }, 100);
+    } else {
+      // Try to get property address from user report or extract from analysis data
+      let propertyAddress = userReport.property_address;
+      
+      if (!propertyAddress && userReport.analysis_data) {
+        propertyAddress = extractPropertyAddress(userReport.analysis_data);
+        console.log('Extracted property address from analysis data:', propertyAddress);
+      }
+      
+      if (propertyAddress && !propertyData && !isLoadingProperty) {
+        console.log('No property data in database, fetching from API for:', propertyAddress);
+        // Add a small delay to ensure userReport state is fully settled
+        setTimeout(() => {
+          fetchPropertyDetails(propertyAddress);
+        }, 100);
+      }
     }
 
     // Load negotiation strategy from database if it exists
@@ -130,7 +157,15 @@ const Results = () => {
     pdfArrayBuffer: pdfArrayBuffer,
   };
 
-  console.log('Results context value pdfArrayBuffer:', contextValue.pdfArrayBuffer ? 'Available' : 'Not available');
+  console.log('Results context value:', {
+    hasAnalysis: !!contextValue.analysis,
+    hasPropertyData: !!contextValue.propertyData,
+    isLoadingProperty: contextValue.isLoadingProperty,
+    propertyError: contextValue.propertyError,
+    hasNegotiationStrategy: !!contextValue.negotiationStrategy,
+    isGeneratingStrategy: contextValue.isGeneratingStrategy,
+    pdfArrayBuffer: contextValue.pdfArrayBuffer ? 'Available' : 'Not available',
+  });
 
   return (
     <SidebarProvider>
