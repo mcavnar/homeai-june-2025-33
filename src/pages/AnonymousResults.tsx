@@ -69,6 +69,11 @@ const AnonymousResults = () => {
   const reportData = stateData || anonymousReport;
   const analysis = reportData?.analysis || reportData?.analysis_data;
 
+  const handleCreateAccount = () => {
+    // Navigate to auth page with context about converting from anonymous
+    window.location.href = '/auth?mode=signup';
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Save Account Banner */}
@@ -85,9 +90,10 @@ const AnonymousResults = () => {
               variant="outline" 
               size="sm" 
               className="bg-white text-blue-600 hover:bg-blue-50"
-              onClick={() => window.location.href = '/auth'}
+              onClick={handleCreateAccount}
             >
-              Create Account
+              <UserPlus className="h-4 w-4 mr-2" />
+              Save Report
             </Button>
           </div>
         </div>

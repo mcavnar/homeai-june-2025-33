@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -5,7 +6,7 @@ import { extractTextFromPDF } from '@/utils/pdfTextExtractor';
 import { HomeInspectionAnalysis } from '@/types/inspection';
 import { generateSessionId } from '@/utils/sessionUtils';
 
-type ProcessingPhase = 'extraction' | 'analysis' | 'saving' | 'complete';
+type ProcessingPhase = 'extraction' | 'analysis' | 'property' | 'negotiation' | 'saving' | 'complete';
 
 export const useAnonymousPDFProcessor = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -46,22 +47,15 @@ export const useAnonymousPDFProcessor = () => {
     });
   };
 
-  const simulateAIProgress = (textLength: number): Promise<void> => {
+  const simulateProgressFor = (phase: ProcessingPhase, startProgress: number, endProgress: number, duration: number): Promise<void> => {
     return new Promise((resolve) => {
-      const baseTime = 35; // 35 seconds for average case
-      const timeMultiplier = Math.min(Math.max(textLength / 5000, 0.8), 2.5);
-      const estimatedTime = baseTime * timeMultiplier * 1000;
-      
-      const startProgress = 25;
-      const endProgress = 85;
       const totalProgressRange = endProgress - startProgress;
-      
       const startTime = Date.now();
       const interval = 200;
       
       const progressInterval = setInterval(() => {
         const elapsed = Date.now() - startTime;
-        const progressRatio = Math.min(elapsed / estimatedTime, 1);
+        const progressRatio = Math.min(elapsed / duration, 1);
         
         const easedProgress = 1 - Math.pow(1 - progressRatio, 2);
         const currentProgress = startProgress + (totalProgressRange * easedProgress);
@@ -73,13 +67,64 @@ export const useAnonymousPDFProcessor = () => {
           resolve();
         }
       }, interval);
-      
-      setTimeout(() => {
-        clearInterval(progressInterval);
-        setOverallProgress(endProgress);
-        resolve();
-      }, 150000);
     });
+  };
+
+  const fetchPropertyData = async (address: string) => {
+    try {
+      console.log('Fetching property data for address:', address);
+      
+      const { data, error } = await supabase.functions.invoke('get-property-data', {
+        body: { address }
+      });
+
+      if (error) {
+        console.error('Property data fetch error:', error);
+        return null;
+      }
+
+      if (data && data.success) {
+        console.log('Property data fetched successfully');
+        return data.propertyData;
+      } else {
+        console.log('No property data found or fetch failed');
+        return null;
+      }
+    } catch (err) {
+      console.error('Error fetching property data:', err);
+      return null;
+    }
+  };
+
+  const generateNegotiationStrategy = async (analysisData: HomeInspectionAnalysis, propertyData: any) => {
+    try {
+      console.log('Generating negotiation strategy...');
+      
+      const { data, error } = await supabase.functions.invoke('generate-negotiation-strategy', {
+        body: {
+          analysis: analysisData,
+          propertyData: propertyData,
+          userEmail: null,
+          emailCaptureSource: 'anonymous-upload'
+        }
+      });
+
+      if (error) {
+        console.error('Negotiation strategy generation error:', error);
+        return null;
+      }
+
+      if (data && data.success) {
+        console.log('Negotiation strategy generated successfully');
+        return data.strategy;
+      } else {
+        console.log('Negotiation strategy generation failed');
+        return null;
+      }
+    } catch (err) {
+      console.error('Error generating negotiation strategy:', err);
+      return null;
+    }
   };
 
   const processPDF = async () => {
@@ -124,11 +169,6 @@ export const useAnonymousPDFProcessor = () => {
 
       if (uploadError) {
         console.error('PDF upload error:', uploadError);
-        console.log('Upload error details:', {
-          message: uploadError.message,
-          name: uploadError.name,
-          // Removed statusCode as it doesn't exist on StorageError
-        });
         // Continue without PDF storage - not critical for analysis
       } else {
         console.log('PDF uploaded successfully:', uploadData?.path);
@@ -144,7 +184,7 @@ export const useAnonymousPDFProcessor = () => {
       const extractionStartTime = Date.now();
       const extractionResult = await extractTextFromPDF(file, (progress) => {
         setExtractionProgress(progress);
-        setOverallProgress((progress / 100) * 25);
+        setOverallProgress((progress / 100) * 20);
       });
       const extractionEndTime = Date.now();
       console.log(`Text extraction completed in ${(extractionEndTime - extractionStartTime) / 1000} seconds`);
@@ -164,14 +204,12 @@ export const useAnonymousPDFProcessor = () => {
 
       console.log('Text extracted successfully:', {
         textLength: extractionResult.text.length,
-        pageCount: extractionResult.pageCount,
-        previewStart: extractionResult.text.substring(0, 100) + '...',
-        previewEnd: '...' + extractionResult.text.substring(extractionResult.text.length - 100)
+        pageCount: extractionResult.pageCount
       });
 
       // Transition to AI analysis phase
       setCurrentPhase('analysis');
-      setOverallProgress(25);
+      setOverallProgress(20);
 
       toast({
         title: "Analyzing with AI...",
@@ -179,7 +217,7 @@ export const useAnonymousPDFProcessor = () => {
       });
 
       // Start simulated progress for AI analysis
-      const aiProgressPromise = simulateAIProgress(extractionResult.text.length);
+      const aiProgressPromise = simulateProgressFor('analysis', 20, 50, 35000);
 
       // Prepare payload for the edge function
       const payload = { 
@@ -189,162 +227,129 @@ export const useAnonymousPDFProcessor = () => {
         emailCaptureSource: 'anonymous-upload'
       };
 
-      console.log('Calling process-pdf edge function with payload:', {
-        extractedTextLength: payload.extractedText.length,
-        userEmail: payload.userEmail,
-        userId: payload.userId,
-        emailCaptureSource: payload.emailCaptureSource,
-        extractedTextPreview: payload.extractedText.substring(0, 100) + '...'
-      });
-
-      // Log Supabase client status without accessing protected properties
-      console.log('Supabase client status check before function call:', {
-        // Using public getters or methods instead of protected properties
-        hasAuth: !!supabase.auth,
-        hasStorage: !!supabase.storage,
-        hasFunctions: !!supabase.functions
-      });
-
+      console.log('Calling process-pdf edge function...');
       const edgeFunctionStartTime = Date.now();
-      console.log('Edge function call initiated at:', new Date(edgeFunctionStartTime).toISOString());
-
-      // Try with error handling and timeout
-      let functionCallCompleted = false;
       
-      // Set a timeout to log if the function call takes too long
-      const timeoutId = setTimeout(() => {
-        if (!functionCallCompleted) {
-          console.warn('Edge function call taking longer than expected (20s)');
-        }
-      }, 20000);
+      const { data, error: functionError } = await supabase.functions.invoke('process-pdf', {
+        body: payload,
+      });
       
-      try {
-        const { data, error: functionError } = await supabase.functions.invoke('process-pdf', {
-          body: payload,
-        });
-        
-        functionCallCompleted = true;
-        clearTimeout(timeoutId);
-        
-        const edgeFunctionEndTime = Date.now();
-        console.log(`Edge function completed in ${(edgeFunctionEndTime - edgeFunctionStartTime) / 1000} seconds`);
-        
-        // Log the raw response to inspect its structure
-        console.log('Edge function raw response:', JSON.stringify(data));
+      const edgeFunctionEndTime = Date.now();
+      console.log(`Edge function completed in ${(edgeFunctionEndTime - edgeFunctionStartTime) / 1000} seconds`);
 
-        if (functionError) {
-          console.error('Edge function error:', {
-            message: functionError.message,
-            name: functionError.name,
-            details: functionError
-          });
-          throw new Error(functionError.message);
-        }
-
-        if (!data) {
-          console.error('Edge function returned no data');
-          throw new Error('No data returned from analysis');
-        }
-
-        if (!data.success) {
-          console.error('Analysis failed:', data.error || 'Unknown error');
-          throw new Error(data.error || 'Failed to analyze extracted text');
-        }
-
-        console.log('Analysis completed successfully');
-        console.log('Analysis response structure check:', {
-          hasAnalysis: !!data.analysis,
-          hasCleanedText: !!data.cleanedText,
-          extractedTextLength: data.extractedTextLength,
-          cleanedTextLength: data.cleanedTextLength
-        });
-
-        // Wait for simulated progress to complete even if real processing is faster
-        await aiProgressPromise;
-
-        // Transition to saving phase
-        setCurrentPhase('saving');
-        setOverallProgress(85);
-
-        const analysisData = data.analysis;
-        setAnalysis(analysisData);
-        setCleanedText(data.cleanedText || '');
-
-        // Progress to 95% during database save
-        setOverallProgress(95);
-
-        // Save to anonymous_reports table using the unique session ID
-        console.log('Saving report to anonymous_reports table with unique session ID:', uniqueSessionId);
-        const dbSaveStartTime = Date.now();
-        
-        const { data: reportData, error: saveError } = await supabase.from('anonymous_reports').insert({
-          session_id: uniqueSessionId,
-          analysis_data: analysisData,
-          property_address: analysisData.propertyInfo?.address,
-          inspection_date: analysisData.propertyInfo?.inspectionDate,
-          pdf_file_path: uploadError ? null : fileName,
-          pdf_text: data.cleanedText,
-          pdf_metadata: {
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            pageCount: extractionResult.pageCount
-          }
-        }).select().single();
-
-        const dbSaveEndTime = Date.now();
-        console.log(`Database save completed in ${(dbSaveEndTime - dbSaveStartTime) / 1000} seconds`);
-
-        if (saveError) {
-          console.error('Error saving to anonymous_reports:', saveError);
-          console.error('Save error details:', {
-            message: saveError.message,
-            details: saveError.details,
-            hint: saveError.hint,
-            code: saveError.code
-          });
-          throw new Error(`Failed to save report: ${saveError.message}`);
-        }
-
-        console.log('Report saved successfully to anonymous_reports:', reportData?.id);
-
-        // Complete the process
-        setCurrentPhase('complete');
-        setOverallProgress(100);
-
-        toast({
-          title: "Analysis complete!",
-          description: `Processed ${extractionResult.pageCount} pages and generated comprehensive insights.`,
-        });
-
-        return {
-          analysis: analysisData,
-          pdfArrayBuffer: arrayBuffer,
-          pdfText: data.cleanedText || '',
-          address: analysisData.propertyInfo?.address,
-          sessionId: uniqueSessionId
-        };
-
-      } catch (invokeErr) {
-        functionCallCompleted = true;
-        clearTimeout(timeoutId);
-        
-        console.error('Error invoking edge function:', invokeErr);
-        
-        // Try to determine if it's a network error or function execution error
-        if (invokeErr.name === 'AbortError' || invokeErr.name === 'TypeError' || invokeErr.message.includes('fetch')) {
-          console.error('Network or connection error:', invokeErr);
-          throw new Error(`Failed to connect to analysis service: ${invokeErr.message}`);
-        } else {
-          console.error('Function execution error:', invokeErr);
-          throw new Error(`Error during analysis: ${invokeErr.message}`);
-        }
+      if (functionError) {
+        console.error('Edge function error:', functionError);
+        throw new Error(functionError.message);
       }
+
+      if (!data || !data.success) {
+        console.error('Analysis failed:', data?.error || 'Unknown error');
+        throw new Error(data?.error || 'Failed to analyze extracted text');
+      }
+
+      console.log('Analysis completed successfully');
+      await aiProgressPromise;
+
+      const analysisData = data.analysis;
+      setAnalysis(analysisData);
+      setCleanedText(data.cleanedText || '');
+
+      // Transition to property data phase
+      setCurrentPhase('property');
+      setOverallProgress(50);
+
+      toast({
+        title: "Fetching property data...",
+        description: "Getting market information for your property.",
+      });
+
+      let propertyData = null;
+      if (analysisData.propertyInfo?.address) {
+        const propertyProgressPromise = simulateProgressFor('property', 50, 70, 10000);
+        propertyData = await fetchPropertyData(analysisData.propertyInfo.address);
+        await propertyProgressPromise;
+      }
+
+      // Transition to negotiation strategy phase
+      setCurrentPhase('negotiation');
+      setOverallProgress(70);
+
+      toast({
+        title: "Generating negotiation strategy...",
+        description: "Creating personalized negotiation recommendations.",
+      });
+
+      let negotiationStrategy = null;
+      const negotiationProgressPromise = simulateProgressFor('negotiation', 70, 85, 15000);
+      negotiationStrategy = await generateNegotiationStrategy(analysisData, propertyData);
+      await negotiationProgressPromise;
+
+      // Transition to saving phase
+      setCurrentPhase('saving');
+      setOverallProgress(85);
+
+      toast({
+        title: "Saving your report...",
+        description: "Finalizing your analysis report.",
+      });
+
+      // Save to anonymous_reports table using the unique session ID
+      console.log('Saving report to anonymous_reports table with unique session ID:', uniqueSessionId);
+      const dbSaveStartTime = Date.now();
       
+      const { data: reportData, error: saveError } = await supabase.from('anonymous_reports').insert({
+        session_id: uniqueSessionId,
+        analysis_data: analysisData,
+        property_data: propertyData,
+        negotiation_strategy: negotiationStrategy,
+        property_address: analysisData.propertyInfo?.address,
+        inspection_date: analysisData.propertyInfo?.inspectionDate,
+        pdf_file_path: uploadError ? null : fileName,
+        pdf_text: data.cleanedText,
+        pdf_metadata: {
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          pageCount: extractionResult.pageCount
+        }
+      }).select().single();
+
+      const dbSaveEndTime = Date.now();
+      console.log(`Database save completed in ${(dbSaveEndTime - dbSaveStartTime) / 1000} seconds`);
+
+      if (saveError) {
+        console.error('Error saving to anonymous_reports:', saveError);
+        throw new Error(`Failed to save report: ${saveError.message}`);
+      }
+
+      console.log('Report saved successfully to anonymous_reports:', reportData?.id);
+
+      // Store the session ID in localStorage for later retrieval
+      localStorage.setItem('anonymous_session_id', uniqueSessionId);
+      console.log('Session ID stored in localStorage for later retrieval');
+
+      // Complete the process
+      setCurrentPhase('complete');
+      setOverallProgress(100);
+
+      toast({
+        title: "Analysis complete!",
+        description: `Processed ${extractionResult.pageCount} pages and generated comprehensive insights.`,
+      });
+
+      return {
+        analysis: analysisData,
+        propertyData: propertyData,
+        negotiationStrategy: negotiationStrategy,
+        pdfArrayBuffer: arrayBuffer,
+        pdfText: data.cleanedText || '',
+        address: analysisData.propertyInfo?.address,
+        sessionId: uniqueSessionId
+      };
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to process PDF';
       console.error('PDF processing error:', err);
-      console.error('Error stack:', err instanceof Error ? err.stack : 'No stack trace available');
       setError(errorMessage);
       toast({
         title: "Processing failed",
@@ -376,6 +381,10 @@ export const useAnonymousPDFProcessor = () => {
         return 'Extracting text from PDF...';
       case 'analysis':
         return 'Analyzing with AI for insights and costs...';
+      case 'property':
+        return 'Fetching property market data...';
+      case 'negotiation':
+        return 'Generating negotiation strategy...';
       case 'saving':
         return 'Saving your report...';
       case 'complete':
@@ -392,9 +401,13 @@ export const useAnonymousPDFProcessor = () => {
       case 'extraction':
         return '10 seconds remaining';
       case 'analysis':
-        const analysisProgress = (overallProgress - 25) / 60;
-        const remainingSeconds = Math.max(5, Math.round(40 * (1 - analysisProgress)));
+        const analysisProgress = (overallProgress - 20) / 30;
+        const remainingSeconds = Math.max(5, Math.round(35 * (1 - analysisProgress)));
         return `${remainingSeconds} seconds remaining`;
+      case 'property':
+        return '10 seconds remaining';
+      case 'negotiation':
+        return '15 seconds remaining';
       case 'saving':
         return '5 seconds remaining';
       case 'complete':
