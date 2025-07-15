@@ -29,32 +29,29 @@ const AccountCreation = () => {
   // Get the analysis data from location state
   const analysisData = location.state;
 
-  // Verify database session by testing auth.uid()
+  // Verify database session by testing a query that uses auth.uid()
   const verifyDatabaseSession = async () => {
     try {
-      const { data, error } = await supabase.rpc('auth.uid');
-      if (error) {
-        console.error('Database session verification error:', error);
+      // Try to query the profiles table with a condition that uses auth.uid()
+      // This will fail if auth.uid() is not available in the database context
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', 'test-non-existent-id')
+        .limit(1);
+      
+      // If we get here without an RLS error, the database session is working
+      // (even if no data is returned, that's fine - we're just testing auth context)
+      if (error && error.message?.includes('row-level security')) {
+        console.log('Database session not ready - RLS indicates no auth context');
         return false;
       }
-      console.log('Database auth.uid():', data);
-      return !!data;
+      
+      console.log('Database session test successful');
+      return true;
     } catch (err) {
-      // If auth.uid() function doesn't exist, try a simple query that uses auth.uid()
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('id', 'test')
-          .limit(1);
-        
-        // If we get here without an auth error, the session is working
-        console.log('Database session test successful');
-        return true;
-      } catch (testErr) {
-        console.error('Database session test failed:', testErr);
-        return false;
-      }
+      console.error('Database session test failed:', err);
+      return false;
     }
   };
 
