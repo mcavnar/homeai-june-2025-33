@@ -32,27 +32,47 @@ const AnonymousUpload = () => {
   };
 
   const handleProcessPDF = async () => {
+    console.log('=== STARTING PDF PROCESSING FROM ANONYMOUS UPLOAD ===');
+    
     const result = await processPDF();
     
-    console.log('Analysis result in AnonymousUpload:', result);
+    console.log('=== PDF PROCESSING COMPLETED ===');
+    console.log('Result received:', result);
     
     if (result) {
+      console.log('=== RESULT VALIDATION ===');
+      console.log('Has analysis:', !!result.analysis);
+      console.log('Has property data:', !!result.propertyData);
+      console.log('Has negotiation strategy:', !!result.negotiationStrategy);
+      console.log('Address:', result.address);
+      console.log('Session ID:', result.sessionId);
+      
       // Track analysis completion
       const totalRepairCosts = result.analysis?.costSummary?.totalEstimatedCost || 0;
+      console.log('Total repair costs for tracking:', totalRepairCosts);
+      
       await trackConversion({
         eventName: 'AnalysisComplete',
         value: totalRepairCosts,
         contentName: 'Anonymous PDF Analysis Complete'
       });
 
-      console.log('Navigating to /account-creation with analysis data');
+      console.log('=== NAVIGATING TO ACCOUNT CREATION ===');
+      console.log('Navigation state being passed:', {
+        hasAnalysis: !!result.analysis,
+        hasPropertyData: !!result.propertyData,
+        hasNegotiationStrategy: !!result.negotiationStrategy,
+        address: result.address,
+        sessionId: result.sessionId
+      });
 
       // Navigate to account creation page with complete data via state
       navigate('/account-creation', { 
         state: result
       });
     } else {
-      console.log('No analysis result - not navigating');
+      console.error('=== NO RESULT FROM PDF PROCESSING ===');
+      console.error('ProcessPDF returned null - analysis failed');
     }
   };
 
