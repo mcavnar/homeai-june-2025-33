@@ -1,10 +1,9 @@
-
 import React, { useRef } from 'react';
 import { Upload, FileText, Loader2, Zap, Shield, Star } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, TrendingUp } from 'lucide-react';
 
 interface FileUploadSectionProps {
   file: File | null;
@@ -59,15 +58,15 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
         <div className="flex items-center justify-center gap-6 mt-4 text-sm text-gray-600">
           <div className="flex items-center gap-1">
             <Shield className="h-4 w-4 text-green-500" />
-            <span>Secure upload</span>
+            <span>Bank-level security</span>
           </div>
           <div className="flex items-center gap-1">
-            <Zap className="h-4 w-4 text-blue-500" />
-            <span>AI-powered</span>
+            <CheckCircle className="h-4 w-4 text-blue-500" />
+            <span>100% confidential</span>
           </div>
           <div className="flex items-center gap-1">
-            <Star className="h-4 w-4 text-yellow-500" />
-            <span>4.9/5 rating</span>
+            <TrendingUp className="h-4 w-4 text-purple-500" />
+            <span>97% accuracy rate</span>
           </div>
         </div>
       </CardHeader>
