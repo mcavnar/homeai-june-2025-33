@@ -319,7 +319,7 @@ const AccountCreation = () => {
         <CardHeader>
           <CardTitle className="text-2xl text-center">Create Your Account</CardTitle>
           <p className="text-gray-600 text-center">
-            Save your inspection report and access it anytime
+            Save your inspection report and access it any time. Your account and the platform is entirely free to use. You can always delete your account and all your data.
           </p>
         </CardHeader>
         
