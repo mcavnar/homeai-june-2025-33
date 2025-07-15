@@ -1,10 +1,9 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { extractTextFromPDF } from '@/utils/pdfTextExtractor';
 import { HomeInspectionAnalysis } from '@/types/inspection';
-import { getSessionId } from '@/utils/sessionUtils';
+import { generateSessionId } from '@/utils/sessionUtils';
 
 type ProcessingPhase = 'extraction' | 'analysis' | 'saving' | 'complete';
 
@@ -104,9 +103,9 @@ export const useAnonymousPDFProcessor = () => {
         lastModified: new Date(file.lastModified).toISOString()
       });
 
-      // Get session ID
-      const sessionId = getSessionId();
-      console.log('Session ID:', sessionId);
+      // Generate a unique session ID for this PDF processing operation
+      const uniqueSessionId = generateSessionId();
+      console.log('Generated unique session ID for this processing:', uniqueSessionId);
 
       // Convert file to ArrayBuffer and store it
       const arrayBuffer = await file.arrayBuffer();
@@ -115,7 +114,7 @@ export const useAnonymousPDFProcessor = () => {
 
       // Upload PDF to Supabase storage
       console.log('Uploading PDF to Supabase storage...');
-      const fileName = `anonymous/${sessionId}/${Date.now()}-${file.name}`;
+      const fileName = `anonymous/${uniqueSessionId}/${Date.now()}-${file.name}`;
       const { error: uploadError, data: uploadData } = await supabase.storage
         .from('inspection-reports')
         .upload(fileName, file, {
@@ -274,12 +273,12 @@ export const useAnonymousPDFProcessor = () => {
         // Progress to 95% during database save
         setOverallProgress(95);
 
-        // Save to anonymous_reports table
-        console.log('Saving report to anonymous_reports table');
+        // Save to anonymous_reports table using the unique session ID
+        console.log('Saving report to anonymous_reports table with unique session ID:', uniqueSessionId);
         const dbSaveStartTime = Date.now();
         
         const { data: reportData, error: saveError } = await supabase.from('anonymous_reports').insert({
-          session_id: sessionId,
+          session_id: uniqueSessionId,
           analysis_data: analysisData,
           property_address: analysisData.propertyInfo?.address,
           inspection_date: analysisData.propertyInfo?.inspectionDate,
@@ -323,7 +322,7 @@ export const useAnonymousPDFProcessor = () => {
           pdfArrayBuffer: arrayBuffer,
           pdfText: data.cleanedText || '',
           address: analysisData.propertyInfo?.address,
-          sessionId
+          sessionId: uniqueSessionId
         };
 
       } catch (invokeErr) {
