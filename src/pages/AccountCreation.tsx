@@ -24,15 +24,25 @@ const AccountCreation = () => {
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const [accountCreated, setAccountCreated] = useState(false);
 
-  // Get analysis data from location state
-  const analysisData = location.state?.analysisData;
+  // Get analysis data from location state - corrected to use the actual structure
+  const analysisData = location.state?.analysis;
   const pdfArrayBuffer = location.state?.pdfArrayBuffer;
   const pdfText = location.state?.pdfText;
+  const propertyData = location.state?.propertyData;
+  const negotiationStrategy = location.state?.negotiationStrategy;
+  const address = location.state?.address;
+
+  console.log('=== ACCOUNT CREATION DEBUG ===');
+  console.log('Full location.state:', location.state);
+  console.log('Analysis data:', analysisData);
+  console.log('Property data:', propertyData);
+  console.log('Negotiation strategy:', negotiationStrategy);
+  console.log('Address from state:', address);
 
   useEffect(() => {
     if (!analysisData) {
-      console.log('No analysis data found, redirecting to upload');
-      navigate('/upload');
+      console.log('No analysis data found, redirecting to anonymous upload');
+      navigate('/anonymous-upload');
     }
   }, [analysisData, navigate]);
 
@@ -40,37 +50,39 @@ const AccountCreation = () => {
     console.log('=== DEBUGGING PROPERTY ADDRESS EXTRACTION ===');
     console.log('Full analysisData structure:', JSON.stringify(analysisData, null, 2));
     
+    if (!analysisData) {
+      console.log('No analysis data provided');
+      return undefined;
+    }
+
+    // First try the address passed directly in the result
+    if (address && typeof address === 'string') {
+      console.log('Found address in result.address:', address);
+      return address;
+    }
+
     // Try multiple ways to extract the property address with detailed logging
-    if (analysisData?.propertyInfo?.address) {
-      console.log('Found address in propertyInfo.address:', analysisData.propertyInfo.address);
-      return analysisData.propertyInfo.address;
+    const possibleAddresses = [
+      analysisData?.propertyInfo?.address,
+      analysisData?.address,
+      analysisData?.property?.address,
+      analysisData?.propertyDetails?.address,
+      analysisData?.location?.address,
+      analysisData?.propertyInformation?.address,
+      analysisData?.inspection?.property?.address,
+      analysisData?.report?.property?.address,
+    ];
+
+    for (const addr of possibleAddresses) {
+      if (addr && typeof addr === 'string' && addr.trim().length > 0) {
+        console.log('Found address:', addr);
+        return addr;
+      }
     }
-    
-    if (analysisData?.address) {
-      console.log('Found address in root address field:', analysisData.address);
-      return analysisData.address;
-    }
-    
-    if (analysisData?.property?.address) {
-      console.log('Found address in property.address:', analysisData.property.address);
-      return analysisData.property.address;
-    }
-    
-    // Additional fallback checks for different possible structures
-    if (analysisData?.propertyDetails?.address) {
-      console.log('Found address in propertyDetails.address:', analysisData.propertyDetails.address);
-      return analysisData.propertyDetails.address;
-    }
-    
-    if (analysisData?.location?.address) {
-      console.log('Found address in location.address:', analysisData.location.address);
-      return analysisData.location.address;
-    }
-    
-    // Try to find any field that might contain an address
+
+    // Deep search for any field that might contain an address
     const searchForAddress = (obj: any, path: string = ''): string | undefined => {
-      if (typeof obj === 'string' && obj.includes(' ') && obj.includes(',')) {
-        // This might be an address string
+      if (typeof obj === 'string' && obj.includes(' ') && (obj.includes(',') || obj.includes('St') || obj.includes('Ave') || obj.includes('Rd') || obj.includes('Blvd'))) {
         console.log(`Potential address found at ${path}:`, obj);
         return obj;
       }
@@ -139,13 +151,17 @@ const AccountCreation = () => {
         analysis_data: analysisData,
         pdf_text: pdfText,
         property_address: propertyAddress,
-        inspection_date: analysisData.propertyInfo?.inspectionDate || analysisData.inspectionDate,
+        inspection_date: analysisData?.propertyInfo?.inspectionDate || analysisData?.inspectionDate,
+        property_data: propertyData,
+        negotiation_strategy: negotiationStrategy,
       };
       
       console.log('Saving user report with data:', {
         hasAnalysisData: !!reportData.analysis_data,
         propertyAddress: reportData.property_address,
         inspectionDate: reportData.inspection_date,
+        hasPropertyData: !!reportData.property_data,
+        hasNegotiationStrategy: !!reportData.negotiation_strategy,
       });
       
       await saveUserReportViaServer(reportData);
@@ -287,6 +303,32 @@ const AccountCreation = () => {
           </form>
         </CardContent>
       </Card>
+
+      {/* Progress Indicator */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center">
+            <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm">
+              ✓
+            </div>
+            <span className="ml-2 text-sm text-gray-600">Upload</span>
+          </div>
+          <div className="w-8 h-px bg-gray-300"></div>
+          <div className="flex items-center">
+            <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm">
+              2
+            </div>
+            <span className="ml-2 text-sm font-medium text-gray-900">Create Account</span>
+          </div>
+          <div className="w-8 h-px bg-gray-300"></div>
+          <div className="flex items-center">
+            <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm">
+              3
+            </div>
+            <span className="ml-2 text-sm text-gray-600">View Results</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
