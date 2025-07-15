@@ -7,14 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle, AlertCircle, Chrome } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 
 const AccountCreation = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, signUp } = useAuth();
+  const { user, signUp, signInWithGoogle } = useAuth();
   const { saveUserReportViaServer, isLoading, error } = useServerUserReport();
   const { toast } = useToast();
   
@@ -23,6 +24,7 @@ const AccountCreation = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const [accountCreated, setAccountCreated] = useState(false);
+  const [authError, setAuthError] = useState('');
 
   // Get analysis data from location state - corrected to use the actual structure
   const analysisData = location.state?.analysis;
@@ -108,6 +110,65 @@ const AccountCreation = () => {
     return undefined;
   };
 
+  const saveReportForUser = async () => {
+    if (!analysisData) {
+      throw new Error('Analysis data not found. Please upload your report again.');
+    }
+
+    // Wait a moment for the user to be fully created
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Extract property address from analysis data with detailed logging
+    const propertyAddress = extractPropertyAddress(analysisData);
+    console.log('Final extracted property address:', propertyAddress);
+    
+    if (!propertyAddress) {
+      console.warn('WARNING: No property address could be extracted from analysis data');
+    }
+    
+    // Save the user report with proper property address
+    const reportData = {
+      analysis_data: analysisData,
+      pdf_text: pdfText,
+      property_address: propertyAddress,
+      inspection_date: analysisData?.propertyInfo?.inspectionDate || analysisData?.inspectionDate,
+      property_data: propertyData,
+      negotiation_strategy: negotiationStrategy,
+    };
+    
+    console.log('Saving user report with data:', {
+      hasAnalysisData: !!reportData.analysis_data,
+      propertyAddress: reportData.property_address,
+      inspectionDate: reportData.inspection_date,
+      hasPropertyData: !!reportData.property_data,
+      hasNegotiationStrategy: !!reportData.negotiation_strategy,
+    });
+    
+    await saveUserReportViaServer(reportData);
+  };
+
+  const handleGoogleAuth = async () => {
+    setAuthError('');
+    setIsCreatingAccount(true);
+
+    try {
+      console.log('Starting Google authentication');
+      const { error } = await signInWithGoogle();
+      
+      if (error) {
+        setAuthError(error.message);
+        return;
+      }
+
+      // The rest will be handled by the useEffect that detects user change
+    } catch (err) {
+      console.error('Google auth error:', err);
+      setAuthError('Google sign-in failed. Please try again.');
+    } finally {
+      setIsCreatingAccount(false);
+    }
+  };
+
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -120,51 +181,19 @@ const AccountCreation = () => {
       return;
     }
 
-    if (!analysisData) {
-      toast({
-        title: "Missing data",
-        description: "Analysis data not found. Please upload your report again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsCreatingAccount(true);
+    setAuthError('');
     
     try {
       console.log('Creating account for:', email);
-      await signUp(email, password);
+      const { error } = await signUp(email, password);
       
-      // Wait a moment for the user to be fully created
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Extract property address from analysis data with detailed logging
-      const propertyAddress = extractPropertyAddress(analysisData);
-      console.log('Final extracted property address:', propertyAddress);
-      
-      if (!propertyAddress) {
-        console.warn('WARNING: No property address could be extracted from analysis data');
+      if (error) {
+        setAuthError(error.message);
+        return;
       }
-      
-      // Save the user report with proper property address
-      const reportData = {
-        analysis_data: analysisData,
-        pdf_text: pdfText,
-        property_address: propertyAddress,
-        inspection_date: analysisData?.propertyInfo?.inspectionDate || analysisData?.inspectionDate,
-        property_data: propertyData,
-        negotiation_strategy: negotiationStrategy,
-      };
-      
-      console.log('Saving user report with data:', {
-        hasAnalysisData: !!reportData.analysis_data,
-        propertyAddress: reportData.property_address,
-        inspectionDate: reportData.inspection_date,
-        hasPropertyData: !!reportData.property_data,
-        hasNegotiationStrategy: !!reportData.negotiation_strategy,
-      });
-      
-      await saveUserReportViaServer(reportData);
+
+      await saveReportForUser();
       
       setAccountCreated(true);
       
@@ -186,15 +215,48 @@ const AccountCreation = () => {
       
     } catch (err) {
       console.error('Error creating account:', err);
-      toast({
-        title: "Account creation failed",
-        description: err instanceof Error ? err.message : "Please try again.",
-        variant: "destructive",
-      });
+      setAuthError(err instanceof Error ? err.message : "Please try again.");
     } finally {
       setIsCreatingAccount(false);
     }
   };
+
+  // Handle successful authentication (both Google and email)
+  useEffect(() => {
+    if (user && !accountCreated && !isCreatingAccount) {
+      // This means authentication was successful, now save the report
+      const handleSuccessfulAuth = async () => {
+        try {
+          setIsCreatingAccount(true);
+          await saveReportForUser();
+          setAccountCreated(true);
+          
+          toast({
+            title: "Account created successfully!",
+            description: "Your inspection report has been saved to your account.",
+          });
+          
+          // Navigate to results after a short delay
+          setTimeout(() => {
+            navigate('/results/synopsis', {
+              state: {
+                analysis: analysisData,
+                pdfArrayBuffer,
+                pdfText,
+              }
+            });
+          }, 2000);
+        } catch (err) {
+          console.error('Error saving report after auth:', err);
+          setAuthError(err instanceof Error ? err.message : "Failed to save report. Please try again.");
+        } finally {
+          setIsCreatingAccount(false);
+        }
+      };
+
+      handleSuccessfulAuth();
+    }
+  }, [user, accountCreated, isCreatingAccount]);
 
   if (!analysisData) {
     return (
@@ -242,12 +304,31 @@ const AccountCreation = () => {
         </CardHeader>
         
         <CardContent>
-          {error && (
+          {(authError || error) && (
             <Alert variant="destructive" className="mb-4">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription>{authError || error}</AlertDescription>
             </Alert>
           )}
+
+          {/* Primary Google Sign In Button */}
+          <Button
+            onClick={handleGoogleAuth}
+            disabled={isCreatingAccount || isLoading}
+            className="w-full flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 h-12 text-base font-medium mb-6"
+          >
+            <Chrome className="h-5 w-5" />
+            Continue with Google (Recommended)
+          </Button>
+
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <Separator className="w-full" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-4 text-gray-500 font-medium">Or use email</span>
+            </div>
+          </div>
           
           <form onSubmit={handleCreateAccount} className="space-y-4">
             <div className="space-y-2">
@@ -259,6 +340,7 @@ const AccountCreation = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="your@email.com"
+                className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
             
@@ -271,6 +353,7 @@ const AccountCreation = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="Enter password"
+                className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
             
@@ -283,12 +366,14 @@ const AccountCreation = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 placeholder="Confirm password"
+                className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
             
             <Button
               type="submit"
-              className="w-full"
+              variant="outline"
+              className="w-full h-12 border-gray-200 hover:bg-gray-50 text-gray-700 font-medium"
               disabled={isCreatingAccount || isLoading}
             >
               {isCreatingAccount || isLoading ? (
@@ -297,7 +382,7 @@ const AccountCreation = () => {
                   Creating Account...
                 </>
               ) : (
-                'Create Account & Save Report'
+                'Create Account with Email'
               )}
             </Button>
           </form>
