@@ -5,7 +5,7 @@ import { useMetaConversions } from '@/hooks/useMetaConversions';
 import FileUploadSection from '@/components/FileUploadSection';
 import ProcessingStatus from '@/components/ProcessingStatus';
 import { useAnonymousPDFProcessor } from '@/hooks/useAnonymousPDFProcessor';
-import { Shield, Clock, CheckCircle, Upload, TrendingUp, Eye } from 'lucide-react';
+import { Shield, Clock, CheckCircle, Upload, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -77,10 +77,6 @@ const AnonymousUpload = () => {
       console.error('=== NO RESULT FROM PDF PROCESSING ===');
       console.error('ProcessPDF returned null - analysis failed');
     }
-  };
-
-  const handleViewDemo = () => {
-    navigate('/demo');
   };
 
   return (
@@ -269,18 +265,6 @@ const AnonymousUpload = () => {
                 <Shield className="h-4 w-4 text-gray-500" />
                 <span className="text-sm text-gray-600">Your data is secure and private</span>
               </div>
-            </div>
-
-            {/* Demo Button */}
-            <div className="pt-6">
-              <Button 
-                onClick={handleViewDemo}
-                variant="outline"
-                className="w-full border-2 border-gray-200 hover:border-gray-300 text-gray-700 hover:text-gray-800 bg-white hover:bg-gray-50"
-              >
-                <Eye className="mr-2 h-4 w-4" />
-                See Sample Analysis Report
-              </Button>
             </div>
           </div>
         </div>
