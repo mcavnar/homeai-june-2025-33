@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
@@ -86,10 +85,10 @@ const AnonymousUpload = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Avoid Costly Home Buying Mistakes
+            Get Instant Home Inspection Report Analysis
           </h1>
           <p className="text-lg text-gray-600 max-w-4xl mx-auto">
-            Our systems analyzes your report and queries our database of millions of contractor quotes, material costs and area variables to produce intelligent analysis with prioritized findings, cost estimates, and negotiation guidance.
+            Upload your home inspection report and get AI-powered analysis with prioritized findings, accurate cost estimates, and negotiation guidance in minutes.
           </p>
         </div>
 
@@ -100,11 +99,10 @@ const AnonymousUpload = () => {
           <div className="space-y-8">
             <Card className="bg-white shadow-lg border border-gray-200">
               <div className="p-8">
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-6">
                   <Upload className="h-5 w-5 text-green-600" />
-                  <h2 className="text-xl font-semibold text-gray-900">Upload Home Inspection Report</h2>
+                  <p className="text-gray-600">Select or drag & drop a PDF file (max 10MB)</p>
                 </div>
-                <p className="text-gray-600 mb-6">Select or drag & drop a PDF file (max 10MB)</p>
 
                 {/* File Upload Area */}
                 <div
