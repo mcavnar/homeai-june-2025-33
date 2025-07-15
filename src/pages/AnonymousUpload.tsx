@@ -94,13 +94,6 @@ const AnonymousUpload = () => {
               <Timer className="h-4 w-4" />
               Free Analysis - Usually $297
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 leading-tight">
-              Discover <span className="text-green-600">$15,000+</span> in Hidden Repair Costs
-            </h1>
-            <p className="text-xl text-gray-600 mb-6 max-w-3xl mx-auto leading-relaxed">
-              Our AI analyzes your inspection report in 2 minutes and reveals the exact repair costs, 
-              negotiation strategies, and trusted contractors - saving you 15+ hours of research.
-            </p>
             <div className="flex items-center justify-center gap-6 text-sm text-gray-600 mb-8">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-green-500" />
