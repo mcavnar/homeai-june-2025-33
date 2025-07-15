@@ -37,20 +37,62 @@ const AccountCreation = () => {
   }, [analysisData, navigate]);
 
   const extractPropertyAddress = (analysisData: any): string | undefined => {
-    // Try multiple ways to extract the property address
-    if (analysisData.propertyInfo?.address) {
+    console.log('=== DEBUGGING PROPERTY ADDRESS EXTRACTION ===');
+    console.log('Full analysisData structure:', JSON.stringify(analysisData, null, 2));
+    
+    // Try multiple ways to extract the property address with detailed logging
+    if (analysisData?.propertyInfo?.address) {
+      console.log('Found address in propertyInfo.address:', analysisData.propertyInfo.address);
       return analysisData.propertyInfo.address;
     }
     
-    if (analysisData.address) {
+    if (analysisData?.address) {
+      console.log('Found address in root address field:', analysisData.address);
       return analysisData.address;
     }
     
-    // Try to find address in the analysis data structure
-    if (analysisData.property?.address) {
+    if (analysisData?.property?.address) {
+      console.log('Found address in property.address:', analysisData.property.address);
       return analysisData.property.address;
     }
     
+    // Additional fallback checks for different possible structures
+    if (analysisData?.propertyDetails?.address) {
+      console.log('Found address in propertyDetails.address:', analysisData.propertyDetails.address);
+      return analysisData.propertyDetails.address;
+    }
+    
+    if (analysisData?.location?.address) {
+      console.log('Found address in location.address:', analysisData.location.address);
+      return analysisData.location.address;
+    }
+    
+    // Try to find any field that might contain an address
+    const searchForAddress = (obj: any, path: string = ''): string | undefined => {
+      if (typeof obj === 'string' && obj.includes(' ') && obj.includes(',')) {
+        // This might be an address string
+        console.log(`Potential address found at ${path}:`, obj);
+        return obj;
+      }
+      
+      if (typeof obj === 'object' && obj !== null) {
+        for (const [key, value] of Object.entries(obj)) {
+          const result = searchForAddress(value, `${path}.${key}`);
+          if (result) return result;
+        }
+      }
+      
+      return undefined;
+    };
+    
+    const foundAddress = searchForAddress(analysisData);
+    if (foundAddress) {
+      console.log('Found address through deep search:', foundAddress);
+      return foundAddress;
+    }
+    
+    console.log('No address found in any expected locations');
+    console.log('Available keys in analysisData:', Object.keys(analysisData || {}));
     return undefined;
   };
 
@@ -84,16 +126,20 @@ const AccountCreation = () => {
       // Wait a moment for the user to be fully created
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Extract property address from analysis data
+      // Extract property address from analysis data with detailed logging
       const propertyAddress = extractPropertyAddress(analysisData);
-      console.log('Extracted property address:', propertyAddress);
+      console.log('Final extracted property address:', propertyAddress);
+      
+      if (!propertyAddress) {
+        console.warn('WARNING: No property address could be extracted from analysis data');
+      }
       
       // Save the user report with proper property address
       const reportData = {
         analysis_data: analysisData,
         pdf_text: pdfText,
         property_address: propertyAddress,
-        inspection_date: analysisData.propertyInfo?.inspectionDate,
+        inspection_date: analysisData.propertyInfo?.inspectionDate || analysisData.inspectionDate,
       };
       
       console.log('Saving user report with data:', {

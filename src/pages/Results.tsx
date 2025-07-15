@@ -53,20 +53,56 @@ const Results = () => {
     }
   }, [state?.pdfArrayBuffer, storagePdfArrayBuffer]);
 
-  // Helper function to extract property address from analysis data
-  const extractPropertyAddress = (analysisData: any): string | undefined => {
-    if (analysisData?.propertyInfo?.address) {
-      return analysisData.propertyInfo.address;
-    }
+  // Enhanced helper function to extract property address from analysis data
+  const extractPropertyAddressFromAnalysis = (analysisData: any): string | undefined => {
+    console.log('=== EXTRACTING ADDRESS FROM ANALYSIS DATA ===');
+    console.log('Analysis data structure:', JSON.stringify(analysisData, null, 2));
     
-    if (analysisData?.address) {
-      return analysisData.address;
+    if (!analysisData) {
+      console.log('No analysis data provided');
+      return undefined;
     }
-    
-    if (analysisData?.property?.address) {
-      return analysisData.property.address;
+
+    // Try multiple possible locations for the address
+    const addressFields = [
+      analysisData?.propertyInfo?.address,
+      analysisData?.address,
+      analysisData?.property?.address,
+      analysisData?.propertyDetails?.address,
+      analysisData?.location?.address,
+    ];
+
+    for (const address of addressFields) {
+      if (address && typeof address === 'string') {
+        console.log('Found address:', address);
+        return address;
+      }
     }
-    
+
+    // Deep search for any address-like string
+    const searchForAddress = (obj: any, path: string = ''): string | undefined => {
+      if (typeof obj === 'string' && obj.includes(' ') && obj.includes(',')) {
+        console.log(`Potential address found at ${path}:`, obj);
+        return obj;
+      }
+      
+      if (typeof obj === 'object' && obj !== null) {
+        for (const [key, value] of Object.entries(obj)) {
+          const result = searchForAddress(value, `${path}.${key}`);
+          if (result) return result;
+        }
+      }
+      
+      return undefined;
+    };
+
+    const foundAddress = searchForAddress(analysisData);
+    if (foundAddress) {
+      console.log('Found address through deep search:', foundAddress);
+      return foundAddress;
+    }
+
+    console.log('No address found in analysis data');
     return undefined;
   };
 
@@ -76,11 +112,13 @@ const Results = () => {
       return;
     }
     
-    console.log('Loading data from user report:', {
+    console.log('=== PROCESSING USER REPORT ===');
+    console.log('User report data:', {
       hasPropertyData: !!userReport.property_data,
       hasNegotiationStrategy: !!userReport.negotiation_strategy,
       propertyAddress: userReport.property_address,
-      userReportId: userReport.id
+      userReportId: userReport.id,
+      analysisDataKeys: Object.keys(userReport.analysis_data || {}),
     });
 
     // Load property data from database if it exists
@@ -92,16 +130,20 @@ const Results = () => {
       let propertyAddress = userReport.property_address;
       
       if (!propertyAddress && userReport.analysis_data) {
-        propertyAddress = extractPropertyAddress(userReport.analysis_data);
-        console.log('Extracted property address from analysis data:', propertyAddress);
+        console.log('No property_address in userReport, trying to extract from analysis_data');
+        propertyAddress = extractPropertyAddressFromAnalysis(userReport.analysis_data);
       }
       
+      console.log('Final property address to use:', propertyAddress);
+      
       if (propertyAddress && !propertyData && !isLoadingProperty) {
-        console.log('No property data in database, fetching from API for:', propertyAddress);
+        console.log('Fetching property details for address:', propertyAddress);
         // Add a small delay to ensure userReport state is fully settled
         setTimeout(() => {
           fetchPropertyDetails(propertyAddress);
         }, 100);
+      } else if (!propertyAddress) {
+        console.warn('WARNING: No property address available to fetch property data');
       }
     }
 
@@ -157,7 +199,8 @@ const Results = () => {
     pdfArrayBuffer: pdfArrayBuffer,
   };
 
-  console.log('Results context value:', {
+  console.log('=== FINAL RESULTS CONTEXT ===');
+  console.log('Context value:', {
     hasAnalysis: !!contextValue.analysis,
     hasPropertyData: !!contextValue.propertyData,
     isLoadingProperty: contextValue.isLoadingProperty,
