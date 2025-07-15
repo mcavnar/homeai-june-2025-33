@@ -127,8 +127,8 @@ export const useAnonymousPDFProcessor = () => {
         console.error('PDF upload error:', uploadError);
         console.log('Upload error details:', {
           message: uploadError.message,
-          statusCode: uploadError.statusCode,
-          name: uploadError.name
+          name: uploadError.name,
+          // Removed statusCode as it doesn't exist on StorageError
         });
         // Continue without PDF storage - not critical for analysis
       } else {
@@ -198,10 +198,12 @@ export const useAnonymousPDFProcessor = () => {
         extractedTextPreview: payload.extractedText.substring(0, 100) + '...'
       });
 
+      // Log Supabase client status without accessing protected properties
       console.log('Supabase client status check before function call:', {
-        url: supabase.supabaseUrl,
-        authTokenLength: supabase.auth.session()?.access_token?.length || 'No token',
-        functionsNamespace: supabase.functions.url
+        // Using public getters or methods instead of protected properties
+        hasAuth: !!supabase.auth,
+        hasStorage: !!supabase.storage,
+        hasFunctions: !!supabase.functions
       });
 
       const edgeFunctionStartTime = Date.now();
