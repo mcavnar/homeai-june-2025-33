@@ -1,10 +1,10 @@
 
 import React, { useRef } from 'react';
-import { Upload, FileText, Loader2, Zap, Shield, Star } from 'lucide-react';
+import { Upload, FileText, Loader2, Zap } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, CheckCircle, TrendingUp } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 interface FileUploadSectionProps {
   file: File | null;
@@ -129,7 +129,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
             ) : (
               <>
                 <Zap className="h-5 w-5 mr-2" />
-                Get My FREE Analysis ($297 Value)
+                Get My FREE Analysis
               </>
             )}
           </Button>
