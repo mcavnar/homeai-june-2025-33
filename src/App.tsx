@@ -9,6 +9,7 @@ import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Landing from "./pages/Landing";
 import AuthPage from "./pages/AuthPage";
+import AnonymousUpload from "./pages/AnonymousUpload";
 import UploadPage from "./pages/UploadPage";
 import Account from "./pages/Account";
 import Results from "./pages/Results";
@@ -18,6 +19,8 @@ import KeySystems from "./pages/results/KeySystems";
 import ServiceProviders from "./pages/results/ServiceProviders";
 import Negotiation from "./pages/results/Negotiation";
 import InspectionReport from "./pages/results/InspectionReport";
+import AnonymousResults from "./pages/AnonymousResults";
+import AnonymousSynopsis from "./pages/anonymous/AnonymousSynopsis";
 import DemoResults from "./pages/DemoResults";
 import DemoSynopsis from "./pages/demo/DemoSynopsis";
 import DemoIssuesList from "./pages/demo/DemoIssuesList";
@@ -49,6 +52,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/auth" element={<AuthPage />} />
+              <Route path="/anonymous-upload" element={<AnonymousUpload />} />
               <Route path="/upload" element={
                 <ProtectedRoute>
                   <UploadPage />
@@ -66,6 +70,16 @@ const App = () => (
               }>
                 <Route index element={<Navigate to="/results/synopsis" replace />} />
                 <Route path="synopsis" element={<Synopsis />} />
+                <Route path="issues" element={<IssuesList />} />
+                <Route path="systems" element={<KeySystems />} />
+                <Route path="providers" element={<ServiceProviders />} />
+                <Route path="negotiation" element={<Negotiation />} />
+                <Route path="report" element={<InspectionReport />} />
+              </Route>
+              {/* Anonymous Results Routes */}
+              <Route path="/anonymous-results" element={<AnonymousResults />}>
+                <Route index element={<Navigate to="/anonymous-results/synopsis" replace />} />
+                <Route path="synopsis" element={<AnonymousSynopsis />} />
                 <Route path="issues" element={<IssuesList />} />
                 <Route path="systems" element={<KeySystems />} />
                 <Route path="providers" element={<ServiceProviders />} />

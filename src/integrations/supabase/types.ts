@@ -77,6 +77,57 @@ export type Database = {
         }
         Relationships: []
       }
+      anonymous_reports: {
+        Row: {
+          analysis_data: Json
+          converted_at: string | null
+          converted_to_user_id: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          inspection_date: string | null
+          negotiation_strategy: Json | null
+          pdf_file_path: string | null
+          pdf_metadata: Json | null
+          pdf_text: string | null
+          property_address: string | null
+          property_data: Json | null
+          session_id: string
+        }
+        Insert: {
+          analysis_data: Json
+          converted_at?: string | null
+          converted_to_user_id?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          inspection_date?: string | null
+          negotiation_strategy?: Json | null
+          pdf_file_path?: string | null
+          pdf_metadata?: Json | null
+          pdf_text?: string | null
+          property_address?: string | null
+          property_data?: Json | null
+          session_id: string
+        }
+        Update: {
+          analysis_data?: Json
+          converted_at?: string | null
+          converted_to_user_id?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          inspection_date?: string | null
+          negotiation_strategy?: Json | null
+          pdf_file_path?: string | null
+          pdf_metadata?: Json | null
+          pdf_text?: string | null
+          property_address?: string | null
+          property_data?: Json | null
+          session_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -591,7 +642,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_expired_anonymous_reports: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
     }
     Enums: {
       interaction_type:

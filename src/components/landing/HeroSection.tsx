@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
 import { useGoogleAnalytics } from '@/hooks/useGoogleAnalytics';
 import { TrackedButton } from '@/components/TrackedButton';
@@ -9,7 +8,6 @@ import { Eye, Upload } from 'lucide-react';
 
 const HeroSection = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { trackConversion } = useMetaConversions();
   const { trackEvent } = useGoogleAnalytics();
 
@@ -27,11 +25,8 @@ const HeroSection = () => {
       contentName: 'Upload Report for Free Button'
     });
 
-    if (user) {
-      navigate('/upload');
-    } else {
-      navigate('/auth');
-    }
+    // Always go to anonymous upload - no authentication required
+    navigate('/anonymous-upload');
   };
 
   const handleViewDemo = async () => {
