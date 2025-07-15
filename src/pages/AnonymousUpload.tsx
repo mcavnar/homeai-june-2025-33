@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
@@ -85,10 +86,10 @@ const AnonymousUpload = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Get Instant Home Inspection Report Analysis
+            Upload Home Inspection Report
           </h1>
           <p className="text-lg text-gray-600 max-w-4xl mx-auto">
-            Upload your home inspection report and get AI-powered analysis with prioritized findings, accurate cost estimates, and negotiation guidance in minutes.
+            Get AI-powered analysis with prioritized findings, accurate cost estimates, and negotiation guidance in minutes.
           </p>
         </div>
 
