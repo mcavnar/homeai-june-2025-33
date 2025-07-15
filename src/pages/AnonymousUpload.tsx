@@ -112,34 +112,6 @@ const AnonymousUpload = () => {
               </div>
             </div>
           </div>
-
-          {/* Trust Indicators */}
-          <div className="flex items-center justify-center gap-8 mb-8 text-sm text-gray-600">
-            <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-green-500" />
-              <span>Bank-level security</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-blue-500" />
-              <span>100% confidential</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-purple-500" />
-              <span>97% accuracy rate</span>
-            </div>
-          </div>
-
-          {/* Demo CTA */}
-          <div className="mb-8">
-            <Button 
-              onClick={handleViewDemo}
-              variant="outline"
-              className="bg-white/90 backdrop-blur-sm hover:bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-700 px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
-            >
-              <Eye className="mr-2 h-4 w-4" />
-              See Sample Analysis Report
-            </Button>
-          </div>
         </div>
 
         {/* Main Upload Section */}
@@ -161,9 +133,37 @@ const AnonymousUpload = () => {
             phaseMessage={getPhaseMessage()}
             estimatedTimeRemaining={getEstimatedTimeRemaining()}
           />
+
+          {/* Trust Indicators - Moved below upload */}
+          <div className="flex items-center justify-center gap-8 mt-6 mb-8 text-sm text-gray-600">
+            <div className="flex items-center gap-2">
+              <Shield className="h-4 w-4 text-green-500" />
+              <span>Bank-level security</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-blue-500" />
+              <span>100% confidential</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-purple-500" />
+              <span>97% accuracy rate</span>
+            </div>
+          </div>
+
+          {/* Demo CTA - Moved below upload */}
+          <div className="text-center mb-8">
+            <Button 
+              onClick={handleViewDemo}
+              variant="outline"
+              className="bg-white/90 backdrop-blur-sm hover:bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-700 px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              <Eye className="mr-2 h-4 w-4" />
+              See Sample Analysis Report
+            </Button>
+          </div>
         </div>
 
-        {/* Social Proof - Testimonials - Moved below upload section */}
+        {/* Social Proof - Testimonials */}
         <div className="max-w-4xl mx-auto mt-8">
           <h3 className="text-2xl font-bold text-center text-gray-900 mb-6">
             Join 2,847+ Smart Home Buyers Who Saved Big
