@@ -9,8 +9,6 @@ import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Landing from "./pages/Landing";
 import AuthPage from "./pages/AuthPage";
-import AnonymousUploadPage from "./pages/AnonymousUploadPage";
-import CompleteSignupPage from "./pages/CompleteSignupPage";
 import UploadPage from "./pages/UploadPage";
 import Account from "./pages/Account";
 import Results from "./pages/Results";
@@ -51,8 +49,6 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/auth" element={<AuthPage />} />
-              <Route path="/upload-anonymous" element={<AnonymousUploadPage />} />
-              <Route path="/complete-signup" element={<CompleteSignupPage />} />
               <Route path="/upload" element={
                 <ProtectedRoute>
                   <UploadPage />

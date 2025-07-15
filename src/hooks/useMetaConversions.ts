@@ -30,7 +30,7 @@ export const useMetaConversions = () => {
           eventId,
           userEmail: user?.email,
           userAgent: navigator.userAgent,
-          value: typeof value === 'number' ? value : undefined,
+          value,
           currency,
           contentName,
           eventSourceUrl: window.location.href

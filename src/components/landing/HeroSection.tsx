@@ -27,8 +27,11 @@ const HeroSection = () => {
       contentName: 'Upload Report for Free Button'
     });
 
-    // Always go to anonymous upload first, regardless of auth status
-    navigate('/upload-anonymous');
+    if (user) {
+      navigate('/upload');
+    } else {
+      navigate('/auth');
+    }
   };
 
   const handleViewDemo = async () => {

@@ -1,6 +1,6 @@
 
 import React, { useRef } from 'react';
-import { Upload, FileText, Loader2, Zap, Home } from 'lucide-react';
+import { Upload, FileText, Loader2, Clock } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -45,19 +45,19 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
   };
 
   return (
-    <Card className="shadow-lg border-2 border-gray-200 hover:border-green-300 transition-colors">
-      <CardHeader className="text-center">
-        <CardTitle className="flex items-center justify-center gap-3 text-2xl">
-          <Home className="h-6 w-6 text-green-600" />
-          Upload Your Inspection Report
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Upload className="h-5 w-5" />
+          Upload Home Inspection Report
         </CardTitle>
-        <CardDescription className="text-base">
-          Get instant analysis in under 2 minutes • PDF files up to 10MB
+        <CardDescription>
+          Select or drag & drop a PDF file (max 10MB)
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div
-          className="border-2 border-dashed border-gray-300 rounded-xl p-12 text-center hover:border-green-400 hover:bg-green-50/50 transition-all cursor-pointer group"
+          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer"
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => fileInputRef.current?.click()}
@@ -71,32 +71,31 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
           />
           
           {file ? (
-            <div className="flex flex-col items-center gap-3">
-              <div className="p-3 bg-green-100 rounded-full">
-                <FileText className="h-8 w-8 text-green-600" />
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900 text-lg">{file.name}</p>
-                <p className="text-green-600 font-medium">
-                  {(file.size / 1024 / 1024).toFixed(2)} MB • Ready to analyze
-                </p>
-              </div>
+            <div className="flex flex-col items-center gap-2">
+              <FileText className="h-12 w-12 text-blue-500" />
+              <p className="font-medium text-gray-900">{file.name}</p>
+              <p className="text-sm text-gray-500">
+                {(file.size / 1024 / 1024).toFixed(2)} MB
+              </p>
             </div>
           ) : (
-            <div className="flex flex-col items-center gap-4">
-              <div className="p-4 bg-gradient-to-br from-blue-100 to-green-100 rounded-full group-hover:from-green-100 group-hover:to-blue-100 transition-all">
-                <Upload className="h-10 w-10 text-blue-600 group-hover:text-green-600 transition-colors" />
-              </div>
-              <div>
-                <p className="text-gray-900 font-semibold text-lg mb-2">
-                  Click here or drag & drop your inspection PDF
-                </p>
-                <p className="text-gray-500">
-                  We support all standard inspection report formats
-                </p>
-              </div>
+            <div className="flex flex-col items-center gap-2">
+              <Upload className="h-12 w-12 text-gray-400" />
+              <p className="text-gray-600">Click to select or drag & drop your home inspection PDF</p>
+              <p className="text-sm text-gray-500">Maximum file size: 10MB</p>
             </div>
           )}
+        </div>
+
+        {/* Processing Time Notice */}
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-start gap-2">
+            <Clock className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-blue-800">
+              <p className="font-medium mb-1">Please be patient during analysis</p>
+              <p>Our AI thoroughly analyzes your inspection report, which can take 1-2 minutes to complete. We're extracting key findings, estimating repair costs, and generating insights to help you make informed decisions.</p>
+            </div>
+          </div>
         </div>
 
         {error && (
@@ -106,28 +105,28 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
           </Alert>
         )}
 
-        <div className="flex gap-3 mt-6">
+        <div className="flex gap-3 mt-4">
           <Button
             onClick={onProcess}
             disabled={!file || isProcessing}
-            className="flex-1 h-12 text-base font-semibold bg-green-600 hover:bg-green-700 border-2 border-green-700 hover:border-green-800 shadow-lg hover:shadow-xl transition-all"
+            className="flex-1"
           >
             {isProcessing ? (
               <>
-                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 {phaseMessage} {Math.round(overallProgress)}%
               </>
             ) : (
               <>
-                <Zap className="h-5 w-5 mr-2" />
-                Get My Free Analysis
+                <FileText className="h-4 w-4 mr-2" />
+                Analyze Home Inspection Report
               </>
             )}
           </Button>
           
-          {file && !isProcessing && (
-            <Button onClick={onReset} variant="outline" className="h-12">
-              Choose Different File
+          {file && (
+            <Button onClick={onReset} variant="outline">
+              Reset
             </Button>
           )}
         </div>
