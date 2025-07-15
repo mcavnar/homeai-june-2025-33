@@ -1,120 +1,72 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import Landing from "./pages/Landing";
-import AuthPage from "./pages/AuthPage";
-import AnonymousUpload from "./pages/AnonymousUpload";
-import UploadPage from "./pages/UploadPage";
-import Account from "./pages/Account";
-import Results from "./pages/Results";
-import Synopsis from "./pages/results/Synopsis";
-import IssuesList from "./pages/results/IssuesList";
-import KeySystems from "./pages/results/KeySystems";
-import ServiceProviders from "./pages/results/ServiceProviders";
-import Negotiation from "./pages/results/Negotiation";
-import InspectionReport from "./pages/results/InspectionReport";
-import AnonymousResults from "./pages/AnonymousResults";
-import AnonymousSynopsis from "./pages/anonymous/AnonymousSynopsis";
-import DemoResults from "./pages/DemoResults";
-import DemoSynopsis from "./pages/demo/DemoSynopsis";
-import DemoIssuesList from "./pages/demo/DemoIssuesList";
-import DemoKeySystems from "./pages/demo/DemoKeySystems";
-import DemoServiceProviders from "./pages/demo/DemoServiceProviders";
-import DemoNegotiation from "./pages/demo/DemoNegotiation";
-import DemoInspectionReport from "./pages/demo/DemoInspectionReport";
-import SharedReport from "./pages/SharedReport";
-import SharedSynopsis from "./pages/shared/SharedSynopsis";
-import SharedIssuesList from "./pages/shared/SharedIssuesList";
-import SharedKeySystems from "./pages/shared/SharedKeySystems";
-import SharedServiceProviders from "./pages/shared/SharedServiceProviders";
-import SharedNegotiation from "./pages/shared/SharedNegotiation";
-import SharedInspectionReport from "./pages/shared/SharedInspectionReport";
-import NotFound from "./pages/NotFound";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsAndConditions from "./pages/TermsAndConditions";
+import { useEffect } from "react";
+import { clearStaleData } from "@/utils/cleanupUtils";
+import Home from "@/pages/Home";
+import Upload from "@/pages/Upload";
+import Results from "@/pages/Results";
+import Synopsis from "@/pages/results/Synopsis";
+import Auth from "@/pages/Auth";
+import AnonymousUpload from "@/pages/AnonymousUpload";
+import AnonymousResults from "@/pages/AnonymousResults";
+import AnonymousSynopsis from "@/pages/anonymous-results/Synopsis";
+import ProsInquiry from "@/pages/ProsInquiry";
+import ServiceProsInquiry from "@/pages/ServiceProsInquiry";
+import PDFSummarizer from "@/components/PDFSummarizer";
+import SampleSurvey from "@/pages/SampleSurvey";
+import SharedReport from "@/pages/SharedReport";
+import Account from "@/pages/Account";
+import UserReports from "@/pages/UserReports";
+import ReportDetails from "@/pages/ReportDetails";
+import RealtorAnalysis from "@/pages/RealtorAnalysis";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
+const App = () => {
+  // Clear stale data on app startup
+  useEffect(() => {
+    clearStaleData();
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+        <AuthProvider>
           <AnalyticsProvider>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/anonymous-upload" element={<AnonymousUpload />} />
-              <Route path="/upload" element={
-                <ProtectedRoute>
-                  <UploadPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/account" element={
-                <ProtectedRoute>
-                  <Account />
-                </ProtectedRoute>
-              } />
-              <Route path="/results" element={
-                <ProtectedRoute requiresReport={true}>
-                  <Results />
-                </ProtectedRoute>
-              }>
-                <Route index element={<Navigate to="/results/synopsis" replace />} />
-                <Route path="synopsis" element={<Synopsis />} />
-                <Route path="issues" element={<IssuesList />} />
-                <Route path="systems" element={<KeySystems />} />
-                <Route path="providers" element={<ServiceProviders />} />
-                <Route path="negotiation" element={<Negotiation />} />
-                <Route path="report" element={<InspectionReport />} />
-              </Route>
-              {/* Anonymous Results Routes */}
-              <Route path="/anonymous-results" element={<AnonymousResults />}>
-                <Route index element={<Navigate to="/anonymous-results/synopsis" replace />} />
-                <Route path="synopsis" element={<AnonymousSynopsis />} />
-                <Route path="issues" element={<IssuesList />} />
-                <Route path="systems" element={<KeySystems />} />
-                <Route path="providers" element={<ServiceProviders />} />
-                <Route path="negotiation" element={<Negotiation />} />
-                <Route path="report" element={<InspectionReport />} />
-              </Route>
-              <Route path="/demo" element={<DemoResults />}>
-                <Route index element={<Navigate to="/demo/synopsis" replace />} />
-                <Route path="synopsis" element={<DemoSynopsis />} />
-                <Route path="issues" element={<DemoIssuesList />} />
-                <Route path="systems" element={<DemoKeySystems />} />
-                <Route path="providers" element={<DemoServiceProviders />} />
-                <Route path="negotiation" element={<DemoNegotiation />} />
-                <Route path="report" element={<DemoInspectionReport />} />
-              </Route>
-              {/* Shared Report Routes */}
-              <Route path="/shared/:token" element={<SharedReport />}>
-                <Route index element={<Navigate to="synopsis" replace />} />
-                <Route path="synopsis" element={<SharedSynopsis />} />
-                <Route path="issues" element={<SharedIssuesList />} />
-                <Route path="systems" element={<SharedKeySystems />} />
-                <Route path="providers" element={<SharedServiceProviders />} />
-                <Route path="negotiation" element={<SharedNegotiation />} />
-                <Route path="report" element={<SharedInspectionReport />} />
-              </Route>
-              <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/terms" element={<TermsAndConditions />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/upload" element={<Upload />} />
+                <Route path="/results" element={<Results />} />
+                <Route path="/results/synopsis" element={<Synopsis />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/anonymous-upload" element={<AnonymousUpload />} />
+                <Route path="/anonymous-results" element={<AnonymousResults />} >
+                  <Route path="synopsis" element={<AnonymousSynopsis />} />
+                </Route>
+                <Route path="/pros-inquiry" element={<ProsInquiry />} />
+                <Route path="/service-pros-inquiry" element={<ServiceProsInquiry />} />
+                <Route path="/pdf-summarizer" element={<PDFSummarizer />} />
+                <Route path="/sample-survey" element={<SampleSurvey />} />
+                <Route path="/shared-report/:token" element={<SharedReport />} />
+                <Route path="/account" element={<Account />} />
+                <Route path="/user-reports" element={<UserReports />} />
+                <Route path="/user-reports/:reportId" element={<ReportDetails />} />
+                <Route path="/realtor-analysis" element={<RealtorAnalysis />} />
+              </Routes>
+            </BrowserRouter>
           </AnalyticsProvider>
-        </BrowserRouter>
+        </AuthProvider>
       </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+    </QueryClientProvider>
+  );
+};
 
 export default App;

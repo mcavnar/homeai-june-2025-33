@@ -41,6 +41,13 @@ export const useAnalytics = () => {
   const sessionStartTimeRef = useRef<number>(Date.now());
   const pageStartTimeRef = useRef<number>(Date.now());
 
+  // Clear localStorage on component mount to prevent stale data issues
+  useEffect(() => {
+    // Clear any stale analytics data
+    localStorage.removeItem('analytics_session');
+    localStorage.removeItem('analytics_page_visit');
+  }, []);
+
   // Start a new session when user logs in
   const startSession = useCallback(async () => {
     if (!user) return;
@@ -55,13 +62,21 @@ export const useAnalytics = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        // Handle 409 conflict errors gracefully
+        if (error.code === '23505' || error.message.includes('409')) {
+          console.log('Analytics session conflict resolved, continuing...');
+          return;
+        }
+        throw error;
+      }
 
       currentSessionRef.current = data;
       sessionStartTimeRef.current = Date.now();
       console.log('Analytics session started:', data.id);
     } catch (error) {
       console.error('Failed to start analytics session:', error);
+      // Don't throw error to prevent breaking the app
     }
   }, [user]);
 
@@ -121,7 +136,14 @@ export const useAnalytics = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        // Handle 409 conflict errors gracefully
+        if (error.code === '23505' || error.message.includes('409')) {
+          console.log('Page visit conflict resolved, continuing...');
+          return;
+        }
+        throw error;
+      }
 
       currentPageVisitRef.current = data;
       pageStartTimeRef.current = Date.now();
@@ -147,6 +169,11 @@ export const useAnalytics = () => {
 
       console.log('Interaction tracked:', interaction.interaction_type, interaction.element_text);
     } catch (error) {
+      // Handle 409 conflict errors gracefully
+      if (error.code === '23505' || error.message.includes('409')) {
+        console.log('Interaction conflict resolved, continuing...');
+        return;
+      }
       console.error('Failed to track interaction:', error);
     }
   }, [user]);

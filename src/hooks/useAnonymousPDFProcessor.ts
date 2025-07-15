@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { extractTextFromPDF } from '@/utils/pdfTextExtractor';
 import { HomeInspectionAnalysis } from '@/types/inspection';
 import { generateSessionId } from '@/utils/sessionUtils';
+import { fetchPropertyData } from '@/utils/propertyDataService';
+import { generateNegotiationStrategy } from '@/utils/negotiationStrategyService';
 
 type ProcessingPhase = 'extraction' | 'analysis' | 'property' | 'negotiation' | 'saving' | 'complete';
 
@@ -68,63 +70,6 @@ export const useAnonymousPDFProcessor = () => {
         }
       }, interval);
     });
-  };
-
-  const fetchPropertyData = async (address: string) => {
-    try {
-      console.log('Fetching property data for address:', address);
-      
-      const { data, error } = await supabase.functions.invoke('get-property-data', {
-        body: { address }
-      });
-
-      if (error) {
-        console.error('Property data fetch error:', error);
-        return null;
-      }
-
-      if (data && data.success) {
-        console.log('Property data fetched successfully');
-        return data.propertyData;
-      } else {
-        console.log('No property data found or fetch failed');
-        return null;
-      }
-    } catch (err) {
-      console.error('Error fetching property data:', err);
-      return null;
-    }
-  };
-
-  const generateNegotiationStrategy = async (analysisData: HomeInspectionAnalysis, propertyData: any) => {
-    try {
-      console.log('Generating negotiation strategy...');
-      
-      const { data, error } = await supabase.functions.invoke('generate-negotiation-strategy', {
-        body: {
-          analysis: analysisData,
-          propertyData: propertyData,
-          userEmail: null,
-          emailCaptureSource: 'anonymous-upload'
-        }
-      });
-
-      if (error) {
-        console.error('Negotiation strategy generation error:', error);
-        return null;
-      }
-
-      if (data && data.success) {
-        console.log('Negotiation strategy generated successfully');
-        return data.strategy;
-      } else {
-        console.log('Negotiation strategy generation failed');
-        return null;
-      }
-    } catch (err) {
-      console.error('Error generating negotiation strategy:', err);
-      return null;
-    }
   };
 
   const processPDF = async () => {
@@ -217,7 +162,7 @@ export const useAnonymousPDFProcessor = () => {
       });
 
       // Start simulated progress for AI analysis
-      const aiProgressPromise = simulateProgressFor('analysis', 20, 50, 35000);
+      const aiProgressPromise = simulateProgressFor('analysis', 20, 50, 25000);
 
       // Prepare payload for the edge function
       const payload = { 
@@ -230,16 +175,26 @@ export const useAnonymousPDFProcessor = () => {
       console.log('Calling process-pdf edge function...');
       const edgeFunctionStartTime = Date.now();
       
-      const { data, error: functionError } = await supabase.functions.invoke('process-pdf', {
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Analysis timed out after 120 seconds')), 120000);
+      });
+
+      const analysisPromise = supabase.functions.invoke('process-pdf', {
         body: payload,
       });
+
+      const { data, error: functionError } = await Promise.race([
+        analysisPromise,
+        timeoutPromise
+      ]) as any;
       
       const edgeFunctionEndTime = Date.now();
       console.log(`Edge function completed in ${(edgeFunctionEndTime - edgeFunctionStartTime) / 1000} seconds`);
 
       if (functionError) {
         console.error('Edge function error:', functionError);
-        throw new Error(functionError.message);
+        throw new Error(functionError.message || 'Analysis failed');
       }
 
       if (!data || !data.success) {
@@ -265,8 +220,13 @@ export const useAnonymousPDFProcessor = () => {
 
       let propertyData = null;
       if (analysisData.propertyInfo?.address) {
-        const propertyProgressPromise = simulateProgressFor('property', 50, 70, 10000);
-        propertyData = await fetchPropertyData(analysisData.propertyInfo.address);
+        const propertyProgressPromise = simulateProgressFor('property', 50, 70, 8000);
+        try {
+          propertyData = await fetchPropertyData(analysisData.propertyInfo.address);
+        } catch (err) {
+          console.error('Property data fetch failed:', err);
+          // Continue without property data
+        }
         await propertyProgressPromise;
       }
 
@@ -280,8 +240,13 @@ export const useAnonymousPDFProcessor = () => {
       });
 
       let negotiationStrategy = null;
-      const negotiationProgressPromise = simulateProgressFor('negotiation', 70, 85, 15000);
-      negotiationStrategy = await generateNegotiationStrategy(analysisData, propertyData);
+      const negotiationProgressPromise = simulateProgressFor('negotiation', 70, 85, 10000);
+      try {
+        negotiationStrategy = await generateNegotiationStrategy(analysisData, propertyData);
+      } catch (err) {
+        console.error('Negotiation strategy generation failed:', err);
+        // Continue without negotiation strategy
+      }
       await negotiationProgressPromise;
 
       // Transition to saving phase
@@ -402,12 +367,12 @@ export const useAnonymousPDFProcessor = () => {
         return '10 seconds remaining';
       case 'analysis':
         const analysisProgress = (overallProgress - 20) / 30;
-        const remainingSeconds = Math.max(5, Math.round(35 * (1 - analysisProgress)));
+        const remainingSeconds = Math.max(5, Math.round(25 * (1 - analysisProgress)));
         return `${remainingSeconds} seconds remaining`;
       case 'property':
-        return '10 seconds remaining';
+        return '8 seconds remaining';
       case 'negotiation':
-        return '15 seconds remaining';
+        return '10 seconds remaining';
       case 'saving':
         return '5 seconds remaining';
       case 'complete':
