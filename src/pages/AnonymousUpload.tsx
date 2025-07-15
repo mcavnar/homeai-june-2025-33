@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
@@ -90,10 +89,6 @@ const AnonymousUpload = () => {
         {/* Hero Section - Conversion Optimized */}
         <div className="text-center mb-12">
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium mb-4">
-              <Timer className="h-4 w-4" />
-              Free Analysis - Usually $297
-            </div>
             <div className="flex items-center justify-center gap-6 text-sm text-gray-600 mb-8">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-green-500" />
