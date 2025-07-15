@@ -6,7 +6,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, AlertCircle, UserPlus } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ResultsSidebar } from '@/components/ResultsSidebar';
 
 const AnonymousResults = () => {
   const location = useLocation();
@@ -96,14 +95,6 @@ const AnonymousResults = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8">
-          {/* Sidebar */}
-          <div className="w-64 flex-shrink-0">
-            <ResultsSidebar 
-              analysis={analysis}
-              basePath="/anonymous-results"
-            />
-          </div>
-
           {/* Main Content */}
           <div className="flex-1">
             <Outlet />
