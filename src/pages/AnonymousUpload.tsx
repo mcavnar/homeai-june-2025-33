@@ -88,8 +88,8 @@ const AnonymousUpload = () => {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Avoid Costly Home Buying Mistakes
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Get intelligent analysis with prioritized findings, cost estimates, and negotiation guidance.
+          <p className="text-lg text-gray-600 max-w-4xl mx-auto">
+            Our systems analyzes your report and queries our database of millions of contractor quotes, material costs and area variables to produce intelligent analysis with prioritized findings, cost estimates, and negotiation guidance.
           </p>
         </div>
 
