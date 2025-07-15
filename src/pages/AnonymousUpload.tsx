@@ -90,7 +90,7 @@ const AnonymousUpload = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Upload Your Inspection Report
+            Avoid Costly Home Buying Mistakes
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Get intelligent analysis with prioritized findings, cost estimates, and negotiation guidance.
