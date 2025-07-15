@@ -29,27 +29,68 @@ const AccountCreation = () => {
   // Get the analysis data from location state
   const analysisData = location.state;
 
-  // Wait for session to be ready with retry logic
-  const waitForSession = async (maxRetries = 5, delay = 1000) => {
+  // Verify database session by testing auth.uid()
+  const verifyDatabaseSession = async () => {
+    try {
+      const { data, error } = await supabase.rpc('auth.uid');
+      if (error) {
+        console.error('Database session verification error:', error);
+        return false;
+      }
+      console.log('Database auth.uid():', data);
+      return !!data;
+    } catch (err) {
+      // If auth.uid() function doesn't exist, try a simple query that uses auth.uid()
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', 'test')
+          .limit(1);
+        
+        // If we get here without an auth error, the session is working
+        console.log('Database session test successful');
+        return true;
+      } catch (testErr) {
+        console.error('Database session test failed:', testErr);
+        return false;
+      }
+    }
+  };
+
+  // Wait for both client and database sessions to be ready
+  const waitForSession = async (maxRetries = 8, delay = 1000) => {
     for (let i = 0; i < maxRetries; i++) {
       try {
+        // Check client session
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
-          console.error('Session error:', error);
+          console.error('Client session error:', error);
           continue;
         }
+        
         if (session?.user?.id) {
-          console.log('Session ready, user ID:', session.user.id);
-          return session;
+          console.log('Client session ready, user ID:', session.user.id);
+          
+          // Also verify database session
+          const dbSessionReady = await verifyDatabaseSession();
+          if (dbSessionReady) {
+            console.log('Both client and database sessions are ready');
+            return session;
+          } else {
+            console.log('Client session ready but database session not yet available');
+          }
+        } else {
+          console.log('Client session not ready');
         }
       } catch (err) {
-        console.error('Error getting session:', err);
+        console.error('Error checking session:', err);
       }
       
       if (i < maxRetries - 1) {
-        console.log(`Session not ready, retrying in ${delay}ms... (attempt ${i + 1}/${maxRetries})`);
+        console.log(`Session not fully ready, retrying in ${delay}ms... (attempt ${i + 1}/${maxRetries})`);
         await new Promise(resolve => setTimeout(resolve, delay));
-        delay *= 1.5; // Exponential backoff
+        delay = Math.min(delay * 1.2, 3000); // Exponential backoff with cap
       }
     }
     throw new Error('Session not ready after maximum retries');
@@ -60,9 +101,12 @@ const AccountCreation = () => {
 
     setSavingReport(true);
     try {
-      // Wait for session to be fully established
+      // Wait for both client and database sessions to be fully established
       console.log('Waiting for session to be ready...');
       await waitForSession();
+      
+      // Add a small additional delay to ensure session propagation
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Now try to save the report
       console.log('Session ready, saving user report...');
@@ -74,6 +118,10 @@ const AccountCreation = () => {
       console.log('Successfully saved user report to database');
     } catch (saveError) {
       console.error('Error saving user report:', saveError);
+      // Check if it's specifically an RLS error
+      if (saveError.message?.includes('row-level security policy')) {
+        throw new Error('Session not properly authenticated. Please refresh the page and try again.');
+      }
       throw new Error('Failed to save report. Please try uploading again.');
     } finally {
       setSavingReport(false);
