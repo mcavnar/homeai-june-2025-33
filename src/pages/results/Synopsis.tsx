@@ -24,6 +24,23 @@ const Synopsis = () => {
     propertyError,
   } = useOutletContext<SynopsisContextType>();
 
+  // Handle case where analysis is not yet available
+  if (!analysis) {
+    return (
+      <div className="space-y-6">
+        <div className="py-6 px-6">
+          <div className="flex items-center justify-center gap-3 py-4">
+            <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+            <div className="text-center">
+              <p className="font-medium text-gray-900">Loading your report...</p>
+              <p className="text-sm text-gray-600">Preparing your analysis data</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const displayAddress = analysis.propertyInfo?.address 
     ? cleanAddressForDisplay(analysis.propertyInfo.address) 
     : undefined;

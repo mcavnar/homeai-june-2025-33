@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useUserReport } from '@/hooks/useUserReport';
@@ -15,7 +16,7 @@ const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, hasExistingReport, isCheckingForReport, refreshExistingReportCheck } = useAuth();
-  const { userReport, isLoading: isLoadingReport, error: reportError, saveUserReport } = useUserReport();
+  const { userReport, isLoading: isLoadingReport, error: reportError, saveUserReport, fetchUserReport } = useUserReport();
   const { saveUserReportViaServer } = useServerUserReport();
   const { toast } = useToast();
   const [pdfArrayBuffer, setPdfArrayBuffer] = useState<ArrayBuffer | null>(null);
@@ -166,6 +167,10 @@ const Results = () => {
         // Refresh the existing report check in AuthContext
         await refreshExistingReportCheck();
         
+        // Trigger a fresh fetch of the user report to get the latest data
+        console.log('Triggering user report refetch after OAuth processing');
+        await fetchUserReport();
+        
         toast({
           title: "Account created successfully!",
           description: "Your inspection report has been saved to your account.",
@@ -192,7 +197,7 @@ const Results = () => {
     };
 
     processOAuthData();
-  }, [hasOAuthDataPending, user, userReport, isProcessingOAuthData, saveUserReportViaServer, refreshExistingReportCheck, toast]);
+  }, [hasOAuthDataPending, user, userReport, isProcessingOAuthData, saveUserReportViaServer, refreshExistingReportCheck, fetchUserReport, toast]);
 
   useEffect(() => {
     // Priority: location state PDF > storage PDF
