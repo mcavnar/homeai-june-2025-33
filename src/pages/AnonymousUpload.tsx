@@ -113,51 +113,6 @@ const AnonymousUpload = () => {
             </div>
           </div>
 
-          {/* Social Proof - Testimonials */}
-          <div className="grid md:grid-cols-3 gap-4 mb-8">
-            <Card className="p-4 bg-white/80 backdrop-blur-sm">
-              <CardContent className="p-0">
-                <div className="flex items-center gap-1 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-gray-600 mb-2">
-                  "Saved me $22,000 on my home purchase! The hidden electrical issues would have cost me a fortune."
-                </p>
-                <p className="text-xs text-gray-500">- Sarah M., First-time buyer</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="p-4 bg-white/80 backdrop-blur-sm">
-              <CardContent className="p-0">
-                <div className="flex items-center gap-1 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-gray-600 mb-2">
-                  "Negotiated $35,000 off the asking price using their detailed repair estimates. Incredible!"
-                </p>
-                <p className="text-xs text-gray-500">- Mark T., Real estate investor</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="p-4 bg-white/80 backdrop-blur-sm">
-              <CardContent className="p-0">
-                <div className="flex items-center gap-1 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-gray-600 mb-2">
-                  "Found $8,000 in HVAC repairs that weren't obvious. The contractor recommendations were spot-on."
-                </p>
-                <p className="text-xs text-gray-500">- Jessica R., Home buyer</p>
-              </CardContent>
-            </Card>
-          </div>
-
           {/* Trust Indicators */}
           <div className="flex items-center justify-center gap-8 mb-8 text-sm text-gray-600">
             <div className="flex items-center gap-2">
@@ -206,6 +161,56 @@ const AnonymousUpload = () => {
             phaseMessage={getPhaseMessage()}
             estimatedTimeRemaining={getEstimatedTimeRemaining()}
           />
+        </div>
+
+        {/* Social Proof - Testimonials - Moved below upload section */}
+        <div className="max-w-4xl mx-auto mt-8">
+          <h3 className="text-2xl font-bold text-center text-gray-900 mb-6">
+            Join 2,847+ Smart Home Buyers Who Saved Big
+          </h3>
+          <div className="grid md:grid-cols-3 gap-4 mb-8">
+            <Card className="p-4 bg-white/80 backdrop-blur-sm">
+              <CardContent className="p-0">
+                <div className="flex items-center gap-1 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-sm text-gray-600 mb-2">
+                  "Saved me $22,000 on my home purchase! The hidden electrical issues would have cost me a fortune."
+                </p>
+                <p className="text-xs text-gray-500">- Sarah M., First-time buyer</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="p-4 bg-white/80 backdrop-blur-sm">
+              <CardContent className="p-0">
+                <div className="flex items-center gap-1 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-sm text-gray-600 mb-2">
+                  "Negotiated $35,000 off the asking price using their detailed repair estimates. Incredible!"
+                </p>
+                <p className="text-xs text-gray-500">- Mark T., Real estate investor</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="p-4 bg-white/80 backdrop-blur-sm">
+              <CardContent className="p-0">
+                <div className="flex items-center gap-1 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-sm text-gray-600 mb-2">
+                  "Found $8,000 in HVAC repairs that weren't obvious. The contractor recommendations were spot-on."
+                </p>
+                <p className="text-xs text-gray-500">- Jessica R., Home buyer</p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* What You'll Get Section */}
