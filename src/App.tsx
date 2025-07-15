@@ -12,6 +12,11 @@ import Landing from "@/pages/Landing";
 import Upload from "@/pages/Upload";
 import Results from "@/pages/Results";
 import Synopsis from "@/pages/results/Synopsis";
+import IssuesList from "@/pages/results/IssuesList";
+import KeySystems from "@/pages/results/KeySystems";
+import ServiceProviders from "@/pages/results/ServiceProviders";
+import Negotiation from "@/pages/results/Negotiation";
+import InspectionReport from "@/pages/results/InspectionReport";
 import AuthPage from "@/pages/AuthPage";
 import AnonymousUpload from "@/pages/AnonymousUpload";
 import AnonymousResults from "@/pages/AnonymousResults";
@@ -24,6 +29,7 @@ import EmailCapture from "@/pages/EmailCapture";
 import DemoResults from "@/pages/DemoResults";
 import AccountCreation from "@/pages/AccountCreation";
 import NotFound from "@/pages/NotFound";
+import { Navigate } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
@@ -46,8 +52,15 @@ const App = () => {
                 <Route path="/upload" element={<Upload />} />
                 <Route path="/upload-page" element={<UploadPage />} />
                 <Route path="/email-capture" element={<EmailCapture />} />
-                <Route path="/results" element={<Results />} />
-                <Route path="/results/synopsis" element={<Synopsis />} />
+                <Route path="/results" element={<Results />}>
+                  <Route index element={<Navigate to="/results/synopsis" replace />} />
+                  <Route path="synopsis" element={<Synopsis />} />
+                  <Route path="issues" element={<IssuesList />} />
+                  <Route path="systems" element={<KeySystems />} />
+                  <Route path="providers" element={<ServiceProviders />} />
+                  <Route path="negotiation" element={<Negotiation />} />
+                  <Route path="report" element={<InspectionReport />} />
+                </Route>
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/anonymous-upload" element={<AnonymousUpload />} />
                 <Route path="/anonymous-results" element={<AnonymousResults />} >
