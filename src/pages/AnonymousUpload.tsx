@@ -259,6 +259,21 @@ const AnonymousUpload = () => {
             </Card>
           </div>
         </div>
+
+        {/* Privacy Protection Box - Centered at Bottom */}
+        <div className="flex justify-center mt-16 mb-8">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-6 max-w-2xl w-full">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-green-800">Your Privacy is Protected</h3>
+            </div>
+            <p className="text-gray-700 text-center">
+              We use enterprise-grade encryption to protect your data throughout the analysis process.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
