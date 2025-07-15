@@ -45,10 +45,10 @@ const AnonymousUpload = () => {
         contentName: 'Anonymous PDF Analysis Complete'
       });
 
-      console.log('Navigating to /anonymous-results/synopsis');
+      console.log('Navigating to /account-creation with analysis data');
 
-      // Navigate to anonymous results with state
-      navigate('/anonymous-results/synopsis', { 
+      // Navigate to account creation page with complete data via state
+      navigate('/account-creation', { 
         state: result
       });
     } else {
@@ -62,7 +62,7 @@ const AnonymousUpload = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Upload Your Inspection Report</h1>
           <p className="text-gray-600">Upload your home inspection PDF to get started with the analysis</p>
-          <p className="text-sm text-gray-500 mt-2">No account required - results are temporarily stored for 7 days</p>
+          <p className="text-sm text-gray-500 mt-2">Free analysis - create account to save results</p>
         </div>
 
         <FileUploadSection
@@ -97,14 +97,14 @@ const AnonymousUpload = () => {
               <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm">
                 2
               </div>
-              <span className="ml-2 text-sm text-gray-600">Results</span>
+              <span className="ml-2 text-sm text-gray-600">Create Account</span>
             </div>
             <div className="w-8 h-px bg-gray-300"></div>
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm">
                 3
               </div>
-              <span className="ml-2 text-sm text-gray-600">Save (Optional)</span>
+              <span className="ml-2 text-sm text-gray-600">View Results</span>
             </div>
           </div>
         </div>

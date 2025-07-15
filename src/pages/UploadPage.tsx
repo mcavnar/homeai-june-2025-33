@@ -96,14 +96,14 @@ const UploadPage = () => {
           estimatedTimeRemaining={getEstimatedTimeRemaining()}
         />
 
-        {/* Progress Indicator */}
+        {/* Progress Indicator - Authenticated users skip account creation */}
         <div className="mt-8 flex justify-center">
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm">
                 ✓
               </div>
-              <span className="ml-2 text-sm text-gray-600">Account Created</span>
+              <span className="ml-2 text-sm text-gray-600">Account Active</span>
             </div>
             <div className="w-8 h-px bg-gray-300"></div>
             <div className="flex items-center">

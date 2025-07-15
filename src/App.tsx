@@ -22,6 +22,7 @@ import Account from "@/pages/Account";
 import UploadPage from "@/pages/UploadPage";
 import EmailCapture from "@/pages/EmailCapture";
 import DemoResults from "@/pages/DemoResults";
+import AccountCreation from "@/pages/AccountCreation";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => {
                 <Route path="/anonymous-results" element={<AnonymousResults />} >
                   <Route path="synopsis" element={<AnonymousSynopsis />} />
                 </Route>
+                <Route path="/account-creation" element={<AccountCreation />} />
                 <Route path="/pdf-summarizer" element={<PDFSummarizer />} />
                 <Route path="/shared-report/:token" element={<SharedReport />} />
                 <Route path="/account" element={<Account />} />
