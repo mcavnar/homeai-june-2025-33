@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,7 +10,7 @@ interface AuthContextType {
   hasExistingReport: boolean | null;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signInWithGoogle: () => Promise<{ error: any }>;
+  signInWithGoogle: (redirectTo?: string) => Promise<{ error: any }>;
   signOut: () => Promise<{ error: any }>;
   checkForExistingReport: () => Promise<boolean>;
   requestAccountDeletion: () => Promise<{ error: any }>;
@@ -119,11 +120,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (redirectTo: string = '/results/synopsis') => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/upload`
+        redirectTo: `${window.location.origin}${redirectTo}`
       }
     });
     return { error };

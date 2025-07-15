@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -152,8 +151,8 @@ const AccountCreation = () => {
     setIsCreatingAccount(true);
 
     try {
-      console.log('Starting Google authentication');
-      const { error } = await signInWithGoogle();
+      console.log('Starting Google authentication with redirect to /results/synopsis');
+      const { error } = await signInWithGoogle('/results/synopsis');
       
       if (error) {
         setAuthError(error.message);
