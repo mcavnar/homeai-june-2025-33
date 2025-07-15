@@ -184,88 +184,79 @@ const AnonymousUpload = () => {
               phaseMessage={getPhaseMessage()}
               estimatedTimeRemaining={getEstimatedTimeRemaining()}
             />
-
-            {/* Privacy Notice */}
-            <Card className="bg-green-50 border-green-200">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Shield className="h-5 w-5 text-green-600" />
-                  <h3 className="font-semibold text-gray-900">Your Privacy is Protected</h3>
-                </div>
-                <p className="text-gray-600">
-                  We use enterprise-grade encryption to protect your data throughout the analysis process.
-                </p>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Right Column - What You'll Get */}
           <div className="space-y-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">What You'll Get</h2>
-            
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">At a Glance</h3>
-                  <p className="text-gray-600">Clear overview of your property's condition</p>
-                </div>
-              </div>
+            <Card className="bg-white shadow-lg border border-gray-200">
+              <CardContent className="p-8">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">What You'll Get</h2>
+                
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-1">At a Glance</h3>
+                      <p className="text-gray-600">Clear overview of your property's condition</p>
+                    </div>
+                  </div>
 
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Prioritized Issues</h3>
-                  <p className="text-gray-600">What needs attention first, second, and later</p>
-                </div>
-              </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-1">Prioritized Issues</h3>
+                      <p className="text-gray-600">What needs attention first, second, and later</p>
+                    </div>
+                  </div>
 
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Cost Estimates</h3>
-                  <p className="text-gray-600">Accurate repair costs for budgeting</p>
-                </div>
-              </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-1">Cost Estimates</h3>
+                      <p className="text-gray-600">Accurate repair costs for budgeting</p>
+                    </div>
+                  </div>
 
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Market Comparison</h3>
-                  <p className="text-gray-600">How your property compares to similar homes</p>
-                </div>
-              </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-1">Market Comparison</h3>
+                      <p className="text-gray-600">How your property compares to similar homes</p>
+                    </div>
+                  </div>
 
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-1">Negotiation Strategy</h3>
+                      <p className="text-gray-600">Practical guidance for talking with sellers</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Negotiation Strategy</h3>
-                  <p className="text-gray-600">Practical guidance for talking with sellers</p>
-                </div>
-              </div>
-            </div>
 
-            {/* Analysis Time & Security */}
-            <div className="border-t pt-6 mt-8">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-600">Analysis completed in 2-3 minutes</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-600">Your data is secure and private</span>
-              </div>
-            </div>
+                {/* Analysis Time & Security */}
+                <div className="border-t pt-6 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm text-gray-600">Analysis completed in 2-3 minutes</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm text-gray-600">Your data is secure and private</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
