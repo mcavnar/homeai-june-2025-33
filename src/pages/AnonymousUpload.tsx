@@ -90,11 +90,10 @@ const AnonymousUpload = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Share Your Inspection Report with Aunt Sally
+            Upload Your Inspection Report
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Upload your home inspection PDF and get intelligent analysis with prioritized 
-            findings, cost estimates, and negotiation guidance.
+            Get intelligent analysis with prioritized findings, cost estimates, and negotiation guidance.
           </p>
         </div>
 
