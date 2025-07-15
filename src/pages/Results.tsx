@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useUserReport } from '@/hooks/useUserReport';
@@ -20,6 +21,7 @@ const Results = () => {
   const { toast } = useToast();
   const [pdfArrayBuffer, setPdfArrayBuffer] = useState<ArrayBuffer | null>(null);
   const [isProcessingOAuthData, setIsProcessingOAuthData] = useState(false);
+  const [hasCheckedForOAuthData, setHasCheckedForOAuthData] = useState(false);
   
   const state = location.state as { 
     analysis: any; 
@@ -50,26 +52,48 @@ const Results = () => {
     setNegotiationStrategyFromDatabase,
   } = useNegotiationStrategy(userReport?.analysis_data || null, propertyData);
 
-  // Handle sessionStorage data from OAuth flow
+  // Handle sessionStorage data from OAuth flow - this runs FIRST and BLOCKS other logic
   useEffect(() => {
     const handleOAuthData = async () => {
-      if (!user || userReport || isProcessingOAuthData) return;
+      console.log('=== OAUTH DATA CHECK ===');
+      console.log('User:', !!user);
+      console.log('UserReport:', !!userReport);
+      console.log('IsProcessingOAuthData:', isProcessingOAuthData);
+      console.log('HasCheckedForOAuthData:', hasCheckedForOAuthData);
+
+      // Only run this once and only if we have a user but no report yet
+      if (!user || userReport || isProcessingOAuthData || hasCheckedForOAuthData) {
+        setHasCheckedForOAuthData(true);
+        return;
+      }
 
       // Check for stored data from OAuth flow
       const storedData = sessionStorage.getItem('pendingAccountCreationData');
-      if (!storedData) return;
+      console.log('Stored OAuth data found:', !!storedData);
+      
+      if (!storedData) {
+        setHasCheckedForOAuthData(true);
+        return;
+      }
 
       try {
         setIsProcessingOAuthData(true);
         const parsedData = JSON.parse(storedData);
         
-        console.log('Found stored OAuth data:', parsedData);
+        console.log('Processing OAuth data:', {
+          hasAnalysis: !!parsedData.analysis,
+          hasPropertyData: !!parsedData.propertyData,
+          hasNegotiationStrategy: !!parsedData.negotiationStrategy,
+          timestamp: parsedData.timestamp
+        });
         
         // Check if data is recent (within 10 minutes)
         const isRecent = Date.now() - parsedData.timestamp < 600000;
         if (!isRecent) {
           console.log('Stored data is too old, clearing it');
           sessionStorage.removeItem('pendingAccountCreationData');
+          setHasCheckedForOAuthData(true);
+          setIsProcessingOAuthData(false);
           return;
         }
 
@@ -110,7 +134,13 @@ const Results = () => {
           negotiation_strategy: parsedData.negotiationStrategy,
         };
 
-        console.log('Saving OAuth user report with data:', reportData);
+        console.log('Saving OAuth user report with data:', {
+          hasAnalysisData: !!reportData.analysis_data,
+          propertyAddress: reportData.property_address,
+          hasPropertyData: !!reportData.property_data,
+          hasNegotiationStrategy: !!reportData.negotiation_strategy,
+        });
+        
         await saveUserReportViaServer(reportData);
         
         // Clear stored data after successful save
@@ -121,8 +151,7 @@ const Results = () => {
           description: "Your inspection report has been saved to your account.",
         });
 
-        // Force a refresh of the user report
-        window.location.reload();
+        console.log('OAuth data processing completed successfully');
 
       } catch (error) {
         console.error('Error processing OAuth data:', error);
@@ -134,11 +163,12 @@ const Results = () => {
         });
       } finally {
         setIsProcessingOAuthData(false);
+        setHasCheckedForOAuthData(true);
       }
     };
 
     handleOAuthData();
-  }, [user, userReport, isProcessingOAuthData, saveUserReportViaServer, toast]);
+  }, [user, userReport, isProcessingOAuthData, hasCheckedForOAuthData, saveUserReportViaServer, toast]);
 
   useEffect(() => {
     // Priority: location state PDF > storage PDF
@@ -250,31 +280,37 @@ const Results = () => {
     }
   }, [userReport, propertyData, isLoadingProperty, fetchPropertyDetails, setPropertyDataFromDatabase, setNegotiationStrategyFromDatabase]);
 
-  // Show loading state while fetching user report, downloading PDF, or processing OAuth data
-  if (isLoadingReport || isDownloadingPDF || isProcessingOAuthData) {
+  // Show loading state while processing OAuth data, fetching user report, or downloading PDF
+  if (isProcessingOAuthData || isLoadingReport || isDownloadingPDF) {
+    console.log('=== SHOWING LOADING STATE ===');
+    console.log('isProcessingOAuthData:', isProcessingOAuthData);
+    console.log('isLoadingReport:', isLoadingReport);
+    console.log('isDownloadingPDF:', isDownloadingPDF);
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="flex items-center gap-3">
           <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
           <p className="text-gray-600">
-            {isLoadingReport ? 'Loading your report...' : 
-             isDownloadingPDF ? 'Loading PDF...' : 
-             'Setting up your account...'}
+            {isProcessingOAuthData ? 'Setting up your account...' :
+             isLoadingReport ? 'Loading your report...' : 
+             'Loading PDF...'}
           </p>
         </div>
       </div>
     );
   }
 
-  // If no report found, redirect to upload
-  if (!userReport && !reportError) {
-    console.log('No user report found, redirecting to upload');
+  // Only redirect to upload if we have checked for OAuth data AND there's no report
+  if (!userReport && !reportError && hasCheckedForOAuthData) {
+    console.log('=== REDIRECTING TO UPLOAD ===');
+    console.log('No user report found and OAuth data checked, redirecting to upload');
     navigate('/upload');
     return null;
   }
 
-  // If there's an error loading the report
-  if (reportError) {
+  // If there's an error loading the report and we've checked for OAuth data
+  if (reportError && hasCheckedForOAuthData) {
     console.error('Error loading user report:', reportError);
     navigate('/upload');
     return null;
@@ -286,14 +322,14 @@ const Results = () => {
   }
 
   const contextValue = {
-    analysis: userReport.analysis_data,
+    analysis: userReport?.analysis_data,
     propertyData,
     isLoadingProperty,
     propertyError,
     negotiationStrategy,
     isGeneratingStrategy,
     strategyError,
-    pdfText: userReport.pdf_text,
+    pdfText: userReport?.pdf_text,
     pdfArrayBuffer: pdfArrayBuffer,
   };
 
