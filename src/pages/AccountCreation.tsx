@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserReport } from '@/hooks/useUserReport';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,6 +28,57 @@ const AccountCreation = () => {
 
   // Get the analysis data from location state
   const analysisData = location.state;
+
+  // Wait for session to be ready with retry logic
+  const waitForSession = async (maxRetries = 5, delay = 1000) => {
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Session error:', error);
+          continue;
+        }
+        if (session?.user?.id) {
+          console.log('Session ready, user ID:', session.user.id);
+          return session;
+        }
+      } catch (err) {
+        console.error('Error getting session:', err);
+      }
+      
+      if (i < maxRetries - 1) {
+        console.log(`Session not ready, retrying in ${delay}ms... (attempt ${i + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 1.5; // Exponential backoff
+      }
+    }
+    throw new Error('Session not ready after maximum retries');
+  };
+
+  const saveAnalysisData = async () => {
+    if (!analysisData) return;
+
+    setSavingReport(true);
+    try {
+      // Wait for session to be fully established
+      console.log('Waiting for session to be ready...');
+      await waitForSession();
+      
+      // Now try to save the report
+      console.log('Session ready, saving user report...');
+      await saveUserReport({
+        analysis_data: analysisData,
+        property_address: analysisData.propertyInfo?.address,
+        inspection_date: analysisData.propertyInfo?.inspectionDate
+      });
+      console.log('Successfully saved user report to database');
+    } catch (saveError) {
+      console.error('Error saving user report:', saveError);
+      throw new Error('Failed to save report. Please try uploading again.');
+    } finally {
+      setSavingReport(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,23 +113,12 @@ const AccountCreation = () => {
         });
 
         // Save the analysis data to the user's database record
-        if (analysisData) {
-          setSavingReport(true);
-          try {
-            await saveUserReport({
-              analysis_data: analysisData,
-              property_address: analysisData.propertyInfo?.address,
-              inspection_date: analysisData.propertyInfo?.inspectionDate
-            });
-            console.log('Successfully saved user report to database');
-          } catch (saveError) {
-            console.error('Error saving user report:', saveError);
-            setError('Account created but failed to save report. Please try uploading again.');
-            setSavingReport(false);
-            setLoading(false);
-            return;
-          }
-          setSavingReport(false);
+        try {
+          await saveAnalysisData();
+        } catch (saveError) {
+          setError(saveError.message);
+          setLoading(false);
+          return;
         }
 
         // Navigate to results without passing state (data is now in database)
@@ -92,23 +133,12 @@ const AccountCreation = () => {
         }
 
         // For existing users signing in, save the analysis data if provided
-        if (analysisData) {
-          setSavingReport(true);
-          try {
-            await saveUserReport({
-              analysis_data: analysisData,
-              property_address: analysisData.propertyInfo?.address,
-              inspection_date: analysisData.propertyInfo?.inspectionDate
-            });
-            console.log('Successfully saved user report to database');
-          } catch (saveError) {
-            console.error('Error saving user report:', saveError);
-            setError('Signed in but failed to save report. Please try uploading again.');
-            setSavingReport(false);
-            setLoading(false);
-            return;
-          }
-          setSavingReport(false);
+        try {
+          await saveAnalysisData();
+        } catch (saveError) {
+          setError(`Signed in but ${saveError.message.toLowerCase()}`);
+          setLoading(false);
+          return;
         }
 
         // Navigate to results
