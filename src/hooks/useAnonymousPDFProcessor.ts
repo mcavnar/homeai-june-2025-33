@@ -175,150 +175,184 @@ export const useAnonymousPDFProcessor = () => {
       console.log('Calling process-pdf edge function...');
       const edgeFunctionStartTime = Date.now();
       
-      // Add timeout to prevent hanging
+      // Increase timeout to 180 seconds and add retry logic
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Analysis timed out after 120 seconds')), 120000);
+        setTimeout(() => reject(new Error('Analysis timed out after 180 seconds. Please try again with a smaller file or contact support if the issue persists.')), 180000);
       });
 
-      const analysisPromise = supabase.functions.invoke('process-pdf', {
-        body: payload,
-      });
+      let analysisPromise;
+      let retryCount = 0;
+      const maxRetries = 2;
 
-      const { data, error: functionError } = await Promise.race([
-        analysisPromise,
-        timeoutPromise
-      ]) as any;
-      
-      const edgeFunctionEndTime = Date.now();
-      console.log(`Edge function completed in ${(edgeFunctionEndTime - edgeFunctionStartTime) / 1000} seconds`);
-
-      if (functionError) {
-        console.error('Edge function error:', functionError);
-        throw new Error(functionError.message || 'Analysis failed');
-      }
-
-      if (!data || !data.success) {
-        console.error('Analysis failed:', data?.error || 'Unknown error');
-        throw new Error(data?.error || 'Failed to analyze extracted text');
-      }
-
-      console.log('Analysis completed successfully');
-      await aiProgressPromise;
-
-      const analysisData = data.analysis;
-      setAnalysis(analysisData);
-      setCleanedText(data.cleanedText || '');
-
-      // Transition to property data phase
-      setCurrentPhase('property');
-      setOverallProgress(50);
-
-      toast({
-        title: "Fetching property data...",
-        description: "Getting market information for your property.",
-      });
-
-      let propertyData = null;
-      if (analysisData.propertyInfo?.address) {
-        const propertyProgressPromise = simulateProgressFor('property', 50, 70, 8000);
+      while (retryCount <= maxRetries) {
         try {
-          propertyData = await fetchPropertyData(analysisData.propertyInfo.address);
-        } catch (err) {
-          console.error('Property data fetch failed:', err);
-          // Continue without property data
+          analysisPromise = supabase.functions.invoke('process-pdf', {
+            body: payload,
+          });
+
+          const { data, error: functionError } = await Promise.race([
+            analysisPromise,
+            timeoutPromise
+          ]) as any;
+          
+          const edgeFunctionEndTime = Date.now();
+          console.log(`Edge function completed in ${(edgeFunctionEndTime - edgeFunctionStartTime) / 1000} seconds`);
+
+          if (functionError) {
+            console.error('Edge function error:', functionError);
+            throw new Error(functionError.message || 'Analysis failed');
+          }
+
+          if (!data || !data.success) {
+            console.error('Analysis failed:', data?.error || 'Unknown error');
+            throw new Error(data?.error || 'Failed to analyze extracted text');
+          }
+
+          console.log('Analysis completed successfully');
+          await aiProgressPromise;
+
+          const analysisData = data.analysis;
+          setAnalysis(analysisData);
+          setCleanedText(data.cleanedText || '');
+
+          // Transition to property data phase
+          setCurrentPhase('property');
+          setOverallProgress(50);
+
+          toast({
+            title: "Fetching property data...",
+            description: "Getting market information for your property.",
+          });
+
+          let propertyData = null;
+          if (analysisData.propertyInfo?.address) {
+            const propertyProgressPromise = simulateProgressFor('property', 50, 70, 8000);
+            try {
+              propertyData = await fetchPropertyData(analysisData.propertyInfo.address);
+            } catch (err) {
+              console.error('Property data fetch failed:', err);
+              // Continue without property data
+            }
+            await propertyProgressPromise;
+          }
+
+          // Transition to negotiation strategy phase
+          setCurrentPhase('negotiation');
+          setOverallProgress(70);
+
+          toast({
+            title: "Generating negotiation strategy...",
+            description: "Creating personalized negotiation recommendations.",
+          });
+
+          let negotiationStrategy = null;
+          const negotiationProgressPromise = simulateProgressFor('negotiation', 70, 85, 10000);
+          try {
+            negotiationStrategy = await generateNegotiationStrategy(analysisData, propertyData);
+          } catch (err) {
+            console.error('Negotiation strategy generation failed:', err);
+            // Continue without negotiation strategy
+          }
+          await negotiationProgressPromise;
+
+          // Transition to saving phase
+          setCurrentPhase('saving');
+          setOverallProgress(85);
+
+          toast({
+            title: "Saving your report...",
+            description: "Finalizing your analysis report.",
+          });
+
+          // Save to anonymous_reports table using the unique session ID
+          console.log('Saving report to anonymous_reports table with unique session ID:', uniqueSessionId);
+          const dbSaveStartTime = Date.now();
+          
+          const { data: reportData, error: saveError } = await supabase.from('anonymous_reports').insert({
+            session_id: uniqueSessionId,
+            analysis_data: analysisData,
+            property_data: propertyData,
+            negotiation_strategy: negotiationStrategy,
+            property_address: analysisData.propertyInfo?.address,
+            inspection_date: analysisData.propertyInfo?.inspectionDate,
+            pdf_file_path: uploadError ? null : fileName,
+            pdf_text: data.cleanedText,
+            pdf_metadata: {
+              name: file.name,
+              size: file.size,
+              type: file.type,
+              pageCount: extractionResult.pageCount
+            }
+          }).select().single();
+
+          const dbSaveEndTime = Date.now();
+          console.log(`Database save completed in ${(dbSaveEndTime - dbSaveStartTime) / 1000} seconds`);
+
+          if (saveError) {
+            console.error('Error saving to anonymous_reports:', saveError);
+            throw new Error(`Failed to save report: ${saveError.message}`);
+          }
+
+          console.log('Report saved successfully to anonymous_reports:', reportData?.id);
+
+          // Store the session ID in localStorage for later retrieval
+          localStorage.setItem('anonymous_session_id', uniqueSessionId);
+          console.log('Session ID stored in localStorage for later retrieval');
+
+          // Complete the process
+          setCurrentPhase('complete');
+          setOverallProgress(100);
+
+          toast({
+            title: "Analysis complete!",
+            description: `Processed ${extractionResult.pageCount} pages and generated comprehensive insights.`,
+          });
+
+          return {
+            analysis: analysisData,
+            propertyData: propertyData,
+            negotiationStrategy: negotiationStrategy,
+            pdfArrayBuffer: arrayBuffer,
+            pdfText: data.cleanedText || '',
+            address: analysisData.propertyInfo?.address,
+            sessionId: uniqueSessionId
+          };
+
+        } catch (retryError) {
+          retryCount++;
+          console.error(`Attempt ${retryCount} failed:`, retryError);
+          
+          if (retryCount <= maxRetries) {
+            console.log(`Retrying analysis (attempt ${retryCount + 1}/${maxRetries + 1})...`);
+            toast({
+              title: `Retrying analysis (${retryCount + 1}/${maxRetries + 1})...`,
+              description: "The previous attempt failed, trying again.",
+            });
+            // Wait 2 seconds before retry
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            continue;
+          } else {
+            throw retryError;
+          }
         }
-        await propertyProgressPromise;
       }
-
-      // Transition to negotiation strategy phase
-      setCurrentPhase('negotiation');
-      setOverallProgress(70);
-
-      toast({
-        title: "Generating negotiation strategy...",
-        description: "Creating personalized negotiation recommendations.",
-      });
-
-      let negotiationStrategy = null;
-      const negotiationProgressPromise = simulateProgressFor('negotiation', 70, 85, 10000);
-      try {
-        negotiationStrategy = await generateNegotiationStrategy(analysisData, propertyData);
-      } catch (err) {
-        console.error('Negotiation strategy generation failed:', err);
-        // Continue without negotiation strategy
-      }
-      await negotiationProgressPromise;
-
-      // Transition to saving phase
-      setCurrentPhase('saving');
-      setOverallProgress(85);
-
-      toast({
-        title: "Saving your report...",
-        description: "Finalizing your analysis report.",
-      });
-
-      // Save to anonymous_reports table using the unique session ID
-      console.log('Saving report to anonymous_reports table with unique session ID:', uniqueSessionId);
-      const dbSaveStartTime = Date.now();
-      
-      const { data: reportData, error: saveError } = await supabase.from('anonymous_reports').insert({
-        session_id: uniqueSessionId,
-        analysis_data: analysisData,
-        property_data: propertyData,
-        negotiation_strategy: negotiationStrategy,
-        property_address: analysisData.propertyInfo?.address,
-        inspection_date: analysisData.propertyInfo?.inspectionDate,
-        pdf_file_path: uploadError ? null : fileName,
-        pdf_text: data.cleanedText,
-        pdf_metadata: {
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          pageCount: extractionResult.pageCount
-        }
-      }).select().single();
-
-      const dbSaveEndTime = Date.now();
-      console.log(`Database save completed in ${(dbSaveEndTime - dbSaveStartTime) / 1000} seconds`);
-
-      if (saveError) {
-        console.error('Error saving to anonymous_reports:', saveError);
-        throw new Error(`Failed to save report: ${saveError.message}`);
-      }
-
-      console.log('Report saved successfully to anonymous_reports:', reportData?.id);
-
-      // Store the session ID in localStorage for later retrieval
-      localStorage.setItem('anonymous_session_id', uniqueSessionId);
-      console.log('Session ID stored in localStorage for later retrieval');
-
-      // Complete the process
-      setCurrentPhase('complete');
-      setOverallProgress(100);
-
-      toast({
-        title: "Analysis complete!",
-        description: `Processed ${extractionResult.pageCount} pages and generated comprehensive insights.`,
-      });
-
-      return {
-        analysis: analysisData,
-        propertyData: propertyData,
-        negotiationStrategy: negotiationStrategy,
-        pdfArrayBuffer: arrayBuffer,
-        pdfText: data.cleanedText || '',
-        address: analysisData.propertyInfo?.address,
-        sessionId: uniqueSessionId
-      };
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to process PDF';
       console.error('PDF processing error:', err);
       setError(errorMessage);
+      
+      // Provide more specific error messages
+      let userMessage = errorMessage;
+      if (errorMessage.includes('timeout')) {
+        userMessage = 'The analysis is taking longer than expected. This may be due to a large file size or high server load. Please try again with a smaller file or contact support if the issue persists.';
+      } else if (errorMessage.includes('Failed to analyze')) {
+        userMessage = 'The AI analysis failed. Please try again or contact support if the issue persists.';
+      }
+      
       toast({
         title: "Processing failed",
-        description: errorMessage,
+        description: userMessage,
         variant: "destructive",
       });
       return null;

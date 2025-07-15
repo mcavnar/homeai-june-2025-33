@@ -23,12 +23,39 @@ interface AnalyticsProviderProps {
 export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }) => {
   const { trackButtonClick, trackInteraction } = useAnalytics();
   
-  // Enable page tracking
-  usePageTracking();
+  // Enable page tracking with error boundary
+  try {
+    usePageTracking();
+  } catch (error) {
+    console.error('Page tracking failed:', error);
+  }
+
+  // Wrap analytics functions with error handling
+  const safeTrackButtonClick = (buttonText: string, elementId?: string, elementClass?: string) => {
+    try {
+      trackButtonClick(buttonText, elementId, elementClass);
+    } catch (error) {
+      console.error('Button click tracking failed:', error);
+    }
+  };
+
+  const safeTrackInteraction = (interaction: {
+    interaction_type: 'button_click' | 'link_click' | 'form_submit' | 'download' | 'navigation';
+    element_id?: string;
+    element_text?: string;
+    element_class?: string;
+    page_path: string;
+  }) => {
+    try {
+      trackInteraction(interaction);
+    } catch (error) {
+      console.error('Interaction tracking failed:', error);
+    }
+  };
 
   const value = {
-    trackButtonClick,
-    trackInteraction,
+    trackButtonClick: safeTrackButtonClick,
+    trackInteraction: safeTrackInteraction,
   };
 
   return (
