@@ -65,7 +65,7 @@ const ProblemsSection = () => {
         {/* Testimonials Section */}
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+            <h3 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               What Our Users Say
             </h3>
             <p className="text-xl text-gray-600 font-light">
