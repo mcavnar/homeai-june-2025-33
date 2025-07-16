@@ -162,7 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (session?.user) {
           // For SIGNED_IN events (including OAuth), try to convert anonymous report first
-          if (event === AuthChangeEvent.SIGNED_IN) {
+          if (event === 'SIGNED_IN') {
             console.log('OAuth user signed in, attempting to convert anonymous report');
             const conversionSuccess = await convertAnonymousReport(session.user.id);
             console.log('Conversion result:', conversionSuccess);
