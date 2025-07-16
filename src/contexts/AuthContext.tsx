@@ -54,16 +54,81 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Function to convert anonymous report to user report
+  const saveReportViaServer = async (reportData: any, userId: string) => {
+    try {
+      console.log('Saving report via server for user:', userId);
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('No active session for saving report');
+      }
+
+      const { data, error } = await supabase.functions.invoke('save-user-report', {
+        body: reportData,
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Edge function error:', error);
+        throw error;
+      }
+
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to save report');
+      }
+
+      console.log('Successfully saved report via server:', data.report.id);
+      return data.report;
+    } catch (error) {
+      console.error('Error saving report via server:', error);
+      throw error;
+    }
+  };
+
   const convertAnonymousReportToUserReport = async (userId: string) => {
     try {
       console.log('=== AUTH CONTEXT: STARTING CONVERSION ===');
       setIsConverting(true);
       
+      // Check for OAuth data first
+      const oauthData = sessionStorage.getItem('pendingAccountCreationData');
+      if (oauthData) {
+        console.log('Found OAuth data, processing...');
+        const parsedData = JSON.parse(oauthData);
+        
+        // Wait for session to be fully established
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const reportData = {
+          analysis_data: parsedData.analysis,
+          pdf_text: parsedData.pdfText,
+          property_address: parsedData.address,
+          property_data: parsedData.propertyData,
+          negotiation_strategy: parsedData.negotiationStrategy,
+        };
+        
+        console.log('Saving OAuth report data:', reportData);
+        const savedReport = await saveReportViaServer(reportData, userId);
+        
+        // Clear the session storage
+        sessionStorage.removeItem('pendingAccountCreationData');
+        
+        setIsConverting(false);
+        return savedReport;
+      }
+      
+      // Check for anonymous report in database
       const sessionId = getSessionId();
       console.log('Session ID for conversion:', sessionId);
       
-      // Get the anonymous report
+      if (!sessionId) {
+        console.log('No session ID found');
+        setIsConverting(false);
+        return null;
+      }
+      
       const { data: anonymousReport, error: fetchError } = await supabase
         .from('anonymous_reports')
         .select('*')
@@ -84,43 +149,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       console.log('Found anonymous report to convert:', anonymousReport.id);
 
-      // First, mark any existing user reports as inactive
-      const { error: deactivateError } = await supabase
-        .from('user_reports')
-        .update({ is_active: false })
-        .eq('user_id', userId)
-        .eq('is_active', true);
+      // Wait for session to be fully established
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      if (deactivateError) {
-        console.error('Error deactivating existing reports:', deactivateError);
-      }
+      const reportData = {
+        analysis_data: anonymousReport.analysis_data,
+        property_data: anonymousReport.property_data,
+        negotiation_strategy: anonymousReport.negotiation_strategy,
+        property_address: anonymousReport.property_address,
+        inspection_date: anonymousReport.inspection_date,
+        pdf_file_path: anonymousReport.pdf_file_path,
+        pdf_text: anonymousReport.pdf_text,
+        pdf_metadata: anonymousReport.pdf_metadata,
+      };
 
-      // Convert to user report
-      const { data: userReport, error: convertError } = await supabase
-        .from('user_reports')
-        .insert({
-          user_id: userId,
-          analysis_data: anonymousReport.analysis_data,
-          property_data: anonymousReport.property_data,
-          negotiation_strategy: anonymousReport.negotiation_strategy,
-          property_address: anonymousReport.property_address,
-          inspection_date: anonymousReport.inspection_date,
-          pdf_file_path: anonymousReport.pdf_file_path,
-          pdf_text: anonymousReport.pdf_text,
-          pdf_metadata: anonymousReport.pdf_metadata,
-          is_active: true,
-          processing_status: 'completed'
-        })
-        .select()
-        .single();
+      console.log('Saving anonymous report data:', reportData);
+      const savedReport = await saveReportViaServer(reportData, userId);
 
-      if (convertError) {
-        console.error('Error converting anonymous report to user report:', convertError);
-        setIsConverting(false);
-        return null;
-      }
-
-      // Update the anonymous report to mark it as converted
+      // Mark the anonymous report as converted
       await supabase
         .from('anonymous_reports')
         .update({
@@ -130,13 +176,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', anonymousReport.id);
 
       console.log('Successfully converted anonymous report to user report');
-      console.log('PDF file path preserved:', userReport.pdf_file_path);
       
-      // Clear the anonymous session ID since it's now converted
+      // Clear the anonymous session ID
       localStorage.removeItem('anonymous_session_id');
       
       setIsConverting(false);
-      return userReport;
+      return savedReport;
     } catch (err) {
       console.error('Error converting anonymous report:', err);
       setIsConverting(false);
@@ -154,7 +199,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // If conversion is in progress, wait for it to complete
     if (isConverting) {
       console.log('Conversion in progress, waiting...');
-      return true; // Return true temporarily while converting
+      return true;
     }
 
     // Check if there's pending OAuth data - if so, return true temporarily
@@ -210,27 +255,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Check if this is a new user signup (either email or OAuth)
           if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-            console.log('User signed in, checking for anonymous report conversion');
+            console.log('User signed in, checking for conversion opportunity');
             
-            // Check if there's an anonymous report to convert
-            const sessionId = getSessionId();
-            if (sessionId) {
-              console.log('Session ID found, attempting conversion');
-              const converted = await convertAnonymousReportToUserReport(session.user.id);
-              
-              if (converted) {
-                console.log('Conversion successful, refreshing report check');
-                await checkForExistingReport();
-              } else {
-                console.log('No conversion needed or failed, checking for existing report');
+            // Use setTimeout to avoid blocking the auth state change
+            setTimeout(async () => {
+              try {
+                console.log('Attempting conversion for user:', session.user.id);
+                const converted = await convertAnonymousReportToUserReport(session.user.id);
+                
+                if (converted) {
+                  console.log('Conversion successful, refreshing report check');
+                  await checkForExistingReport();
+                } else {
+                  console.log('No conversion needed, checking for existing report');
+                  await checkForExistingReport();
+                }
+              } catch (error) {
+                console.error('Error in conversion process:', error);
                 await checkForExistingReport();
               }
-            } else {
-              console.log('No session ID found, checking for existing report');
-              await checkForExistingReport();
-            }
+            }, 100);
           }
         } else {
           setHasExistingReport(null);
@@ -249,21 +294,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        // For initial session, check for conversion opportunity
-        const sessionId = getSessionId();
-        if (sessionId) {
-          console.log('Initial session with anonymous data, attempting conversion');
-          const converted = await convertAnonymousReportToUserReport(session.user.id);
-          
-          if (converted) {
-            console.log('Initial conversion successful');
-            await checkForExistingReport();
-          } else {
+        setTimeout(async () => {
+          try {
+            console.log('Initial session check, attempting conversion');
+            const converted = await convertAnonymousReportToUserReport(session.user.id);
+            
+            if (converted) {
+              console.log('Initial conversion successful');
+              await checkForExistingReport();
+            } else {
+              await checkForExistingReport();
+            }
+          } catch (error) {
+            console.error('Error in initial conversion:', error);
             await checkForExistingReport();
           }
-        } else {
-          await checkForExistingReport();
-        }
+        }, 100);
       }
       
       setLoading(false);
