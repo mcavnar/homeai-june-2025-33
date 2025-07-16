@@ -1,174 +1,204 @@
 
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAnonymousReport } from '@/hooks/useAnonymousReport';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { UserPlus, Clock } from 'lucide-react';
+import { useAnonymousPropertyData } from '@/hooks/useAnonymousPropertyData';
+import { useAnonymousNegotiationStrategy } from '@/hooks/useAnonymousNegotiationStrategy';
+import AtAGlance from '@/components/AtAGlance';
+import ModernStepper from '@/components/ModernStepper';
+import MostExpensiveIssues from '@/components/MostExpensiveIssues';
+import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle, Loader2 } from 'lucide-react';
+import { cleanAddressForDisplay } from '@/utils/addressUtils';
 
 const AnonymousSynopsis = () => {
   const location = useLocation();
-  const { anonymousReport } = useAnonymousReport();
+  const navigate = useNavigate();
+  const { anonymousReport, isLoading, error } = useAnonymousReport();
   
-  // Use state data first, then fallback to database data
-  const reportData = location.state || anonymousReport;
-  const analysis = reportData?.analysis || reportData?.analysis_data;
+  // Get data from navigation state if available (for immediate display)
+  const stateData = location.state;
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
-  if (!analysis) {
+  // Use state data first, then fallback to database data
+  const reportData = stateData || anonymousReport;
+  const analysis = reportData?.analysis;
+
+  // Get session ID from state or report
+  useEffect(() => {
+    const currentSessionId = stateData?.sessionId || anonymousReport?.session_id;
+    setSessionId(currentSessionId);
+  }, [stateData, anonymousReport]);
+
+  // Initialize property data hooks
+  const {
+    propertyData,
+    isLoadingProperty,
+    propertyError,
+    fetchPropertyDetails,
+    setPropertyDataFromDatabase,
+  } = useAnonymousPropertyData(sessionId || undefined);
+
+  // Initialize negotiation strategy hooks
+  const {
+    negotiationStrategy,
+    isGeneratingStrategy,
+    strategyError,
+    setNegotiationStrategyFromDatabase,
+  } = useAnonymousNegotiationStrategy(analysis, propertyData, sessionId || undefined);
+
+  // Load property data from database if available
+  useEffect(() => {
+    if (reportData?.property_data && !propertyData) {
+      setPropertyDataFromDatabase(reportData.property_data);
+    }
+  }, [reportData?.property_data, propertyData, setPropertyDataFromDatabase]);
+
+  // Load negotiation strategy from database if available
+  useEffect(() => {
+    if (reportData?.negotiation_strategy && !negotiationStrategy) {
+      setNegotiationStrategyFromDatabase(reportData.negotiation_strategy);
+    }
+  }, [reportData?.negotiation_strategy, negotiationStrategy, setNegotiationStrategyFromDatabase]);
+
+  // Fetch property data when analysis is available and address is present
+  useEffect(() => {
+    const address = analysis?.propertyInfo?.address;
+    if (address && !propertyData && !isLoadingProperty && !propertyError && sessionId) {
+      console.log('Fetching property data for address:', address);
+      fetchPropertyDetails(address);
+    }
+  }, [analysis, propertyData, isLoadingProperty, propertyError, sessionId, fetchPropertyDetails]);
+
+  // Redirect to upload if no data
+  if (!isLoading && !reportData && !stateData) {
+    navigate('/anonymous-upload');
+    return null;
+  }
+
+  if (isLoading) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-600">No analysis data available.</p>
-        <Button 
-          onClick={() => window.location.href = '/anonymous-upload'} 
-          className="mt-4"
-        >
-          Upload Report
-        </Button>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">Loading your report...</p>
+        </div>
       </div>
     );
   }
 
-  const expiresAt = anonymousReport?.expires_at;
-  const timeRemaining = expiresAt ? 
-    Math.ceil((new Date(expiresAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 
-    7;
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <Card className="max-w-md w-full">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Report Not Found</h3>
+              <p className="text-gray-600 mb-4">{error}</p>
+              <button 
+                onClick={() => navigate('/anonymous-upload')}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              >
+                Upload New Report
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!analysis) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">Preparing your analysis...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const displayAddress = analysis.propertyInfo?.address 
+    ? cleanAddressForDisplay(analysis.propertyInfo.address) 
+    : undefined;
 
   return (
-    <div className="space-y-6">
-      {/* Temporary Storage Notice */}
-      <Card className="border-amber-200 bg-amber-50">
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-3">
-            <Clock className="h-5 w-5 text-amber-600" />
-            <div>
-              <p className="text-sm font-medium text-amber-800">
-                Temporary Storage - {timeRemaining} days remaining
-              </p>
-              <p className="text-sm text-amber-700">
-                Your report will be automatically deleted in {timeRemaining} days. 
-                Create an account to save it permanently.
-              </p>
-            </div>
-            <Button 
-              size="sm" 
-              className="ml-auto"
-              onClick={() => window.location.href = '/auth'}
-            >
-              <UserPlus className="h-4 w-4 mr-2" />
-              Save Report
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Analysis Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Analysis Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Issues Summary */}
-            <div className="bg-red-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-red-800 mb-2">Issues Found</h3>
-              <p className="text-2xl font-bold text-red-600">
-                {analysis.detailedFindings?.length || 0}
-              </p>
-              <p className="text-sm text-red-600">Total Issues</p>
-            </div>
-
-            {/* Cost Summary */}
-            <div className="bg-yellow-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-yellow-800 mb-2">Estimated Costs</h3>
-              <p className="text-2xl font-bold text-yellow-600">
-                ${analysis.costSummary?.totalEstimatedCost?.toLocaleString() || 'N/A'}
-              </p>
-              <p className="text-sm text-yellow-600">Total Repair Cost</p>
-            </div>
-
-            {/* Safety Issues */}
-            <div className="bg-orange-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-orange-800 mb-2">Safety Issues</h3>
-              <p className="text-2xl font-bold text-orange-600">
-                {analysis.safetyIssues?.length || 0}
-              </p>
-              <p className="text-sm text-orange-600">Critical Items</p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
+          {/* Page Header */}
+          <div className="text-left">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+            <div className="text-gray-600 text-lg">
+              {displayAddress && analysis.propertyInfo?.inspectionDate ? (
+                <p>{displayAddress} • Inspection Date: {analysis.propertyInfo.inspectionDate}</p>
+              ) : displayAddress ? (
+                <p>{displayAddress}</p>
+              ) : analysis.propertyInfo?.inspectionDate ? (
+                <p>Inspection Date: {analysis.propertyInfo.inspectionDate}</p>
+              ) : null}
             </div>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Executive Summary */}
-      {analysis.executiveSummary && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Executive Summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-700 leading-relaxed">
-              {analysis.executiveSummary}
-            </p>
-          </CardContent>
-        </Card>
-      )}
+          {/* Property Loading State - Only show if actively loading */}
+          {isLoadingProperty && (
+            <Alert className="bg-blue-50 border-blue-200">
+              <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+              <AlertDescription className="text-blue-800">
+                <strong>Loading property details...</strong> Market information is being fetched to calculate your condition score.
+              </AlertDescription>
+            </Alert>
+          )}
 
-      {/* Property Information */}
-      {analysis.propertyInfo && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Property Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h4 className="font-semibold text-gray-700">Address</h4>
-                <p className="text-gray-600">{analysis.propertyInfo.address || 'N/A'}</p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-700">Inspection Date</h4>
-                <p className="text-gray-600">{analysis.propertyInfo.inspectionDate || 'N/A'}</p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-700">Property Type</h4>
-                <p className="text-gray-600">{analysis.propertyInfo.propertyType || 'N/A'}</p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-700">Year Built</h4>
-                <p className="text-gray-600">{analysis.propertyInfo.yearBuilt || 'N/A'}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          {/* Property Error */}
+          {propertyError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Property details unavailable: {propertyError}
+              </AlertDescription>
+            </Alert>
+          )}
 
-      {/* Detailed Findings */}
-      {analysis.detailedFindings && analysis.detailedFindings.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Key Issues Found</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {analysis.detailedFindings.slice(0, 5).map((finding: any, index: number) => (
-                <div key={index} className="border-l-4 border-blue-500 pl-4">
-                  <h4 className="font-semibold text-gray-800">{finding.title}</h4>
-                  <p className="text-gray-600 text-sm">{finding.description}</p>
-                  {finding.estimatedCost && (
-                    <p className="text-sm font-medium text-blue-600 mt-1">
-                      Estimated Cost: ${finding.estimatedCost.toLocaleString()}
-                    </p>
-                  )}
-                </div>
-              ))}
-              {analysis.detailedFindings.length > 5 && (
-                <p className="text-sm text-gray-500 italic">
-                  And {analysis.detailedFindings.length - 5} more issues...
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          {/* Negotiation Strategy Loading */}
+          {isGeneratingStrategy && (
+            <Alert className="bg-purple-50 border-purple-200">
+              <Loader2 className="h-4 w-4 animate-spin text-purple-600" />
+              <AlertDescription className="text-purple-800">
+                <strong>Generating negotiation strategy...</strong> Analyzing inspection findings and market data.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Negotiation Strategy Error */}
+          {strategyError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Negotiation strategy unavailable: {strategyError}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* At a Glance Section - Show immediately with available data */}
+          <AtAGlance 
+            analysis={analysis} 
+            propertyData={propertyData}
+            negotiationStrategy={negotiationStrategy}
+          />
+
+          {/* Modern Stepper Next Steps */}
+          <ModernStepper />
+
+          {/* Most Expensive Issues Section */}
+          {analysis.issues && analysis.issues.length > 0 && (
+            <MostExpensiveIssues issues={analysis.issues} />
+          )}
+        </div>
+      </div>
     </div>
   );
 };

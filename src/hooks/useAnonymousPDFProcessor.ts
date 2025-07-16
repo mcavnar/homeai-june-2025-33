@@ -1,13 +1,12 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { extractTextFromPDF } from '@/utils/pdfTextExtractor';
 import { HomeInspectionAnalysis } from '@/types/inspection';
 import { generateSessionId } from '@/utils/sessionUtils';
-import { fetchPropertyData } from '@/utils/propertyDataService';
-import { generateNegotiationStrategy } from '@/utils/negotiationStrategyService';
 
-type ProcessingPhase = 'extraction' | 'analysis' | 'property' | 'negotiation' | 'saving' | 'complete';
+type ProcessingPhase = 'extraction' | 'analysis' | 'saving' | 'complete';
 
 export const useAnonymousPDFProcessor = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -128,7 +127,7 @@ export const useAnonymousPDFProcessor = () => {
       const extractionStartTime = Date.now();
       const extractionResult = await extractTextFromPDF(file, (progress) => {
         setExtractionProgress(progress);
-        setOverallProgress((progress / 100) * 20);
+        setOverallProgress((progress / 100) * 40); // Take 40% of total progress
       });
       const extractionEndTime = Date.now();
       console.log(`Text extraction completed in ${(extractionEndTime - extractionStartTime) / 1000} seconds`);
@@ -153,7 +152,7 @@ export const useAnonymousPDFProcessor = () => {
 
       // Transition to AI analysis phase
       setCurrentPhase('analysis');
-      setOverallProgress(20);
+      setOverallProgress(40);
 
       toast({
         title: "Analyzing with AI...",
@@ -161,7 +160,7 @@ export const useAnonymousPDFProcessor = () => {
       });
 
       // Start simulated progress for AI analysis
-      const aiProgressPromise = simulateProgressFor('analysis', 20, 50, 25000);
+      const aiProgressPromise = simulateProgressFor('analysis', 40, 80, 25000);
 
       // Prepare payload for the edge function
       const payload = { 
@@ -238,51 +237,9 @@ export const useAnonymousPDFProcessor = () => {
       setCleanedText(analysisResult.cleanedText || '');
       console.log('Analysis data set:', analysisData);
 
-      // Transition to property data phase
-      setCurrentPhase('property');
-      setOverallProgress(50);
-
-      toast({
-        title: "Fetching property data...",
-        description: "Getting market information for your property.",
-      });
-
-      let propertyData = null;
-      if (analysisData.propertyInfo?.address) {
-        const propertyProgressPromise = simulateProgressFor('property', 50, 70, 8000);
-        try {
-          propertyData = await fetchPropertyData(analysisData.propertyInfo.address);
-          console.log('Property data fetched:', propertyData);
-        } catch (err) {
-          console.error('Property data fetch failed:', err);
-          // Continue without property data
-        }
-        await propertyProgressPromise;
-      }
-
-      // Transition to negotiation strategy phase
-      setCurrentPhase('negotiation');
-      setOverallProgress(70);
-
-      toast({
-        title: "Generating negotiation strategy...",
-        description: "Creating personalized negotiation recommendations.",
-      });
-
-      let negotiationStrategy = null;
-      const negotiationProgressPromise = simulateProgressFor('negotiation', 70, 85, 10000);
-      try {
-        negotiationStrategy = await generateNegotiationStrategy(analysisData, propertyData);
-        console.log('Negotiation strategy generated:', negotiationStrategy);
-      } catch (err) {
-        console.error('Negotiation strategy generation failed:', err);
-        // Continue without negotiation strategy
-      }
-      await negotiationProgressPromise;
-
       // Transition to saving phase
       setCurrentPhase('saving');
-      setOverallProgress(85);
+      setOverallProgress(80);
 
       toast({
         title: "Saving your report...",
@@ -296,8 +253,6 @@ export const useAnonymousPDFProcessor = () => {
       const { data: reportData, error: saveError } = await supabase.from('anonymous_reports').insert({
         session_id: uniqueSessionId,
         analysis_data: analysisData,
-        property_data: propertyData,
-        negotiation_strategy: negotiationStrategy,
         property_address: analysisData.propertyInfo?.address,
         inspection_date: analysisData.propertyInfo?.inspectionDate,
         pdf_file_path: uploadError ? null : fileName,
@@ -336,8 +291,6 @@ export const useAnonymousPDFProcessor = () => {
       // Create and return the result object
       const result = {
         analysis: analysisData,
-        propertyData: propertyData,
-        negotiationStrategy: negotiationStrategy,
         pdfArrayBuffer: arrayBuffer,
         pdfText: analysisResult.cleanedText || '',
         address: analysisData.propertyInfo?.address,
@@ -347,8 +300,6 @@ export const useAnonymousPDFProcessor = () => {
       console.log('=== PROCESSING COMPLETE - RETURNING RESULT ===');
       console.log('Result object:', {
         hasAnalysis: !!result.analysis,
-        hasPropertyData: !!result.propertyData,
-        hasNegotiationStrategy: !!result.negotiationStrategy,
         hasPdfArrayBuffer: !!result.pdfArrayBuffer,
         address: result.address,
         sessionId: result.sessionId
@@ -399,10 +350,6 @@ export const useAnonymousPDFProcessor = () => {
         return 'Extracting text from PDF...';
       case 'analysis':
         return 'Analyzing with AI for insights and costs...';
-      case 'property':
-        return 'Fetching property market data...';
-      case 'negotiation':
-        return 'Generating negotiation strategy...';
       case 'saving':
         return 'Saving your report...';
       case 'complete':
@@ -419,13 +366,9 @@ export const useAnonymousPDFProcessor = () => {
       case 'extraction':
         return '10 seconds remaining';
       case 'analysis':
-        const analysisProgress = (overallProgress - 20) / 30;
+        const analysisProgress = (overallProgress - 40) / 40;
         const remainingSeconds = Math.max(5, Math.round(25 * (1 - analysisProgress)));
         return `${remainingSeconds} seconds remaining`;
-      case 'property':
-        return '8 seconds remaining';
-      case 'negotiation':
-        return '10 seconds remaining';
       case 'saving':
         return '5 seconds remaining';
       case 'complete':

@@ -5,7 +5,7 @@ import { useMetaConversions } from '@/hooks/useMetaConversions';
 import FileUploadSection from '@/components/FileUploadSection';
 import ProcessingStatus from '@/components/ProcessingStatus';
 import { useAnonymousPDFProcessor } from '@/hooks/useAnonymousPDFProcessor';
-import { Shield, Clock, CheckCircle, Upload, TrendingUp } from 'lucide-react';
+import { Shield, Clock, CheckCircle, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -45,8 +45,6 @@ const AnonymousUpload = () => {
     if (result) {
       console.log('=== RESULT VALIDATION ===');
       console.log('Has analysis:', !!result.analysis);
-      console.log('Has property data:', !!result.propertyData);
-      console.log('Has negotiation strategy:', !!result.negotiationStrategy);
       console.log('Address:', result.address);
       console.log('Session ID:', result.sessionId);
       
@@ -63,13 +61,11 @@ const AnonymousUpload = () => {
       console.log('=== NAVIGATING TO ACCOUNT CREATION ===');
       console.log('Navigation state being passed:', {
         hasAnalysis: !!result.analysis,
-        hasPropertyData: !!result.propertyData,
-        hasNegotiationStrategy: !!result.negotiationStrategy,
         address: result.address,
         sessionId: result.sessionId
       });
 
-      // Navigate to account creation page with complete data via state
+      // Navigate to account creation page with result data via state
       navigate('/account-creation', { 
         state: result
       });
@@ -244,7 +240,7 @@ const AnonymousUpload = () => {
                 <div className="border-t pt-6 space-y-3">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">Analysis completed in 2-3 minutes</span>
+                    <span className="text-sm text-gray-600">Analysis completed in 15-30 seconds</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Shield className="h-4 w-4 text-gray-500" />
