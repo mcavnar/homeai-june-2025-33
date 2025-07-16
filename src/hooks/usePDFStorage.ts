@@ -49,8 +49,7 @@ export const usePDFStorage = (pdfFilePath?: string): UsePDFStorageResult => {
 
         console.log('PDF data received from storage:', {
           size: data.size,
-          type: data.type,
-          lastModified: data.lastModified
+          type: data.type
         });
 
         const arrayBuffer = await data.arrayBuffer();
