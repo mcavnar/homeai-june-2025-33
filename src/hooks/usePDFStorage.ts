@@ -16,6 +16,7 @@ export const usePDFStorage = (pdfFilePath?: string): UsePDFStorageResult => {
   useEffect(() => {
     const downloadPDF = async () => {
       if (!pdfFilePath) {
+        console.log('No PDF file path provided');
         return;
       }
 
@@ -23,31 +24,66 @@ export const usePDFStorage = (pdfFilePath?: string): UsePDFStorageResult => {
         setIsLoading(true);
         setError(null);
         
-        console.log('Downloading PDF from storage:', pdfFilePath);
+        console.log('Starting PDF download from storage:', pdfFilePath);
+        console.log('Storage bucket: inspection-reports');
         
+        // Add timeout to prevent infinite loading
+        const timeoutId = setTimeout(() => {
+          throw new Error('PDF download timed out after 30 seconds');
+        }, 30000);
+
         const { data, error: downloadError } = await supabase.storage
           .from('inspection-reports')
           .download(pdfFilePath);
 
+        clearTimeout(timeoutId);
+
         if (downloadError) {
-          throw downloadError;
+          console.error('Supabase storage download error:', downloadError);
+          throw new Error(`Storage download failed: ${downloadError.message}`);
         }
 
         if (!data) {
-          throw new Error('No PDF data received');
+          throw new Error('No PDF data received from storage');
         }
 
+        console.log('PDF data received from storage:', {
+          size: data.size,
+          type: data.type,
+          lastModified: data.lastModified
+        });
+
         const arrayBuffer = await data.arrayBuffer();
+        
+        if (arrayBuffer.byteLength === 0) {
+          throw new Error('PDF file is empty');
+        }
+
         setPdfArrayBuffer(arrayBuffer);
-        console.log('PDF downloaded successfully, size:', arrayBuffer.byteLength);
+        console.log('PDF downloaded successfully:', {
+          arrayBufferSize: arrayBuffer.byteLength,
+          filePath: pdfFilePath
+        });
+        
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to download PDF';
-        console.error('Error downloading PDF from storage:', err);
+        console.error('Error downloading PDF from storage:', {
+          error: err,
+          filePath: pdfFilePath,
+          message: errorMessage
+        });
         setError(errorMessage);
+        setPdfArrayBuffer(null);
       } finally {
         setIsLoading(false);
       }
     };
+
+    // Reset state when pdfFilePath changes
+    if (pdfFilePath) {
+      setPdfArrayBuffer(null);
+      setError(null);
+    }
 
     downloadPDF();
   }, [pdfFilePath]);

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useUserReport } from '@/hooks/useUserReport';
@@ -62,6 +61,14 @@ const Results = () => {
   
   // Use PDF storage hook to download PDF if not available from location state
   const shouldDownloadPDF = !state?.pdfArrayBuffer && userReport?.pdf_file_path;
+  
+  console.log('PDF loading state:', {
+    hasStateArrayBuffer: !!state?.pdfArrayBuffer,
+    hasPDFFilePath: !!userReport?.pdf_file_path,
+    shouldDownloadPDF,
+    pdfFilePath: userReport?.pdf_file_path
+  });
+
   const { 
     pdfArrayBuffer: storagePdfArrayBuffer, 
     isLoading: isDownloadingPDF, 
@@ -198,14 +205,27 @@ const Results = () => {
     processOAuthData();
   }, [hasOAuthDataPending, user, userReport, isProcessingOAuthData, saveUserReportViaServer, refreshExistingReportCheck, fetchUserReport, toast]);
 
+  // Handle PDF loading from state or storage with better error handling
   useEffect(() => {
+    console.log('PDF loading effect triggered:', {
+      hasStateArrayBuffer: !!state?.pdfArrayBuffer,
+      hasStorageArrayBuffer: !!storagePdfArrayBuffer,
+      isDownloadingPDF,
+      pdfDownloadError
+    });
+
     // Priority: location state PDF > storage PDF
     if (state?.pdfArrayBuffer) {
+      console.log('Using PDF from location state');
       setPdfArrayBuffer(state.pdfArrayBuffer);
     } else if (storagePdfArrayBuffer) {
+      console.log('Using PDF from storage download');
       setPdfArrayBuffer(storagePdfArrayBuffer);
+    } else if (pdfDownloadError) {
+      console.error('PDF download failed:', pdfDownloadError);
+      // Keep pdfArrayBuffer as null to trigger loading state
     }
-  }, [state?.pdfArrayBuffer, storagePdfArrayBuffer]);
+  }, [state?.pdfArrayBuffer, storagePdfArrayBuffer, pdfDownloadError, isDownloadingPDF]);
 
   // Load negotiation strategy from database if it exists
   useEffect(() => {
@@ -253,10 +273,6 @@ const Results = () => {
     return null;
   }
 
-  if (pdfDownloadError) {
-    console.error('Error downloading PDF:', pdfDownloadError);
-  }
-
   const contextValue = {
     analysis: userReport?.analysis_data,
     propertyData,
@@ -267,6 +283,9 @@ const Results = () => {
     strategyError,
     pdfText: userReport?.pdf_text,
     pdfArrayBuffer: pdfArrayBuffer,
+    isDownloadingPDF,
+    pdfDownloadError,
+    pdfFilePath: userReport?.pdf_file_path,
   };
 
   console.log('=== FINAL RESULTS CONTEXT ===');
@@ -278,6 +297,9 @@ const Results = () => {
     hasNegotiationStrategy: !!contextValue.negotiationStrategy,
     isGeneratingStrategy: contextValue.isGeneratingStrategy,
     pdfArrayBuffer: contextValue.pdfArrayBuffer ? 'Available' : 'Not available',
+    isDownloadingPDF: contextValue.isDownloadingPDF,
+    pdfDownloadError: contextValue.pdfDownloadError,
+    pdfFilePath: contextValue.pdfFilePath,
   });
 
   return (

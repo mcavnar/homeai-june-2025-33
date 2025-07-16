@@ -18,7 +18,7 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
   const [showSearch, setShowSearch] = useState(false);
   const [initialSearchExecuted, setInitialSearchExecuted] = useState(false);
 
-  // Load PDF
+  // Load PDF with detailed logging
   const { pdf, totalPages, loading, error } = usePDFLoader(pdfArrayBuffer);
 
   // Render PDF pages
@@ -89,12 +89,22 @@ const PDFViewer = forwardRef<any, PDFViewerProps>(({ pdfArrayBuffer, initialSear
     }
   };
 
+  const handleRetry = () => {
+    // For retry, we'd need to trigger a re-fetch of the PDF
+    // This would typically be handled by the parent component
+    window.location.reload();
+  };
+
   if (loading) {
-    return <PDFLoadingState />;
+    return <PDFLoadingState message="Loading PDF..." subMessage="Preparing document for viewing" />;
   }
 
   if (error) {
-    return <PDFErrorState error={error} />;
+    return <PDFErrorState error={error} onRetry={handleRetry} />;
+  }
+
+  if (!pdf) {
+    return <PDFLoadingState message="Initializing PDF..." subMessage="Setting up document viewer" />;
   }
 
   return (
