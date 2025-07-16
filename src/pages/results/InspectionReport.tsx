@@ -12,6 +12,8 @@ interface InspectionReportContextType {
   isDownloadingPDF?: boolean;
   pdfDownloadError?: string;
   pdfFilePath?: string;
+  isRecoveringPDF?: boolean;
+  pdfRecoveryError?: string;
 }
 
 interface LocationState {
@@ -25,7 +27,9 @@ const InspectionReport = () => {
     pdfArrayBuffer, 
     isDownloadingPDF, 
     pdfDownloadError, 
-    pdfFilePath 
+    pdfFilePath,
+    isRecoveringPDF,
+    pdfRecoveryError
   } = useOutletContext<InspectionReportContextType>();
   
   const location = useLocation();
@@ -38,10 +42,40 @@ const InspectionReport = () => {
     isDownloadingPDF,
     pdfDownloadError,
     pdfFilePath,
+    isRecoveringPDF,
+    pdfRecoveryError,
     searchContext: locationState
   });
 
-  // Show loading state while PDF is being downloaded
+  // Show PDF recovery state
+  if (isRecoveringPDF) {
+    console.log('Showing PDF recovery loading state');
+    return (
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="text-left">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Inspection Report</h1>
+          <div className="text-gray-600 text-lg">
+            <p>Original PDF inspection report with search functionality</p>
+          </div>
+        </div>
+
+        <Card>
+          <CardContent className="text-center py-12">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+              <p className="text-gray-600">Recovering your PDF from your original upload...</p>
+            </div>
+            <p className="text-gray-400 text-sm">
+              We're locating your inspection report in our system. This may take a moment.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show PDF download loading state
   if (isDownloadingPDF) {
     console.log('Showing PDF download loading state');
     return (
@@ -69,9 +103,9 @@ const InspectionReport = () => {
     );
   }
 
-  // Show error state if PDF download failed
-  if (pdfDownloadError) {
-    console.log('Showing PDF download error state:', pdfDownloadError);
+  // Show error state if PDF download failed or recovery failed
+  if (pdfDownloadError || pdfRecoveryError) {
+    console.log('Showing PDF error state:', pdfDownloadError || pdfRecoveryError);
     return (
       <div className="space-y-6">
         {/* Page Header */}
@@ -85,7 +119,7 @@ const InspectionReport = () => {
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <strong>Failed to load PDF:</strong> {pdfDownloadError}
+            <strong>Failed to load PDF:</strong> {pdfDownloadError || pdfRecoveryError}
           </AlertDescription>
         </Alert>
 
@@ -102,6 +136,7 @@ const InspectionReport = () => {
                   <li>• Storage permissions issue</li>
                   <li>• File corruption during upload</li>
                   <li>• Network connectivity problems</li>
+                  {pdfRecoveryError && <li>• Unable to locate your original PDF</li>}
                 </ul>
                 {pdfFilePath && (
                   <p className="text-xs text-gray-400 mb-4">
@@ -123,8 +158,8 @@ const InspectionReport = () => {
     );
   }
 
-  // Show loading state if no PDF is available yet (but not actively downloading)
-  if (!pdfArrayBuffer && !isDownloadingPDF) {
+  // Show loading state if no PDF is available yet (but not actively downloading or recovering)
+  if (!pdfArrayBuffer && !isDownloadingPDF && !isRecoveringPDF) {
     console.log('Showing no PDF available state');
     return (
       <div className="space-y-6">

@@ -4,6 +4,7 @@ import { useUserReport } from '@/hooks/useUserReport';
 import { usePropertyDataManager } from '@/hooks/usePropertyDataManager';
 import { useNegotiationStrategy } from '@/hooks/useNegotiationStrategy';
 import { usePDFStorage } from '@/hooks/usePDFStorage';
+import { usePDFRecovery } from '@/hooks/usePDFRecovery';
 import { useServerUserReport } from '@/hooks/useServerUserReport';
 import { useAuth } from '@/contexts/AuthContext';
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -15,7 +16,7 @@ const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, hasExistingReport, isCheckingForReport, refreshExistingReportCheck } = useAuth();
-  const { userReport, isLoading: isLoadingReport, error: reportError, saveUserReport, fetchUserReport } = useUserReport();
+  const { userReport, isLoading: isLoadingReport, error: reportError, saveUserReport, fetchUserReport, updateUserReport } = useUserReport();
   const { saveUserReportViaServer } = useServerUserReport();
   const { toast } = useToast();
   const [pdfArrayBuffer, setPdfArrayBuffer] = useState<ArrayBuffer | null>(null);
@@ -29,7 +30,6 @@ const Results = () => {
     pdfText?: string;
   } | null;
 
-  // Extract property address early for parallel loading
   const extractPropertyAddressFromAnalysis = (analysisData: any): string | undefined => {
     if (!analysisData) return undefined;
 
@@ -49,17 +49,14 @@ const Results = () => {
     return undefined;
   };
 
-  // Get property address from userReport or analysis data
   const propertyAddress = userReport?.property_address || 
     extractPropertyAddressFromAnalysis(userReport?.analysis_data);
 
-  // Use the new property data manager with fix for refetching
   const { propertyData, isLoadingProperty, propertyError } = usePropertyDataManager({
     address: propertyAddress,
     propertyData: userReport?.property_data,
   });
   
-  // Determine if we need to download PDF from storage
   const shouldDownloadPDF = Boolean(
     !state?.pdfArrayBuffer && 
     userReport?.pdf_file_path && 
@@ -80,7 +77,28 @@ const Results = () => {
     error: pdfDownloadError 
   } = usePDFStorage(shouldDownloadPDF ? userReport.pdf_file_path : undefined);
 
-  // Use negotiation strategy hook with improved state management
+  const { isRecovering: isRecoveringPDF, recoveryError } = usePDFRecovery(
+    userReport,
+    async (recoveredPDFData) => {
+      try {
+        console.log('PDF Recovery: Updating user report with recovered PDF data');
+        await updateUserReport(recoveredPDFData);
+        
+        toast({
+          title: "PDF recovered successfully!",
+          description: "Your inspection report PDF has been restored.",
+        });
+      } catch (error) {
+        console.error('PDF Recovery: Error updating user report:', error);
+        toast({
+          title: "PDF recovery failed",
+          description: "Could not restore your PDF. Please try refreshing the page.",
+          variant: "destructive",
+        });
+      }
+    }
+  );
+
   const {
     negotiationStrategy,
     isGeneratingStrategy,
@@ -88,7 +106,6 @@ const Results = () => {
     setNegotiationStrategyFromDatabase,
   } = useNegotiationStrategy(userReport?.analysis_data || null, propertyData);
 
-  // Step 1: Initialize OAuth data check immediately when component loads
   useEffect(() => {
     console.log('=== RESULTS: INITIALIZING OAUTH CHECK ===');
     const storedData = sessionStorage.getItem('pendingAccountCreationData');
@@ -117,7 +134,6 @@ const Results = () => {
     setHasInitializedOAuthCheck(true);
   }, []);
 
-  // Step 2: Process OAuth data when user is authenticated and OAuth data exists
   useEffect(() => {
     const processOAuthData = async () => {
       console.log('=== RESULTS: OAUTH DATA PROCESSING CHECK ===');
@@ -126,7 +142,6 @@ const Results = () => {
       console.log('UserReport exists:', !!userReport);
       console.log('IsProcessingOAuthData:', isProcessingOAuthData);
 
-      // Only process if we have OAuth data, user is authenticated, no existing report, and not already processing
       if (!hasOAuthDataPending || !user || userReport || isProcessingOAuthData) {
         return;
       }
@@ -151,7 +166,6 @@ const Results = () => {
 
         const propertyAddress = extractPropertyAddressFromAnalysis(parsedData.analysis) || parsedData.address;
         
-        // Save the report using the stored data
         const reportData = {
           analysis_data: parsedData.analysis,
           pdf_text: parsedData.pdfText,
@@ -170,14 +184,11 @@ const Results = () => {
         
         await saveUserReportViaServer(reportData);
         
-        // Clear stored data after successful save
         sessionStorage.removeItem('pendingAccountCreationData');
         setHasOAuthDataPending(false);
         
-        // Refresh the existing report check in AuthContext
         await refreshExistingReportCheck();
         
-        // Trigger a fresh fetch of the user report to get the latest data
         console.log('Triggering user report refetch after OAuth processing');
         await fetchUserReport();
         
@@ -193,7 +204,6 @@ const Results = () => {
         sessionStorage.removeItem('pendingAccountCreationData');
         setHasOAuthDataPending(false);
         
-        // Refresh the existing report check to clear the temporary state
         await refreshExistingReportCheck();
         
         toast({
@@ -209,7 +219,6 @@ const Results = () => {
     processOAuthData();
   }, [hasOAuthDataPending, user, userReport, isProcessingOAuthData, saveUserReportViaServer, refreshExistingReportCheck, fetchUserReport, toast]);
 
-  // Improved PDF loading logic with better state management
   useEffect(() => {
     console.log('=== PDF LOADING EFFECT ===');
     console.log('PDF loading effect triggered:', {
@@ -221,7 +230,6 @@ const Results = () => {
       shouldDownloadPDF
     });
 
-    // Priority: location state PDF > storage PDF > existing PDF
     if (state?.pdfArrayBuffer && !pdfArrayBuffer) {
       console.log('Setting PDF from location state');
       setPdfArrayBuffer(state.pdfArrayBuffer);
@@ -230,11 +238,9 @@ const Results = () => {
       setPdfArrayBuffer(storagePdfArrayBuffer);
     } else if (pdfDownloadError) {
       console.error('PDF download failed:', pdfDownloadError);
-      // Keep pdfArrayBuffer as null to trigger error state
     }
   }, [state?.pdfArrayBuffer, storagePdfArrayBuffer, pdfDownloadError, isDownloadingPDF, pdfArrayBuffer]);
 
-  // Load negotiation strategy from database with proper state management
   useEffect(() => {
     if (userReport?.negotiation_strategy) {
       console.log('Loading existing negotiation strategy from database');
@@ -242,7 +248,6 @@ const Results = () => {
     }
   }, [userReport?.negotiation_strategy, setNegotiationStrategyFromDatabase]);
 
-  // Simplified loading logic - show loading only for critical blocking operations
   const isCriticalLoading = isProcessingOAuthData || isLoadingReport || isCheckingForReport || !hasInitializedOAuthCheck;
 
   if (isCriticalLoading) {
@@ -293,6 +298,8 @@ const Results = () => {
     isDownloadingPDF,
     pdfDownloadError,
     pdfFilePath: userReport?.pdf_file_path,
+    isRecoveringPDF,
+    pdfRecoveryError: recoveryError,
   };
 
   console.log('=== FINAL RESULTS CONTEXT ===');
@@ -308,6 +315,8 @@ const Results = () => {
     isDownloadingPDF: contextValue.isDownloadingPDF,
     pdfDownloadError: contextValue.pdfDownloadError,
     pdfFilePath: contextValue.pdfFilePath,
+    isRecoveringPDF: contextValue.isRecoveringPDF,
+    pdfRecoveryError: contextValue.pdfRecoveryError,
   });
 
   return (
