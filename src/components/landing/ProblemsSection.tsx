@@ -50,6 +50,25 @@ const ProblemsSection = () => {
           </h2>
         </div>
 
+        {/* Why We Built Home AI Section */}
+        <div className="max-w-4xl mx-auto mb-20">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
+              Why We Built Home AI
+            </h3>
+          </div>
+          
+          <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100">
+            <blockquote className="text-gray-700 text-lg font-light leading-relaxed mb-8">
+              "We founded HomeAI because a few of us recently bought homes and we found the home inspection report the most stressful part of the process. In my case, my report identified a myriad of issues and was over 70 pages. It was a very good report, but I had to spend significant time trying to price the issues, then figure out how we'd negotiate. I frequently had to resort back to flipping through the big PDF and making notes. Once I started working with AI, I realized it was the perfect tool to make the home inspection report an easy to use source of lasting value. With access to databases that contain millions of contractor quotes and details on material costs and labor rates for various markets, we were able to provide accurate repair estimates that power negotiation advice. And we explain details about the home's key systems, necessary maintenance plans. The list goes on. This is the beginning of our journey. We hope you'll try HomeAI (it's free) and tell us what you think!"
+            </blockquote>
+            <div className="text-right border-t border-gray-100 pt-6">
+              <div className="font-semibold text-gray-900">Matt Cavnar</div>
+              <div className="text-gray-500 text-sm">Co-founder, HomeAI</div>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-20">
           {problems.map((problem, index) => (
             <div key={index} className="bg-white rounded-2xl p-10 text-center shadow-sm border border-gray-100">
