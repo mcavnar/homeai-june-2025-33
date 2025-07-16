@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.2';
@@ -47,7 +46,9 @@ serve(async (req) => {
       pdf_text, 
       pdf_metadata, 
       property_address, 
-      inspection_date 
+      inspection_date,
+      convert_from_anonymous,
+      anonymous_session_id
     } = await req.json();
 
     if (!analysis_data) {
@@ -57,6 +58,59 @@ serve(async (req) => {
     // Create service role client for database operations
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     const serviceClient = createClient(supabaseUrl!, serviceRoleKey!);
+
+    let finalPdfFilePath = pdf_file_path;
+
+    // If converting from anonymous report, handle PDF file path migration
+    if (convert_from_anonymous && anonymous_session_id && pdf_file_path) {
+      try {
+        console.log('Converting anonymous report with PDF file path:', pdf_file_path);
+        
+        // Check if the file exists in storage
+        const { data: fileData, error: downloadError } = await serviceClient.storage
+          .from('inspection-reports')
+          .download(pdf_file_path);
+
+        if (!downloadError && fileData) {
+          // Create new file path for the authenticated user
+          const fileName = pdf_file_path.split('/').pop();
+          const newFilePath = `${user.id}/${fileName}`;
+          
+          console.log('Moving PDF from', pdf_file_path, 'to', newFilePath);
+          
+          // Upload the file to the new user-specific path
+          const { error: uploadError } = await serviceClient.storage
+            .from('inspection-reports')
+            .upload(newFilePath, fileData, {
+              contentType: 'application/pdf',
+              upsert: true
+            });
+
+          if (uploadError) {
+            console.error('Error uploading PDF to user folder:', uploadError);
+            // Keep the original path if upload fails
+          } else {
+            console.log('Successfully moved PDF to user folder');
+            finalPdfFilePath = newFilePath;
+            
+            // Try to delete the old file (non-critical if it fails)
+            try {
+              await serviceClient.storage
+                .from('inspection-reports')
+                .remove([pdf_file_path]);
+              console.log('Successfully removed old PDF file');
+            } catch (deleteError) {
+              console.log('Note: Could not remove old PDF file, but this is not critical');
+            }
+          }
+        } else {
+          console.log('Could not find PDF file in storage, keeping original path');
+        }
+      } catch (error) {
+        console.error('Error handling PDF file migration:', error);
+        // Continue with original path if migration fails
+      }
+    }
 
     console.log('Deactivating existing active reports for user:', user.id);
     
@@ -80,7 +134,7 @@ serve(async (req) => {
       analysis_data,
       property_data,
       negotiation_strategy,
-      pdf_file_path,
+      pdf_file_path: finalPdfFilePath,
       pdf_text,
       pdf_metadata,
       property_address,
@@ -105,7 +159,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        report: data
+        report: data,
+        pdf_migrated: convert_from_anonymous && finalPdfFilePath !== pdf_file_path
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
