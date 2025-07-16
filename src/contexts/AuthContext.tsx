@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { getSessionId } from '@/utils/sessionUtils';
 
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Helper function to convert anonymous report to user report
-  const convertAnonymousReport = async (userId: string): Promise<void> => {
+  const convertAnonymousReport = async (userId: string): Promise<boolean> => {
     try {
       const sessionId = getSessionId();
       console.log('Converting anonymous report for session:', sessionId);
@@ -93,12 +93,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (anonymousError) {
         console.error('Error fetching anonymous report:', anonymousError);
-        return;
+        return false;
       }
 
       if (!anonymousReport) {
         console.log('No anonymous report found for session');
-        return;
+        return false;
       }
 
       console.log('Found anonymous report to convert:', anonymousReport.id);
@@ -107,7 +107,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data: { session: currentSession } } = await supabase.auth.getSession();
       if (!currentSession) {
         console.error('No active session for conversion');
-        return;
+        return false;
       }
 
       const { data, error: conversionError } = await supabase.functions.invoke('save-user-report', {
@@ -130,7 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (conversionError) {
         console.error('Error converting anonymous report:', conversionError);
-        return;
+        return false;
       }
 
       console.log('Successfully converted anonymous report:', data);
@@ -145,27 +145,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', anonymousReport.id);
 
       console.log('Anonymous report marked as converted');
+      return true;
     } catch (error) {
       console.error('Error in convertAnonymousReport:', error);
+      return false;
     }
   };
 
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: AuthChangeEvent, session) => {
         console.log('=== AUTH STATE CHANGE ===', event);
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // If this is a new user signup, try to convert anonymous report
-          if (event === 'SIGNED_UP') {
-            console.log('New user signed up, attempting to convert anonymous report');
-            await convertAnonymousReport(session.user.id);
+          // For SIGNED_IN events (including OAuth), try to convert anonymous report first
+          if (event === AuthChangeEvent.SIGNED_IN) {
+            console.log('OAuth user signed in, attempting to convert anonymous report');
+            const conversionSuccess = await convertAnonymousReport(session.user.id);
+            console.log('Conversion result:', conversionSuccess);
           }
           
-          // Check for existing report when user logs in
+          // Check for existing report after conversion (or for regular sign-ins)
           await checkForExistingReport();
         } else {
           setHasExistingReport(null);
@@ -184,7 +187,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (session?.user) {
         // For existing sessions, also try to convert any pending anonymous reports
-        await convertAnonymousReport(session.user.id);
+        const conversionSuccess = await convertAnonymousReport(session.user.id);
+        console.log('Initial session conversion result:', conversionSuccess);
         await checkForExistingReport();
       }
       
