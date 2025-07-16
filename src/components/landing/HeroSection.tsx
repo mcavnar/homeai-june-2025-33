@@ -54,7 +54,7 @@ const HeroSection = () => {
         </h1>
         
         <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
-          Upload your inspection report and will provide accurate repair estimates, give detailed information on your key systems and their expected lifespans and maintenance costs, recommend service and provide negotiation advice.
+          Upload your inspection report and we'll provide accurate repair estimates, give detailed information on your key systems and their maintenance costs, recommend service providers and offer negotiation advice.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
