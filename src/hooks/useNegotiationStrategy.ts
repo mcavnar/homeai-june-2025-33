@@ -13,11 +13,34 @@ export const useNegotiationStrategy = (
   const [negotiationStrategy, setNegotiationStrategy] = useState<NegotiationStrategy | null>(null);
   const [isGeneratingStrategy, setIsGeneratingStrategy] = useState(false);
   const [strategyError, setStrategyError] = useState<string>('');
+  const [pendingStrategy, setPendingStrategy] = useState<NegotiationStrategy | null>(null);
   const { toast } = useToast();
-  const { updateUserReport } = useUserReport();
+  const { userReport, updateUserReport } = useUserReport();
+
+  // Save pending strategy to user report when it becomes available
+  useEffect(() => {
+    const savePendingStrategy = async () => {
+      if (pendingStrategy && userReport && !negotiationStrategy) {
+        try {
+          console.log('Saving pending negotiation strategy to user report');
+          await updateUserReport({ negotiation_strategy: pendingStrategy });
+          setNegotiationStrategy(pendingStrategy);
+          setPendingStrategy(null);
+        } catch (error) {
+          console.error('Error saving pending negotiation strategy:', error);
+          // Don't fail the strategy generation if database save fails
+          setNegotiationStrategy(pendingStrategy);
+          setPendingStrategy(null);
+        }
+      }
+    };
+
+    savePendingStrategy();
+  }, [pendingStrategy, userReport, negotiationStrategy, updateUserReport]);
 
   useEffect(() => {
     const generateNegotiationStrategy = async () => {
+      // Don't generate if we already have a strategy or if generation is in progress
       if (!analysis || !propertyData || negotiationStrategy || isGeneratingStrategy) {
         return;
       }
@@ -47,11 +70,23 @@ export const useNegotiationStrategy = (
         }
 
         const generatedStrategy = data.negotiationStrategy;
-        setNegotiationStrategy(generatedStrategy);
 
-        // Save negotiation strategy to user_reports table
-        console.log('Saving negotiation strategy to user_reports table');
-        await updateUserReport({ negotiation_strategy: generatedStrategy });
+        // If we have a user report, try to save immediately
+        if (userReport) {
+          try {
+            console.log('Saving negotiation strategy to user_reports table');
+            await updateUserReport({ negotiation_strategy: generatedStrategy });
+            setNegotiationStrategy(generatedStrategy);
+          } catch (error) {
+            console.error('Error saving negotiation strategy to database:', error);
+            // Don't fail the strategy generation if database save fails
+            setNegotiationStrategy(generatedStrategy);
+          }
+        } else {
+          // If no user report yet, store as pending
+          console.log('No user report available yet, storing strategy as pending');
+          setPendingStrategy(generatedStrategy);
+        }
 
         toast({
           title: "Negotiation strategy ready!",
@@ -73,22 +108,24 @@ export const useNegotiationStrategy = (
     };
 
     generateNegotiationStrategy();
-  }, [analysis, propertyData, negotiationStrategy, isGeneratingStrategy, toast, updateUserReport]);
+  }, [analysis, propertyData, negotiationStrategy, isGeneratingStrategy, userReport, updateUserReport, toast]);
 
   const resetStrategy = () => {
     setNegotiationStrategy(null);
+    setPendingStrategy(null);
     setStrategyError('');
   };
 
   const setNegotiationStrategyFromDatabase = (strategy: NegotiationStrategy | null) => {
     setNegotiationStrategy(strategy);
+    setPendingStrategy(null);
     if (strategy) {
       console.log('Negotiation strategy loaded from database');
     }
   };
 
   return {
-    negotiationStrategy,
+    negotiationStrategy: negotiationStrategy || pendingStrategy,
     isGeneratingStrategy,
     strategyError,
     resetStrategy,

@@ -68,6 +68,8 @@ const Results = () => {
     error: pdfDownloadError 
   } = usePDFStorage(shouldDownloadPDF ? userReport.pdf_file_path : undefined);
 
+  // Only start negotiation strategy generation when we have both analysis and property data
+  // The userReport dependency is handled inside the hook now
   const {
     negotiationStrategy,
     isGeneratingStrategy,
