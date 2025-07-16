@@ -27,6 +27,12 @@ import Account from "@/pages/Account";
 import UploadPage from "@/pages/UploadPage";
 import EmailCapture from "@/pages/EmailCapture";
 import DemoResults from "@/pages/DemoResults";
+import DemoSynopsis from "@/pages/demo/DemoSynopsis";
+import DemoIssuesList from "@/pages/demo/DemoIssuesList";
+import DemoKeySystems from "@/pages/demo/DemoKeySystems";
+import DemoServiceProviders from "@/pages/demo/DemoServiceProviders";
+import DemoNegotiation from "@/pages/demo/DemoNegotiation";
+import DemoInspectionReport from "@/pages/demo/DemoInspectionReport";
 import AccountCreation from "@/pages/AccountCreation";
 import NotFound from "@/pages/NotFound";
 import { Navigate } from "react-router-dom";
@@ -61,6 +67,15 @@ const App = () => {
                   <Route path="negotiation" element={<Negotiation />} />
                   <Route path="report" element={<InspectionReport />} />
                 </Route>
+                <Route path="/demo-results" element={<DemoResults />}>
+                  <Route index element={<Navigate to="/demo-results/synopsis" replace />} />
+                  <Route path="synopsis" element={<DemoSynopsis />} />
+                  <Route path="issues" element={<DemoIssuesList />} />
+                  <Route path="systems" element={<DemoKeySystems />} />
+                  <Route path="providers" element={<DemoServiceProviders />} />
+                  <Route path="negotiation" element={<DemoNegotiation />} />
+                  <Route path="report" element={<DemoInspectionReport />} />
+                </Route>
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/anonymous-upload" element={<AnonymousUpload />} />
                 <Route path="/anonymous-results" element={<AnonymousResults />} >
@@ -70,7 +85,6 @@ const App = () => {
                 <Route path="/pdf-summarizer" element={<PDFSummarizer />} />
                 <Route path="/shared-report/:token" element={<SharedReport />} />
                 <Route path="/account" element={<Account />} />
-                <Route path="/demo-results" element={<DemoResults />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AnalyticsProvider>

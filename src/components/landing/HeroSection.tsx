@@ -43,7 +43,7 @@ const HeroSection = () => {
       contentName: 'View Demo Report Button'
     });
 
-    navigate('/demo');
+    navigate('/demo-results/synopsis');
   };
 
   return (
