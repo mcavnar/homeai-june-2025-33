@@ -50,7 +50,7 @@ const HeroSection = () => {
     <div className="bg-blue-50 py-24">
       <div className="container mx-auto px-6 text-center">
         <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight max-w-5xl mx-auto">
-          Turn Your Home Inspection Report into the Ultimate Home Dashboard
+          Get Instant Repair Costs and Negotiation Advice From Your Inspection Report
         </h1>
         
         <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
