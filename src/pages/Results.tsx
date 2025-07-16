@@ -53,18 +53,23 @@ const Results = () => {
   const propertyAddress = userReport?.property_address || 
     extractPropertyAddressFromAnalysis(userReport?.analysis_data);
 
-  // Use the new property data manager for parallel loading
+  // Use the new property data manager with fix for refetching
   const { propertyData, isLoadingProperty, propertyError } = usePropertyDataManager({
     address: propertyAddress,
     propertyData: userReport?.property_data,
   });
   
-  // Use PDF storage hook to download PDF if not available from location state
-  const shouldDownloadPDF = !state?.pdfArrayBuffer && userReport?.pdf_file_path;
+  // Determine if we need to download PDF from storage
+  const shouldDownloadPDF = Boolean(
+    !state?.pdfArrayBuffer && 
+    userReport?.pdf_file_path && 
+    !pdfArrayBuffer
+  );
   
-  console.log('PDF loading state:', {
+  console.log('PDF loading decision:', {
     hasStateArrayBuffer: !!state?.pdfArrayBuffer,
     hasPDFFilePath: !!userReport?.pdf_file_path,
+    hasExistingArrayBuffer: !!pdfArrayBuffer,
     shouldDownloadPDF,
     pdfFilePath: userReport?.pdf_file_path
   });
@@ -75,8 +80,7 @@ const Results = () => {
     error: pdfDownloadError 
   } = usePDFStorage(shouldDownloadPDF ? userReport.pdf_file_path : undefined);
 
-  // Only start negotiation strategy generation when we have both analysis and property data
-  // The userReport dependency is handled inside the hook now
+  // Use negotiation strategy hook with improved state management
   const {
     negotiationStrategy,
     isGeneratingStrategy,
@@ -205,29 +209,32 @@ const Results = () => {
     processOAuthData();
   }, [hasOAuthDataPending, user, userReport, isProcessingOAuthData, saveUserReportViaServer, refreshExistingReportCheck, fetchUserReport, toast]);
 
-  // Handle PDF loading from state or storage with better error handling
+  // Improved PDF loading logic with better state management
   useEffect(() => {
+    console.log('=== PDF LOADING EFFECT ===');
     console.log('PDF loading effect triggered:', {
       hasStateArrayBuffer: !!state?.pdfArrayBuffer,
       hasStorageArrayBuffer: !!storagePdfArrayBuffer,
+      currentPdfArrayBuffer: !!pdfArrayBuffer,
       isDownloadingPDF,
-      pdfDownloadError
+      pdfDownloadError,
+      shouldDownloadPDF
     });
 
-    // Priority: location state PDF > storage PDF
-    if (state?.pdfArrayBuffer) {
-      console.log('Using PDF from location state');
+    // Priority: location state PDF > storage PDF > existing PDF
+    if (state?.pdfArrayBuffer && !pdfArrayBuffer) {
+      console.log('Setting PDF from location state');
       setPdfArrayBuffer(state.pdfArrayBuffer);
-    } else if (storagePdfArrayBuffer) {
-      console.log('Using PDF from storage download');
+    } else if (storagePdfArrayBuffer && !pdfArrayBuffer) {
+      console.log('Setting PDF from storage download');
       setPdfArrayBuffer(storagePdfArrayBuffer);
     } else if (pdfDownloadError) {
       console.error('PDF download failed:', pdfDownloadError);
-      // Keep pdfArrayBuffer as null to trigger loading state
+      // Keep pdfArrayBuffer as null to trigger error state
     }
-  }, [state?.pdfArrayBuffer, storagePdfArrayBuffer, pdfDownloadError, isDownloadingPDF]);
+  }, [state?.pdfArrayBuffer, storagePdfArrayBuffer, pdfDownloadError, isDownloadingPDF, pdfArrayBuffer]);
 
-  // Load negotiation strategy from database if it exists
+  // Load negotiation strategy from database with proper state management
   useEffect(() => {
     if (userReport?.negotiation_strategy) {
       console.log('Loading existing negotiation strategy from database');
@@ -296,6 +303,7 @@ const Results = () => {
     propertyError: contextValue.propertyError,
     hasNegotiationStrategy: !!contextValue.negotiationStrategy,
     isGeneratingStrategy: contextValue.isGeneratingStrategy,
+    strategyError: contextValue.strategyError,
     pdfArrayBuffer: contextValue.pdfArrayBuffer ? 'Available' : 'Not available',
     isDownloadingPDF: contextValue.isDownloadingPDF,
     pdfDownloadError: contextValue.pdfDownloadError,

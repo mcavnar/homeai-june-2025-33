@@ -14,6 +14,7 @@ export const useNegotiationStrategy = (
   const [isGeneratingStrategy, setIsGeneratingStrategy] = useState(false);
   const [strategyError, setStrategyError] = useState<string>('');
   const [pendingStrategy, setPendingStrategy] = useState<NegotiationStrategy | null>(null);
+  const [hasLoadedFromDatabase, setHasLoadedFromDatabase] = useState(false);
   const { toast } = useToast();
   const { userReport, updateUserReport } = useUserReport();
 
@@ -26,11 +27,13 @@ export const useNegotiationStrategy = (
           await updateUserReport({ negotiation_strategy: pendingStrategy });
           setNegotiationStrategy(pendingStrategy);
           setPendingStrategy(null);
+          setIsGeneratingStrategy(false);
         } catch (error) {
           console.error('Error saving pending negotiation strategy:', error);
           // Don't fail the strategy generation if database save fails
           setNegotiationStrategy(pendingStrategy);
           setPendingStrategy(null);
+          setIsGeneratingStrategy(false);
         }
       }
     };
@@ -40,8 +43,15 @@ export const useNegotiationStrategy = (
 
   useEffect(() => {
     const generateNegotiationStrategy = async () => {
-      // Don't generate if we already have a strategy or if generation is in progress
-      if (!analysis || !propertyData || negotiationStrategy || isGeneratingStrategy) {
+      // Don't generate if we already have a strategy, if generation is in progress, or if we loaded from database
+      if (!analysis || !propertyData || negotiationStrategy || isGeneratingStrategy || hasLoadedFromDatabase) {
+        console.log('Skipping negotiation strategy generation:', {
+          hasAnalysis: !!analysis,
+          hasPropertyData: !!propertyData,
+          hasStrategy: !!negotiationStrategy,
+          isGenerating: isGeneratingStrategy,
+          hasLoadedFromDB: hasLoadedFromDatabase
+        });
         return;
       }
 
@@ -49,6 +59,8 @@ export const useNegotiationStrategy = (
       setStrategyError('');
 
       try {
+        console.log('Generating negotiation strategy with analysis and property data');
+        
         toast({
           title: "Generating negotiation strategy...",
           description: "Analyzing inspection findings and market data to create your negotiation plan.",
@@ -108,17 +120,21 @@ export const useNegotiationStrategy = (
     };
 
     generateNegotiationStrategy();
-  }, [analysis, propertyData, negotiationStrategy, isGeneratingStrategy, userReport, updateUserReport, toast]);
+  }, [analysis, propertyData, negotiationStrategy, isGeneratingStrategy, hasLoadedFromDatabase, userReport, updateUserReport, toast]);
 
   const resetStrategy = () => {
     setNegotiationStrategy(null);
     setPendingStrategy(null);
     setStrategyError('');
+    setHasLoadedFromDatabase(false);
   };
 
   const setNegotiationStrategyFromDatabase = (strategy: NegotiationStrategy | null) => {
+    console.log('Setting negotiation strategy from database:', !!strategy);
     setNegotiationStrategy(strategy);
     setPendingStrategy(null);
+    setIsGeneratingStrategy(false); // Important: Reset loading state when loading from DB
+    setHasLoadedFromDatabase(true);
     if (strategy) {
       console.log('Negotiation strategy loaded from database');
     }

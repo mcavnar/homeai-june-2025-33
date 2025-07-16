@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePropertyData } from './usePropertyData';
 
 interface UsePropertyDataManagerProps {
@@ -8,6 +8,8 @@ interface UsePropertyDataManagerProps {
 }
 
 export const usePropertyDataManager = ({ address, propertyData }: UsePropertyDataManagerProps) => {
+  const [hasLoadedFromDatabase, setHasLoadedFromDatabase] = useState(false);
+  
   const {
     propertyData: fetchedPropertyData,
     isLoadingProperty,
@@ -18,19 +20,34 @@ export const usePropertyDataManager = ({ address, propertyData }: UsePropertyDat
 
   // Load property data from database if available
   useEffect(() => {
-    if (propertyData) {
+    if (propertyData && !hasLoadedFromDatabase) {
       console.log('Loading existing property data from database');
       setPropertyDataFromDatabase(propertyData);
+      setHasLoadedFromDatabase(true);
     }
-  }, [propertyData, setPropertyDataFromDatabase]);
+  }, [propertyData, hasLoadedFromDatabase, setPropertyDataFromDatabase]);
 
-  // Fetch property data immediately when address is available
+  // Only fetch property data if we don't have it from database and not already loading
   useEffect(() => {
-    if (address && !propertyData && !fetchedPropertyData && !isLoadingProperty) {
+    const shouldFetch = address && 
+                       !propertyData && 
+                       !fetchedPropertyData && 
+                       !isLoadingProperty && 
+                       !hasLoadedFromDatabase;
+    
+    if (shouldFetch) {
       console.log('Starting property data fetch for address:', address);
       fetchPropertyDetails(address);
+    } else {
+      console.log('Skipping property data fetch:', {
+        hasAddress: !!address,
+        hasPropertyData: !!propertyData,
+        hasFetchedData: !!fetchedPropertyData,
+        isLoading: isLoadingProperty,
+        hasLoadedFromDB: hasLoadedFromDatabase
+      });
     }
-  }, [address, propertyData, fetchedPropertyData, isLoadingProperty, fetchPropertyDetails]);
+  }, [address, propertyData, fetchedPropertyData, isLoadingProperty, hasLoadedFromDatabase, fetchPropertyDetails]);
 
   return {
     propertyData: fetchedPropertyData || propertyData,

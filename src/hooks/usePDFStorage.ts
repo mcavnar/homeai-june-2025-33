@@ -59,7 +59,7 @@ export const usePDFStorage = (pdfFilePath?: string): UsePDFStorageResult => {
         }
 
         setPdfArrayBuffer(arrayBuffer);
-        console.log('PDF downloaded successfully:', {
+        console.log('PDF downloaded successfully from storage:', {
           arrayBufferSize: arrayBuffer.byteLength,
           filePath: pdfFilePath
         });

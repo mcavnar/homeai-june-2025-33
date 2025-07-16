@@ -33,8 +33,8 @@ const InspectionReport = () => {
   
   const locationState = location.state as LocationState;
 
-  console.log('InspectionReport render:', {
-    pdfArrayBuffer: pdfArrayBuffer ? 'Available' : 'Not available',
+  console.log('InspectionReport render state:', {
+    pdfArrayBuffer: pdfArrayBuffer ? `Available (${pdfArrayBuffer.byteLength} bytes)` : 'Not available',
     isDownloadingPDF,
     pdfDownloadError,
     pdfFilePath,
@@ -43,6 +43,7 @@ const InspectionReport = () => {
 
   // Show loading state while PDF is being downloaded
   if (isDownloadingPDF) {
+    console.log('Showing PDF download loading state');
     return (
       <div className="space-y-6">
         {/* Page Header */}
@@ -70,6 +71,7 @@ const InspectionReport = () => {
 
   // Show error state if PDF download failed
   if (pdfDownloadError) {
+    console.log('Showing PDF download error state:', pdfDownloadError);
     return (
       <div className="space-y-6">
         {/* Page Header */}
@@ -123,6 +125,7 @@ const InspectionReport = () => {
 
   // Show loading state if no PDF is available yet (but not actively downloading)
   if (!pdfArrayBuffer && !isDownloadingPDF) {
+    console.log('Showing no PDF available state');
     return (
       <div className="space-y-6">
         {/* Page Header */}
@@ -149,6 +152,7 @@ const InspectionReport = () => {
   }
 
   // Show PDF viewer when PDF is available
+  console.log('Showing PDF viewer with ArrayBuffer');
   return (
     <div className="space-y-6">
       {/* Page Header */}
