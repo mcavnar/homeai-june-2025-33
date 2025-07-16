@@ -79,6 +79,10 @@ const HeroSection = () => {
             Upload Report for Free
           </TrackedButton>
         </div>
+
+        <p className="text-sm text-gray-500 mt-6 max-w-2xl mx-auto">
+          The platform is entirely free to use and you can delete your account and information at any time
+        </p>
       </div>
     </div>
   );
