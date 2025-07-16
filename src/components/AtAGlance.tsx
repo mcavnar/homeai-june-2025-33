@@ -10,7 +10,7 @@ import BottomLineSummary from './BottomLineSummary';
 
 interface AtAGlanceProps {
   analysis: HomeInspectionAnalysis;
-  propertyData: RedfinPropertyData;
+  propertyData?: RedfinPropertyData;
 }
 
 const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
@@ -29,6 +29,19 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {/* Always show repair costs and issues found cards when analysis is available */}
+        {hasAnalysis && (
+          <>
+            <RepairCostsCard 
+              totalRepairCost={totalRepairCost}
+              analysis={analysis}
+            />
+            <IssuesFoundCard 
+              issues={analysis.issues || []} 
+            />
+          </>
+        )}
+        
         {/* Show condition score card only when both analysis and property data are available */}
         {hasBothAnalysisAndProperty && conditionResult && (
           <ConditionScoreCard 
@@ -36,21 +49,6 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
             rating={conditionResult.rating}
             analysis={analysis}
             propertyData={propertyData}
-          />
-        )}
-        
-        {/* Show repair costs card when analysis is available */}
-        {hasAnalysis && (
-          <RepairCostsCard 
-            totalRepairCost={totalRepairCost}
-            analysis={analysis}
-          />
-        )}
-        
-        {/* Show issues found card when analysis is available */}
-        {hasAnalysis && (
-          <IssuesFoundCard 
-            issues={analysis.issues || []} 
           />
         )}
       </div>

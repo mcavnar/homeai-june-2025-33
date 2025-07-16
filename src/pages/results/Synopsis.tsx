@@ -61,17 +61,14 @@ const Synopsis = () => {
         </div>
       </div>
 
-      {/* Property Loading State - Transparent background */}
+      {/* Property Loading State - Only show if actively loading */}
       {isLoadingProperty && (
-        <div className="py-6 px-6">
-          <div className="flex items-center justify-center gap-3 py-4">
-            <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
-            <div className="text-center">
-              <p className="font-medium text-gray-900">Fetching property details...</p>
-              <p className="text-sm text-gray-600">Looking up market information</p>
-            </div>
-          </div>
-        </div>
+        <Alert className="bg-blue-50 border-blue-200">
+          <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+          <AlertDescription className="text-blue-800">
+            <strong>Loading property details...</strong> Market information is being fetched to calculate your condition score.
+          </AlertDescription>
+        </Alert>
       )}
 
       {/* Property Error */}
@@ -84,10 +81,8 @@ const Synopsis = () => {
         </Alert>
       )}
 
-      {/* At a Glance Section */}
-      {analysis && propertyData && (
-        <AtAGlance analysis={analysis} propertyData={propertyData} />
-      )}
+      {/* At a Glance Section - Show immediately with available data */}
+      <AtAGlance analysis={analysis} propertyData={propertyData} />
 
       {/* Modern Stepper Next Steps */}
       <ModernStepper />

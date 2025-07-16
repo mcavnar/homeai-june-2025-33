@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useUserReport } from '@/hooks/useUserReport';
-import { usePropertyData } from '@/hooks/usePropertyData';
+import { usePropertyDataManager } from '@/hooks/usePropertyDataManager';
 import { useNegotiationStrategy } from '@/hooks/useNegotiationStrategy';
 import { usePDFStorage } from '@/hooks/usePDFStorage';
 import { useServerUserReport } from '@/hooks/useServerUserReport';
@@ -29,6 +29,36 @@ const Results = () => {
     pdfArrayBuffer?: ArrayBuffer;
     pdfText?: string;
   } | null;
+
+  // Extract property address early for parallel loading
+  const extractPropertyAddressFromAnalysis = (analysisData: any): string | undefined => {
+    if (!analysisData) return undefined;
+
+    const addressFields = [
+      analysisData?.propertyInfo?.address,
+      analysisData?.address,
+      analysisData?.property?.address,
+      analysisData?.propertyDetails?.address,
+      analysisData?.location?.address,
+    ];
+
+    for (const address of addressFields) {
+      if (address && typeof address === 'string') {
+        return address;
+      }
+    }
+    return undefined;
+  };
+
+  // Get property address from userReport or analysis data
+  const propertyAddress = userReport?.property_address || 
+    extractPropertyAddressFromAnalysis(userReport?.analysis_data);
+
+  // Use the new property data manager for parallel loading
+  const { propertyData, isLoadingProperty, propertyError } = usePropertyDataManager({
+    address: propertyAddress,
+    propertyData: userReport?.property_data,
+  });
   
   // Use PDF storage hook to download PDF if not available from location state
   const shouldDownloadPDF = !state?.pdfArrayBuffer && userReport?.pdf_file_path;
@@ -37,14 +67,6 @@ const Results = () => {
     isLoading: isDownloadingPDF, 
     error: pdfDownloadError 
   } = usePDFStorage(shouldDownloadPDF ? userReport.pdf_file_path : undefined);
-
-  const {
-    propertyData,
-    isLoadingProperty,
-    propertyError,
-    fetchPropertyDetails,
-    setPropertyDataFromDatabase,
-  } = usePropertyData();
 
   const {
     negotiationStrategy,
@@ -114,32 +136,7 @@ const Results = () => {
           timestamp: parsedData.timestamp
         });
 
-        // Extract property address
-        const extractPropertyAddress = (analysisData: any): string | undefined => {
-          if (!analysisData) return undefined;
-
-          if (parsedData.address && typeof parsedData.address === 'string') {
-            return parsedData.address;
-          }
-
-          const possibleAddresses = [
-            analysisData?.propertyInfo?.address,
-            analysisData?.address,
-            analysisData?.property?.address,
-            analysisData?.propertyDetails?.address,
-            analysisData?.location?.address,
-          ];
-
-          for (const addr of possibleAddresses) {
-            if (addr && typeof addr === 'string' && addr.trim().length > 0) {
-              return addr;
-            }
-          }
-
-          return undefined;
-        };
-
-        const propertyAddress = extractPropertyAddress(parsedData.analysis);
+        const propertyAddress = extractPropertyAddressFromAnalysis(parsedData.analysis) || parsedData.address;
         
         // Save the report using the stored data
         const reportData = {
@@ -208,112 +205,21 @@ const Results = () => {
     }
   }, [state?.pdfArrayBuffer, storagePdfArrayBuffer]);
 
-  const extractPropertyAddressFromAnalysis = (analysisData: any): string | undefined => {
-    console.log('=== EXTRACTING ADDRESS FROM ANALYSIS DATA ===');
-    console.log('Analysis data structure:', JSON.stringify(analysisData, null, 2));
-    
-    if (!analysisData) {
-      console.log('No analysis data provided');
-      return undefined;
-    }
-
-    // Try multiple possible locations for the address
-    const addressFields = [
-      analysisData?.propertyInfo?.address,
-      analysisData?.address,
-      analysisData?.property?.address,
-      analysisData?.propertyDetails?.address,
-      analysisData?.location?.address,
-    ];
-
-    for (const address of addressFields) {
-      if (address && typeof address === 'string') {
-        console.log('Found address:', address);
-        return address;
-      }
-    }
-
-    // Deep search for any address-like string
-    const searchForAddress = (obj: any, path: string = ''): string | undefined => {
-      if (typeof obj === 'string' && obj.includes(' ') && obj.includes(',')) {
-        console.log(`Potential address found at ${path}:`, obj);
-        return obj;
-      }
-      
-      if (typeof obj === 'object' && obj !== null) {
-        for (const [key, value] of Object.entries(obj)) {
-          const result = searchForAddress(value, `${path}.${key}`);
-          if (result) return result;
-        }
-      }
-      
-      return undefined;
-    };
-
-    const foundAddress = searchForAddress(analysisData);
-    if (foundAddress) {
-      console.log('Found address through deep search:', foundAddress);
-      return foundAddress;
-    }
-
-    console.log('No address found in analysis data');
-    return undefined;
-  };
-
+  // Load negotiation strategy from database if it exists
   useEffect(() => {
-    if (!userReport) {
-      console.log('UserReport not yet available, waiting...');
-      return;
-    }
-    
-    console.log('=== PROCESSING USER REPORT ===');
-    console.log('User report data:', {
-      hasPropertyData: !!userReport.property_data,
-      hasNegotiationStrategy: !!userReport.negotiation_strategy,
-      propertyAddress: userReport.property_address,
-      userReportId: userReport.id,
-      analysisDataKeys: Object.keys(userReport.analysis_data || {}),
-    });
-
-    // Load property data from database if it exists
-    if (userReport.property_data) {
-      console.log('Loading existing property data from database');
-      setPropertyDataFromDatabase(userReport.property_data as any);
-    } else {
-      // Try to get property address from user report or extract from analysis data
-      let propertyAddress = userReport.property_address;
-      
-      if (!propertyAddress && userReport.analysis_data) {
-        console.log('No property_address in userReport, trying to extract from analysis_data');
-        propertyAddress = extractPropertyAddressFromAnalysis(userReport.analysis_data);
-      }
-      
-      console.log('Final property address to use:', propertyAddress);
-      
-      if (propertyAddress && !propertyData && !isLoadingProperty) {
-        console.log('Fetching property details for address:', propertyAddress);
-        // Add a small delay to ensure userReport state is fully settled
-        setTimeout(() => {
-          fetchPropertyDetails(propertyAddress);
-        }, 100);
-      } else if (!propertyAddress) {
-        console.warn('WARNING: No property address available to fetch property data');
-      }
-    }
-
-    // Load negotiation strategy from database if it exists
-    if (userReport.negotiation_strategy) {
+    if (userReport?.negotiation_strategy) {
       console.log('Loading existing negotiation strategy from database');
       setNegotiationStrategyFromDatabase(userReport.negotiation_strategy as any);
     }
-  }, [userReport, propertyData, isLoadingProperty, fetchPropertyDetails, setPropertyDataFromDatabase, setNegotiationStrategyFromDatabase]);
+  }, [userReport?.negotiation_strategy, setNegotiationStrategyFromDatabase]);
 
-  if (isProcessingOAuthData || isLoadingReport || isDownloadingPDF || hasOAuthDataPending || isCheckingForReport || !hasInitializedOAuthCheck) {
+  // Simplified loading logic - show loading only for critical blocking operations
+  const isCriticalLoading = isProcessingOAuthData || isLoadingReport || isCheckingForReport || !hasInitializedOAuthCheck;
+
+  if (isCriticalLoading) {
     console.log('=== SHOWING LOADING STATE ===');
     console.log('isProcessingOAuthData:', isProcessingOAuthData);
     console.log('isLoadingReport:', isLoadingReport);
-    console.log('isDownloadingPDF:', isDownloadingPDF);
-    console.log('hasOAuthDataPending:', hasOAuthDataPending);
     console.log('isCheckingForReport:', isCheckingForReport);
     console.log('hasInitializedOAuthCheck:', hasInitializedOAuthCheck);
     
@@ -325,8 +231,7 @@ const Results = () => {
             {isProcessingOAuthData ? 'Setting up your account...' :
              hasOAuthDataPending ? 'Completing account setup...' :
              isCheckingForReport ? 'Checking for existing reports...' :
-             isLoadingReport ? 'Loading your report...' : 
-             'Loading PDF...'}
+             'Loading your report...'}
           </p>
         </div>
       </div>
