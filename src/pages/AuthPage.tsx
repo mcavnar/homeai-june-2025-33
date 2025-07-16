@@ -4,8 +4,6 @@ import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
 import { useGoogleAnalytics } from '@/hooks/useGoogleAnalytics';
-import { supabase } from '@/integrations/supabase/client';
-import { getSessionId } from '@/utils/sessionUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,7 +16,7 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const { user, signUp, signIn, signInWithGoogle, hasExistingReport } = useAuth();
+  const { user, signUp, signIn, signInWithGoogle, hasExistingReport, convertAnonymousReportToUserReport } = useAuth();
   const { trackConversion } = useMetaConversions();
   const { trackEvent } = useGoogleAnalytics();
   
@@ -28,78 +26,6 @@ const AuthPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  // Function to convert anonymous report to user report
-  const convertAnonymousReportToUserReport = async (userId: string) => {
-    try {
-      const sessionId = getSessionId();
-      
-      // Get the anonymous report
-      const { data: anonymousReport, error: fetchError } = await supabase
-        .from('anonymous_reports')
-        .select('*')
-        .eq('session_id', sessionId)
-        .maybeSingle();
-
-      if (fetchError || !anonymousReport) {
-        console.log('No anonymous report found to convert');
-        return;
-      }
-
-      // First, mark any existing user reports as inactive
-      const { error: deactivateError } = await supabase
-        .from('user_reports')
-        .update({ is_active: false })
-        .eq('user_id', userId)
-        .eq('is_active', true);
-
-      if (deactivateError) {
-        console.error('Error deactivating existing reports:', deactivateError);
-      }
-
-      // Convert to user report
-      const { data: userReport, error: convertError } = await supabase
-        .from('user_reports')
-        .insert({
-          user_id: userId,
-          analysis_data: anonymousReport.analysis_data,
-          property_data: anonymousReport.property_data,
-          negotiation_strategy: anonymousReport.negotiation_strategy,
-          property_address: anonymousReport.property_address,
-          inspection_date: anonymousReport.inspection_date,
-          pdf_file_path: anonymousReport.pdf_file_path,
-          pdf_text: anonymousReport.pdf_text,
-          pdf_metadata: anonymousReport.pdf_metadata,
-          is_active: true,
-          processing_status: 'completed'
-        })
-        .select()
-        .single();
-
-      if (convertError) {
-        console.error('Error converting anonymous report to user report:', convertError);
-        return;
-      }
-
-      // Update the anonymous report to mark it as converted
-      await supabase
-        .from('anonymous_reports')
-        .update({
-          converted_to_user_id: userId,
-          converted_at: new Date().toISOString()
-        })
-        .eq('id', anonymousReport.id);
-
-      console.log('Successfully converted anonymous report to user report');
-      
-      // Clear the anonymous session ID since it's now converted
-      localStorage.removeItem('anonymous_session_id');
-      
-      return userReport;
-    } catch (err) {
-      console.error('Error converting anonymous report:', err);
-    }
-  };
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -118,22 +44,10 @@ const AuthPage = () => {
       if (hasExistingReport) {
         navigate(from || '/results/synopsis', { replace: true });
       } else {
-        // Check if there's anonymous report data to convert
-        const sessionId = getSessionId();
-        if (sessionId) {
-          convertAnonymousReportToUserReport(user.id).then((converted) => {
-            if (converted) {
-              navigate(from || '/results/synopsis', { replace: true });
-            } else {
-              navigate(from || '/upload', { replace: true });
-            }
-          });
-        } else {
-          navigate(from || '/upload', { replace: true });
-        }
+        navigate(from || '/upload', { replace: true });
       }
     }
-  }, [user, hasExistingReport, navigate, location, isSignUp]);
+  }, [user, hasExistingReport, navigate, location, isSignUp, convertAnonymousReportToUserReport]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
