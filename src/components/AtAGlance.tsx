@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { HomeInspectionAnalysis } from '@/types/inspection';
+import { HomeInspectionAnalysis, NegotiationStrategy } from '@/types/inspection';
 import { RedfinPropertyData } from '@/types/redfin';
 import { calculateConditionScore } from '@/utils/conditionScore';
 import ConditionScoreCard from './ConditionScoreCard';
@@ -11,9 +11,10 @@ import BottomLineSummary from './BottomLineSummary';
 interface AtAGlanceProps {
   analysis: HomeInspectionAnalysis;
   propertyData?: RedfinPropertyData;
+  negotiationStrategy?: NegotiationStrategy;
 }
 
-const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData }) => {
+const AtAGlance: React.FC<AtAGlanceProps> = ({ analysis, propertyData, negotiationStrategy }) => {
   const totalRepairCost = analysis.costSummary?.grandTotal?.max || 0;
   
   // Check data availability for each card

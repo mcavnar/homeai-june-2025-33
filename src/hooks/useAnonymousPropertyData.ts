@@ -39,7 +39,7 @@ export const useAnonymousPropertyData = (sessionId?: string) => {
         console.log('Saving property data to anonymous_reports table');
         // Don't await this - let it run in background
         supabase.from('anonymous_reports')
-          .update({ property_data: data })
+          .update({ property_data: data as any })
           .eq('session_id', sessionId)
           .then(({ error }) => {
             if (error) {

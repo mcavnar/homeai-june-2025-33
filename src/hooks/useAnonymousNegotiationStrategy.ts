@@ -25,7 +25,7 @@ export const useAnonymousNegotiationStrategy = (
         try {
           console.log('Saving pending negotiation strategy to anonymous report');
           const { error } = await supabase.from('anonymous_reports')
-            .update({ negotiation_strategy: pendingStrategy })
+            .update({ negotiation_strategy: pendingStrategy as any })
             .eq('session_id', sessionId);
           
           if (error) {
@@ -80,7 +80,7 @@ export const useAnonymousNegotiationStrategy = (
           try {
             console.log('Saving negotiation strategy to anonymous_reports table');
             const { error } = await supabase.from('anonymous_reports')
-              .update({ negotiation_strategy: generatedStrategy })
+              .update({ negotiation_strategy: generatedStrategy as any })
               .eq('session_id', sessionId);
             
             if (error) {
