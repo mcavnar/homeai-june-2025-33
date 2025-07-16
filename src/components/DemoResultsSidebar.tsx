@@ -25,32 +25,32 @@ import {
 const navigationItems = [
   {
     title: 'Dashboard',
-    url: '/demo/synopsis',
+    url: '/demo-results/synopsis',
     icon: FileText,
   },
   {
     title: 'Issues List',
-    url: '/demo/issues',
+    url: '/demo-results/issues',
     icon: AlertTriangle,
   },
   {
     title: 'Key Systems',
-    url: '/demo/systems',
+    url: '/demo-results/systems',
     icon: Settings,
   },
   {
     title: 'Service Providers',
-    url: '/demo/providers',
+    url: '/demo-results/providers',
     icon: Users,
   },
   {
     title: 'Negotiation',
-    url: '/demo/negotiation',
+    url: '/demo-results/negotiation',
     icon: Handshake,
   },
   {
     title: 'Inspection Report',
-    url: '/auth',
+    url: '/anonymous-upload',
     icon: ClipboardList,
   },
 ];
@@ -60,7 +60,7 @@ const DemoResultsSidebar = () => {
   const navigate = useNavigate();
 
   const handleUploadReport = () => {
-    navigate('/auth');
+    navigate('/anonymous-upload');
   };
 
   return (

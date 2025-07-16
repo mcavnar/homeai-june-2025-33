@@ -67,7 +67,7 @@ const DemoServiceProviders = () => {
   ];
 
   const handleUploadReport = () => {
-    navigate('/auth');
+    navigate('/anonymous-upload');
   };
 
   return (

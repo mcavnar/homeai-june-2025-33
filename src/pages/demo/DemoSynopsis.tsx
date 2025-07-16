@@ -21,7 +21,7 @@ const DemoSynopsis = () => {
     : undefined;
 
   const handleUploadReport = () => {
-    navigate('/auth');
+    navigate('/anonymous-upload');
   };
 
   return (

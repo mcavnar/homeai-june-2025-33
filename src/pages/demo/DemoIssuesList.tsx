@@ -13,7 +13,7 @@ const DemoIssuesList = () => {
   const navigate = useNavigate();
 
   const handleUploadReport = () => {
-    navigate('/auth');
+    navigate('/anonymous-upload');
   };
 
   return (
