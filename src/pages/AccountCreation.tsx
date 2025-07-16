@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useServerUserReport } from '@/hooks/useServerUserReport';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,8 @@ import { useToast } from '@/hooks/use-toast';
 const AccountCreation = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, signUp, signInWithGoogle, hasExistingReport } = useAuth();
+  const { user, signUp, signInWithGoogle } = useAuth();
+  const { saveUserReportViaServer, isLoading, error } = useServerUserReport();
   const { toast } = useToast();
   
   const [email, setEmail] = useState('');
@@ -24,7 +25,7 @@ const AccountCreation = () => {
   const [accountCreated, setAccountCreated] = useState(false);
   const [authError, setAuthError] = useState('');
 
-  // Get analysis data from location state
+  // Get analysis data from location state - corrected to use the actual structure
   const analysisData = location.state?.analysis;
   const pdfArrayBuffer = location.state?.pdfArrayBuffer;
   const pdfText = location.state?.pdfText;
@@ -46,6 +47,68 @@ const AccountCreation = () => {
     }
   }, [analysisData, navigate]);
 
+  const extractPropertyAddress = (analysisData: any): string | undefined => {
+    console.log('=== DEBUGGING PROPERTY ADDRESS EXTRACTION ===');
+    console.log('Full analysisData structure:', JSON.stringify(analysisData, null, 2));
+    
+    if (!analysisData) {
+      console.log('No analysis data provided');
+      return undefined;
+    }
+
+    // First try the address passed directly in the result
+    if (address && typeof address === 'string') {
+      console.log('Found address in result.address:', address);
+      return address;
+    }
+
+    // Try multiple ways to extract the property address with detailed logging
+    const possibleAddresses = [
+      analysisData?.propertyInfo?.address,
+      analysisData?.address,
+      analysisData?.property?.address,
+      analysisData?.propertyDetails?.address,
+      analysisData?.location?.address,
+      analysisData?.propertyInformation?.address,
+      analysisData?.inspection?.property?.address,
+      analysisData?.report?.property?.address,
+    ];
+
+    for (const addr of possibleAddresses) {
+      if (addr && typeof addr === 'string' && addr.trim().length > 0) {
+        console.log('Found address:', addr);
+        return addr;
+      }
+    }
+
+    // Deep search for any field that might contain an address
+    const searchForAddress = (obj: any, path: string = ''): string | undefined => {
+      if (typeof obj === 'string' && obj.includes(' ') && (obj.includes(',') || obj.includes('St') || obj.includes('Ave') || obj.includes('Rd') || obj.includes('Blvd'))) {
+        console.log(`Potential address found at ${path}:`, obj);
+        return obj;
+      }
+      
+      if (typeof obj === 'object' && obj !== null) {
+        for (const [key, value] of Object.entries(obj)) {
+          const result = searchForAddress(value, `${path}.${key}`);
+          if (result) return result;
+        }
+      }
+      
+      return undefined;
+    };
+    
+    const foundAddress = searchForAddress(analysisData);
+    if (foundAddress) {
+      console.log('Found address through deep search:', foundAddress);
+      return foundAddress;
+    }
+    
+    console.log('No address found in any expected locations');
+    console.log('Available keys in analysisData:', Object.keys(analysisData || {}));
+    return undefined;
+  };
+
   const storeDataInSessionStorage = () => {
     const storageData = {
       analysis: analysisData,
@@ -59,6 +122,43 @@ const AccountCreation = () => {
     
     console.log('Storing data in sessionStorage for OAuth flow:', storageData);
     sessionStorage.setItem('pendingAccountCreationData', JSON.stringify(storageData));
+  };
+
+  const saveReportForUser = async () => {
+    if (!analysisData) {
+      throw new Error('Analysis data not found. Please upload your report again.');
+    }
+
+    // Wait a moment for the user to be fully created
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Extract property address from analysis data with detailed logging
+    const propertyAddress = extractPropertyAddress(analysisData);
+    console.log('Final extracted property address:', propertyAddress);
+    
+    if (!propertyAddress) {
+      console.warn('WARNING: No property address could be extracted from analysis data');
+    }
+    
+    // Save the user report with proper property address
+    const reportData = {
+      analysis_data: analysisData,
+      pdf_text: pdfText,
+      property_address: propertyAddress,
+      inspection_date: analysisData?.propertyInfo?.inspectionDate || analysisData?.inspectionDate,
+      property_data: propertyData,
+      negotiation_strategy: negotiationStrategy,
+    };
+    
+    console.log('Saving user report with data:', {
+      hasAnalysisData: !!reportData.analysis_data,
+      propertyAddress: reportData.property_address,
+      inspectionDate: reportData.inspection_date,
+      hasPropertyData: !!reportData.property_data,
+      hasNegotiationStrategy: !!reportData.negotiation_strategy,
+    });
+    
+    await saveUserReportViaServer(reportData);
   };
 
   const handleGoogleAuth = async () => {
@@ -79,7 +179,7 @@ const AccountCreation = () => {
         return;
       }
 
-      // The rest will be handled by the AuthContext after OAuth redirect
+      // The rest will be handled by the Results component after OAuth redirect
     } catch (err) {
       console.error('Google auth error:', err);
       setAuthError('Google sign-in failed. Please try again.');
@@ -113,12 +213,25 @@ const AccountCreation = () => {
         return;
       }
 
+      await saveReportForUser();
+      
       setAccountCreated(true);
       
       toast({
         title: "Account created successfully!",
-        description: "Check your email for a confirmation link.",
+        description: "Your inspection report has been saved to your account.",
       });
+      
+      // Navigate to results after a short delay
+      setTimeout(() => {
+        navigate('/results/synopsis', {
+          state: {
+            analysis: analysisData,
+            pdfArrayBuffer,
+            pdfText,
+          }
+        });
+      }, 2000);
       
     } catch (err) {
       console.error('Error creating account:', err);
@@ -128,14 +241,42 @@ const AccountCreation = () => {
     }
   };
 
-  // Handle successful authentication - redirect to results
+  // Handle successful authentication (email signup only - Google OAuth is handled in Results component)
   useEffect(() => {
-    if (user && hasExistingReport !== null) {
-      console.log('User authenticated, redirecting to results');
-      // Navigate to results - the AuthContext will handle the conversion
-      navigate('/results/synopsis');
+    if (user && !accountCreated && !isCreatingAccount && !location.state?.fromOAuth) {
+      // This means email authentication was successful, now save the report
+      const handleSuccessfulAuth = async () => {
+        try {
+          setIsCreatingAccount(true);
+          await saveReportForUser();
+          setAccountCreated(true);
+          
+          toast({
+            title: "Account created successfully!",
+            description: "Your inspection report has been saved to your account.",
+          });
+          
+          // Navigate to results after a short delay
+          setTimeout(() => {
+            navigate('/results/synopsis', {
+              state: {
+                analysis: analysisData,
+                pdfArrayBuffer,
+                pdfText,
+              }
+            });
+          }, 2000);
+        } catch (err) {
+          console.error('Error saving report after auth:', err);
+          setAuthError(err instanceof Error ? err.message : "Failed to save report. Please try again.");
+        } finally {
+          setIsCreatingAccount(false);
+        }
+      };
+
+      handleSuccessfulAuth();
     }
-  }, [user, hasExistingReport, navigate]);
+  }, [user, accountCreated, isCreatingAccount]);
 
   if (!analysisData) {
     return (
@@ -160,8 +301,11 @@ const AccountCreation = () => {
             <div className="text-center space-y-4">
               <CheckCircle className="h-12 w-12 text-green-500 mx-auto" />
               <h2 className="text-xl font-semibold text-gray-900">Account Created!</h2>
-              <p className="text-gray-600">Please check your email for a confirmation link to activate your account.</p>
-              <p className="text-sm text-gray-500">After confirming your email, you'll be able to access your inspection report.</p>
+              <p className="text-gray-600">Redirecting to your inspection report...</p>
+              <div className="flex items-center justify-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                <span className="text-sm text-gray-500">Loading dashboard...</span>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -180,17 +324,17 @@ const AccountCreation = () => {
         </CardHeader>
         
         <CardContent>
-          {authError && (
+          {(authError || error) && (
             <Alert variant="destructive" className="mb-4">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{authError}</AlertDescription>
+              <AlertDescription>{authError || error}</AlertDescription>
             </Alert>
           )}
 
           {/* Primary Google Sign In Button */}
           <Button
             onClick={handleGoogleAuth}
-            disabled={isCreatingAccount}
+            disabled={isCreatingAccount || isLoading}
             className="w-full flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 h-12 text-base font-medium mb-6"
           >
             <Chrome className="h-5 w-5" />
@@ -250,9 +394,9 @@ const AccountCreation = () => {
               type="submit"
               variant="outline"
               className="w-full h-12 border-gray-200 hover:bg-gray-50 text-gray-700 font-medium"
-              disabled={isCreatingAccount}
+              disabled={isCreatingAccount || isLoading}
             >
-              {isCreatingAccount ? (
+              {isCreatingAccount || isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Creating Account...

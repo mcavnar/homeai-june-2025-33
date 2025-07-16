@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { getSessionId } from '@/utils/sessionUtils';
 
 interface AuthContextType {
   user: User | null;
@@ -10,7 +9,6 @@ interface AuthContextType {
   loading: boolean;
   hasExistingReport: boolean | null;
   isCheckingForReport: boolean;
-  isConverting: boolean;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: (redirectTo?: string) => Promise<{ error: any }>;
@@ -18,7 +16,6 @@ interface AuthContextType {
   checkForExistingReport: () => Promise<boolean>;
   refreshExistingReportCheck: () => Promise<void>;
   requestAccountDeletion: () => Promise<{ error: any }>;
-  convertAnonymousReportToUserReport: (userId: string) => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,7 +34,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [hasExistingReport, setHasExistingReport] = useState<boolean | null>(null);
   const [isCheckingForReport, setIsCheckingForReport] = useState(false);
-  const [isConverting, setIsConverting] = useState(false);
 
   const checkForOAuthData = (): boolean => {
     const storedData = sessionStorage.getItem('pendingAccountCreationData');
@@ -54,154 +50,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const saveReportViaServer = async (reportData: any, userId: string) => {
-    try {
-      console.log('Saving report via server for user:', userId);
-      
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error('No active session for saving report');
-      }
-
-      const { data, error } = await supabase.functions.invoke('save-user-report', {
-        body: reportData,
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (error) {
-        console.error('Edge function error:', error);
-        throw error;
-      }
-
-      if (!data?.success) {
-        throw new Error(data?.error || 'Failed to save report');
-      }
-
-      console.log('Successfully saved report via server:', data.report.id);
-      return data.report;
-    } catch (error) {
-      console.error('Error saving report via server:', error);
-      throw error;
-    }
-  };
-
-  const convertAnonymousReportToUserReport = async (userId: string) => {
-    try {
-      console.log('=== AUTH CONTEXT: STARTING CONVERSION ===');
-      setIsConverting(true);
-      
-      // Check for OAuth data first
-      const oauthData = sessionStorage.getItem('pendingAccountCreationData');
-      if (oauthData) {
-        console.log('Found OAuth data, processing...');
-        const parsedData = JSON.parse(oauthData);
-        
-        // Wait for session to be fully established
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        const reportData = {
-          analysis_data: parsedData.analysis,
-          pdf_text: parsedData.pdfText,
-          property_address: parsedData.address,
-          property_data: parsedData.propertyData,
-          negotiation_strategy: parsedData.negotiationStrategy,
-        };
-        
-        console.log('Saving OAuth report data:', reportData);
-        const savedReport = await saveReportViaServer(reportData, userId);
-        
-        // Clear the session storage
-        sessionStorage.removeItem('pendingAccountCreationData');
-        
-        setIsConverting(false);
-        return savedReport;
-      }
-      
-      // Check for anonymous report in database
-      const sessionId = getSessionId();
-      console.log('Session ID for conversion:', sessionId);
-      
-      if (!sessionId) {
-        console.log('No session ID found');
-        setIsConverting(false);
-        return null;
-      }
-      
-      const { data: anonymousReport, error: fetchError } = await supabase
-        .from('anonymous_reports')
-        .select('*')
-        .eq('session_id', sessionId)
-        .maybeSingle();
-
-      if (fetchError) {
-        console.error('Error fetching anonymous report:', fetchError);
-        setIsConverting(false);
-        return null;
-      }
-
-      if (!anonymousReport) {
-        console.log('No anonymous report found to convert');
-        setIsConverting(false);
-        return null;
-      }
-
-      console.log('Found anonymous report to convert:', anonymousReport.id);
-
-      // Wait for session to be fully established
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const reportData = {
-        analysis_data: anonymousReport.analysis_data,
-        property_data: anonymousReport.property_data,
-        negotiation_strategy: anonymousReport.negotiation_strategy,
-        property_address: anonymousReport.property_address,
-        inspection_date: anonymousReport.inspection_date,
-        pdf_file_path: anonymousReport.pdf_file_path,
-        pdf_text: anonymousReport.pdf_text,
-        pdf_metadata: anonymousReport.pdf_metadata,
-      };
-
-      console.log('Saving anonymous report data:', reportData);
-      const savedReport = await saveReportViaServer(reportData, userId);
-
-      // Mark the anonymous report as converted
-      await supabase
-        .from('anonymous_reports')
-        .update({
-          converted_to_user_id: userId,
-          converted_at: new Date().toISOString()
-        })
-        .eq('id', anonymousReport.id);
-
-      console.log('Successfully converted anonymous report to user report');
-      
-      // Clear the anonymous session ID
-      localStorage.removeItem('anonymous_session_id');
-      
-      setIsConverting(false);
-      return savedReport;
-    } catch (err) {
-      console.error('Error converting anonymous report:', err);
-      setIsConverting(false);
-      return null;
-    }
-  };
-
   const checkForExistingReport = async (): Promise<boolean> => {
     if (!user) return false;
 
     console.log('=== AUTH CONTEXT: CHECKING FOR EXISTING REPORT ===');
     console.log('User ID:', user.id);
-    console.log('Is converting:', isConverting);
     
-    // If conversion is in progress, wait for it to complete
-    if (isConverting) {
-      console.log('Conversion in progress, waiting...');
-      return true;
-    }
-
     // Check if there's pending OAuth data - if so, return true temporarily
     const hasPendingOAuth = checkForOAuthData();
     if (hasPendingOAuth) {
@@ -255,32 +109,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-            console.log('User signed in, checking for conversion opportunity');
-            
-            // Use setTimeout to avoid blocking the auth state change
-            setTimeout(async () => {
-              try {
-                console.log('Attempting conversion for user:', session.user.id);
-                const converted = await convertAnonymousReportToUserReport(session.user.id);
-                
-                if (converted) {
-                  console.log('Conversion successful, refreshing report check');
-                  await checkForExistingReport();
-                } else {
-                  console.log('No conversion needed, checking for existing report');
-                  await checkForExistingReport();
-                }
-              } catch (error) {
-                console.error('Error in conversion process:', error);
-                await checkForExistingReport();
-              }
-            }, 100);
-          }
+          // Check for existing report when user logs in
+          await checkForExistingReport();
         } else {
           setHasExistingReport(null);
           setIsCheckingForReport(false);
-          setIsConverting(false);
         }
         
         setLoading(false);
@@ -294,22 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        setTimeout(async () => {
-          try {
-            console.log('Initial session check, attempting conversion');
-            const converted = await convertAnonymousReportToUserReport(session.user.id);
-            
-            if (converted) {
-              console.log('Initial conversion successful');
-              await checkForExistingReport();
-            } else {
-              await checkForExistingReport();
-            }
-          } catch (error) {
-            console.error('Error in initial conversion:', error);
-            await checkForExistingReport();
-          }
-        }, 100);
+        await checkForExistingReport();
       }
       
       setLoading(false);
@@ -317,6 +135,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Update hasExistingReport when user changes
+  useEffect(() => {
+    if (user) {
+      checkForExistingReport();
+    } else {
+      setHasExistingReport(null);
+      setIsCheckingForReport(false);
+    }
+  }, [user]);
 
   const signUp = async (email: string, password: string) => {
     const redirectUrl = `${window.location.origin}/`;
@@ -354,7 +182,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sessionStorage.clear();
     setHasExistingReport(null);
     setIsCheckingForReport(false);
-    setIsConverting(false);
     const { error } = await supabase.auth.signOut();
     return { error };
   };
@@ -388,7 +215,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     hasExistingReport,
     isCheckingForReport,
-    isConverting,
     signUp,
     signIn,
     signInWithGoogle,
@@ -396,7 +222,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkForExistingReport,
     refreshExistingReportCheck,
     requestAccountDeletion,
-    convertAnonymousReportToUserReport,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
