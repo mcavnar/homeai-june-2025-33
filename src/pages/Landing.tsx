@@ -2,7 +2,8 @@
 import React from 'react';
 import LandingNavigation from '@/components/landing/LandingNavigation';
 import HeroSection from '@/components/landing/HeroSection';
-import ProblemsSection from '@/components/landing/ProblemsSection';
+import FeaturesSection from '@/components/landing/FeaturesSection';
+import WhyWeBuildSection from '@/components/landing/WhyWeBuildSection';
 import BenefitsSection from '@/components/landing/BenefitsSection';
 import ProcessSection from '@/components/landing/ProcessSection';
 import LandingFooter from '@/components/landing/LandingFooter';
@@ -12,7 +13,8 @@ const Landing = () => {
     <div className="min-h-screen bg-white">
       <LandingNavigation />
       <HeroSection />
-      <ProblemsSection />
+      <FeaturesSection />
+      <WhyWeBuildSection />
       <BenefitsSection />
       <ProcessSection />
       <LandingFooter />
