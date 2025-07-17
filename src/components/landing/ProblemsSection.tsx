@@ -46,7 +46,7 @@ const ProblemsSection = () => {
       <div className="container mx-auto px-6">
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
-            Turn Your Report into the Ultimate Home Condition Dashboard
+            Turn Your Inspection Report into the Ultimate Home Condition Dashboard
           </h2>
           <div className="max-w-4xl mx-auto mt-12">
             <img 
