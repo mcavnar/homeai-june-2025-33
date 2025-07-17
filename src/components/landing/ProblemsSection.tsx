@@ -48,6 +48,13 @@ const ProblemsSection = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
             Turn Your Report into the Ultimate Home Condition Dashboard
           </h2>
+          <div className="max-w-4xl mx-auto mt-12">
+            <img 
+              src="/lovable-uploads/e9006c0e-8a2f-4a16-a27e-1a5df07794fb.png" 
+              alt="HomeAI inspection dashboard showing repair costs, issues identified, and overall condition"
+              className="w-full rounded-2xl shadow-lg border border-gray-200"
+            />
+          </div>
         </div>
 
         {/* Why We Built Home AI Section */}
