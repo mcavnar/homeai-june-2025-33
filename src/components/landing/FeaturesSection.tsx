@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
 import { useGoogleAnalytics } from '@/hooks/useGoogleAnalytics';
 import { TrackedButton } from '@/components/TrackedButton';
-import { Upload, Star } from 'lucide-react';
+import { Upload } from 'lucide-react';
 
 const FeaturesSection = () => {
   const navigate = useNavigate();
@@ -172,12 +172,7 @@ const FeaturesSection = () => {
               {testimonials.map((testimonial, index) => (
                 <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center mb-3">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
-                      ))}
-                    </div>
-                    <blockquote className="text-gray-700 text-sm font-light leading-relaxed mb-4">
+                    <blockquote className="text-gray-700 text-sm font-light leading-relaxed mb-3">
                       "{testimonial.quote}"
                     </blockquote>
                   </div>
