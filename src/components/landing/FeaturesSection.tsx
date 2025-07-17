@@ -117,7 +117,7 @@ const FeaturesSection = () => {
                 trackingLabel="Issues Section Upload Button"
               >
                 <Upload className="mr-2 h-5 w-5" />
-                Upload Your Report
+                Understand Your Issues — Free
               </TrackedButton>
             </div>
           </div>
