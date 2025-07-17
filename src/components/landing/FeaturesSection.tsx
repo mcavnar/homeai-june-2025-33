@@ -84,7 +84,7 @@ const FeaturesSection = () => {
               <img 
                 src="https://znohkixqcmwifqnqwdoc.supabase.co/storage/v1/object/public/site-images/HomeAI_dashboard_jul172025.png" 
                 alt="HomeAI dashboard showing repair costs, issues identified, and overall condition"
-                className="w-full rounded-2xl shadow-lg border border-gray-200"
+                className="w-full"
               />
             </div>
           </div>
@@ -99,7 +99,7 @@ const FeaturesSection = () => {
               <img 
                 src="https://znohkixqcmwifqnqwdoc.supabase.co/storage/v1/object/public/site-images/HomeAI_issues_jul172025.png" 
                 alt="HomeAI issues list with severity ratings and repair estimates"
-                className="w-full rounded-2xl shadow-lg border border-gray-200"
+                className="w-full"
               />
             </div>
             <div>
@@ -150,7 +150,7 @@ const FeaturesSection = () => {
               <img 
                 src="https://znohkixqcmwifqnqwdoc.supabase.co/storage/v1/object/public/site-images/HomeAI_keysystems_jul172025.png" 
                 alt="HomeAI key systems overview showing HVAC, roof, plumbing, and electrical health"
-                className="w-full rounded-2xl shadow-lg border border-gray-200"
+                className="w-full"
               />
             </div>
           </div>
@@ -165,7 +165,7 @@ const FeaturesSection = () => {
               <img 
                 src="https://znohkixqcmwifqnqwdoc.supabase.co/storage/v1/object/public/site-images/HomeAI_momonphone_jul172025.png" 
                 alt="HomeAI mobile app interface showing home inspection results"
-                className="w-full rounded-2xl shadow-lg"
+                className="w-full"
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
