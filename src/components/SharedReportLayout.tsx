@@ -44,7 +44,7 @@ const SharedReportLayout: React.FC<SharedReportLayoutProps> = ({ children }) => 
               <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">🏠</span>
               </div>
-              <div className="text-xl font-bold text-gray-900">HomeAi</div>
+              <div className="text-xl font-bold text-gray-900">HomeAI</div>
             </div>
             <div className="text-sm text-gray-500">
               Shared Report
@@ -71,7 +71,7 @@ const SharedReportLayout: React.FC<SharedReportLayoutProps> = ({ children }) => 
               rel="noopener noreferrer"
               className="text-blue-600 hover:text-blue-800 font-medium"
             >
-              HomeAi
+              HomeAI
             </a>
           </div>
         </div>

@@ -403,7 +403,7 @@ const AuthPage = () => {
         <div className="text-center space-y-4">
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
             <p className="text-sm text-gray-700 italic font-medium mb-2">
-              "HomeAi saved me $8,500 on my inspection negotiations!"
+              "HomeAI saved me $8,500 on my inspection negotiations!"
             </p>
             <p className="text-xs text-gray-500">- Sarah M., First-time Homebuyer</p>
           </div>

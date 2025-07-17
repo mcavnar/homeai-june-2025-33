@@ -22,7 +22,7 @@ const PrivacyPolicy = () => {
         <div className="prose max-w-none text-gray-700 space-y-6">
           <p>
             This Privacy Policy ("Policy") applies to the collection, use, and disclosure of personal 
-            information by HomeAi ("HomeAi," "we," "us," or "our") in connection with our online platform, 
+            information by HomeAI ("HomeAI," "we," "us," or "our") in connection with our online platform, 
             available at [your‐platform‐URL], where users can upload, store, and access home inspection 
             reports (collectively, the "Services").
           </p>
@@ -146,13 +146,13 @@ const PrivacyPolicy = () => {
           <ul className="list-disc pl-6 space-y-2 mt-2">
             <li>Comply with any applicable law, regulation, legal process, or governmental request;</li>
             <li>Enforce our terms, policies, and agreements;</li>
-            <li>Protect the rights, property, or safety of HomeAi, our users, or others;</li>
+            <li>Protect the rights, property, or safety of HomeAI, our users, or others;</li>
             <li>Detect, prevent, or otherwise address fraud, security, or technical issues.</li>
           </ul>
 
           <h3 className="text-xl font-semibold text-gray-900 mt-6">C. Business Transfers</h3>
           <p>
-            If HomeAi is involved in a merger, acquisition, reorganization, or sale of assets, personal information may be 
+            If HomeAI is involved in a merger, acquisition, reorganization, or sale of assets, personal information may be 
             transferred as part of that transaction. We will notify you before your information is transferred and becomes 
             subject to a different privacy policy.
           </p>
@@ -203,7 +203,7 @@ const PrivacyPolicy = () => {
             your rights, please contact us at:
           </p>
           <p className="mt-2">
-            HomeAi<br />
+            HomeAI<br />
             Email: info@fivefourventures.com
           </p>
 
@@ -224,7 +224,7 @@ const PrivacyPolicy = () => {
           </p>
 
           <p className="mt-8">
-            Thank you for trusting HomeAi with your data. We are committed to protecting your privacy and ensuring the 
+            Thank you for trusting HomeAI with your data. We are committed to protecting your privacy and ensuring the 
             security of your home inspection reports.
           </p>
         </div>
