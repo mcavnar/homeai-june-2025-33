@@ -43,7 +43,7 @@ const ProblemsSection = () => {
         {/* Why We Built Home AI Section */}
         <div className="max-w-4xl mx-auto mb-20">
           <div className="text-center mb-12">
-            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
+            <h3 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
               Why We Built HomeAI
             </h3>
           </div>
