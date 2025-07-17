@@ -168,20 +168,25 @@ const FeaturesSection = () => {
                 className="w-full"
               />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
-              {testimonials.map((testimonial, index) => (
-                <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
-                  <div>
-                    <blockquote className="text-gray-700 text-sm font-light leading-relaxed mb-3">
-                      "{testimonial.quote}"
-                    </blockquote>
-                  </div>
-                  <div className="border-t border-gray-100 pt-3">
-                    <div className="font-semibold text-gray-900 text-sm">{testimonial.name}</div>
-                    <div className="text-gray-500 text-xs">{testimonial.location}</div>
-                  </div>
-                </div>
-              ))}
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
+                What Our Users Say
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {testimonials.map((testimonial, index) => (
+                 <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+                   <div>
+                     <blockquote className="text-gray-700 text-sm font-light leading-relaxed mb-3">
+                       "{testimonial.quote}"
+                     </blockquote>
+                   </div>
+                   <div className="border-t border-gray-100 pt-3">
+                     <div className="font-semibold text-gray-900 text-sm">{testimonial.name}</div>
+                     <div className="text-gray-500 text-xs">{testimonial.location}</div>
+                   </div>
+                 </div>
+               ))}
+              </div>
             </div>
           </div>
         </div>
