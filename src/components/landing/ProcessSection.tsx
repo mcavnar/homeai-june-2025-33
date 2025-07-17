@@ -29,28 +29,30 @@ const ProcessSection = () => {
     navigate('/anonymous-upload');
   };
 
-  const steps = [
-    {
-      number: "1",
-      title: "Upload Report",
-      description: "Simply drag and drop your PDF inspection report"
-    },
-    {
-      number: "2",
-      title: "Intelligent Data Analysis",
-      description: "Our AI processes your report using millions of proprietary data points to deliver insights you can't get anywhere else"
-    },
-    {
-      number: "3",
-      title: "Get Insights",
-      description: "Receive your personalized analysis and action plan"
-    }
-  ];
+  // Commented out steps for potential future use
+  // const steps = [
+  //   {
+  //     number: "1",
+  //     title: "Upload Report",
+  //     description: "Simply drag and drop your PDF inspection report"
+  //   },
+  //   {
+  //     number: "2",
+  //     title: "Intelligent Data Analysis",
+  //     description: "Our AI processes your report using millions of proprietary data points to deliver insights you can't get anywhere else"
+  //   },
+  //   {
+  //     number: "3",
+  //     title: "Get Insights",
+  //     description: "Receive your personalized analysis and action plan"
+  //   }
+  // ];
 
   return (
     <div className="py-24 bg-gray-50">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-20">
+        {/* Commented out title and steps sections for potential future use */}
+        {/* <div className="text-center mb-20">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
             Simple Process, Powerful Results
           </h2>
@@ -68,7 +70,7 @@ const ProcessSection = () => {
               </p>
             </div>
           ))}
-        </div>
+        </div> */}
 
         {/* Upload Call-to-Action Box */}
         <div className="max-w-4xl mx-auto">
