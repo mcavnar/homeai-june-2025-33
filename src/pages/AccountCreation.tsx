@@ -317,7 +317,7 @@ const AccountCreation = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Create Your Account</CardTitle>
+          <CardTitle className="text-2xl text-center">Create Your Free Account</CardTitle>
           <p className="text-gray-600 text-center">
             Save your inspection report and access it any time. Your account and the platform is entirely free to use. You can always delete your account and all your data.
           </p>
