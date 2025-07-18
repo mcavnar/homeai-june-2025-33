@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useMetaConversions } from '@/hooks/useMetaConversions';
+import { useUnifiedMetaTracking } from '@/hooks/useUnifiedMetaTracking';
 import { useGoogleAnalytics } from '@/hooks/useGoogleAnalytics';
 import { supabase } from '@/integrations/supabase/client';
 import { getSessionId } from '@/utils/sessionUtils';
@@ -19,7 +19,7 @@ const AuthPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { user, signUp, signIn, signInWithGoogle, hasExistingReport } = useAuth();
-  const { trackConversion } = useMetaConversions();
+  const { trackEvent: trackMetaEvent } = useUnifiedMetaTracking();
   const { trackEvent } = useGoogleAnalytics();
   
   // Check if mode=signin is in URL params, otherwise default to signup
@@ -165,7 +165,7 @@ const AuthPage = () => {
       } else {
         // Track successful registration for sign-up
         if (isSignUp) {
-          await trackConversion({
+          await trackMetaEvent({
             eventName: 'CompleteRegistration',
             contentName: 'Email Signup'
           });
@@ -196,7 +196,7 @@ const AuthPage = () => {
         setError(error.message);
       } else {
         // Track successful Google registration
-        await trackConversion({
+        await trackMetaEvent({
           eventName: 'CompleteRegistration',
           contentName: 'Google OAuth'
         });

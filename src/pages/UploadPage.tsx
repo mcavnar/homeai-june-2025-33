@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useMetaConversions } from '@/hooks/useMetaConversions';
+import { useUnifiedMetaTracking } from '@/hooks/useUnifiedMetaTracking';
 import FileUploadSection from '@/components/FileUploadSection';
 import ProcessingStatus from '@/components/ProcessingStatus';
 import { usePDFProcessor } from '@/hooks/usePDFProcessor';
@@ -10,7 +10,7 @@ import { usePDFProcessor } from '@/hooks/usePDFProcessor';
 const UploadPage = () => {
   const navigate = useNavigate();
   const { user, checkForExistingReport } = useAuth();
-  const { trackConversion } = useMetaConversions();
+  const { trackEvent: trackMetaEvent } = useUnifiedMetaTracking();
   
   const {
     file,
@@ -26,7 +26,7 @@ const UploadPage = () => {
 
   const handleFileSelectWithTracking = (selectedFile: File) => {
     // Track the PDF upload started event
-    trackConversion({
+    trackMetaEvent({
       eventName: 'AnalyzeReport',
       contentName: 'PDF Upload Started'
     });
@@ -45,7 +45,7 @@ const UploadPage = () => {
     if (result) {
       // Track analysis completion with repair cost value
       const totalRepairCosts = result.analysis?.costSummary?.totalEstimatedCost || 0;
-      await trackConversion({
+      await trackMetaEvent({
         eventName: 'AnalysisComplete',
         value: totalRepairCosts,
         contentName: 'PDF Analysis Complete'

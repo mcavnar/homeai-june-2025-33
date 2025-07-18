@@ -1,14 +1,12 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMetaConversions } from '@/hooks/useMetaConversions';
 import { useGoogleAnalytics } from '@/hooks/useGoogleAnalytics';
 import { TrackedButton } from '@/components/TrackedButton';
 import { Upload } from 'lucide-react';
 
 const FeaturesSection = () => {
   const navigate = useNavigate();
-  const { trackConversion } = useMetaConversions();
   const { trackEvent } = useGoogleAnalytics();
 
   const handleUpload = async (sectionName: string) => {
@@ -17,12 +15,6 @@ const FeaturesSection = () => {
       event_category: 'engagement',
       event_label: sectionName,
       value: 1
-    });
-
-    // Track conversion
-    await trackConversion({
-      eventName: 'Lead',
-      contentName: `${sectionName} Upload Report Button`
     });
 
     // Navigate to upload
@@ -75,6 +67,8 @@ const FeaturesSection = () => {
                 size="lg"
                 className="px-8 py-4 text-lg font-medium h-auto rounded-lg"
                 trackingLabel="Dashboard Section Upload Button"
+                metaEventName="Lead"
+                metaContentName="Dashboard Section Upload Report Button"
               >
                 <Upload className="mr-2 h-5 w-5" />
                 Get Your Free Dashboard
@@ -115,6 +109,8 @@ const FeaturesSection = () => {
                 size="lg"
                 className="px-8 py-4 text-lg font-medium h-auto rounded-lg"
                 trackingLabel="Issues Section Upload Button"
+                metaEventName="Lead"
+                metaContentName="Issues Section Upload Report Button"
               >
                 <Upload className="mr-2 h-5 w-5" />
                 Understand Your Issues — Free
@@ -141,6 +137,8 @@ const FeaturesSection = () => {
                 size="lg"
                 className="px-8 py-4 text-lg font-medium h-auto rounded-lg"
                 trackingLabel="Systems Section Upload Button"
+                metaEventName="Lead"
+                metaContentName="Systems Section Upload Report Button"
               >
                 <Upload className="mr-2 h-5 w-5" />
                 Learn About Your Key Systems

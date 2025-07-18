@@ -1,6 +1,5 @@
 
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { useUnifiedMetaTracking } from './useUnifiedMetaTracking';
 
 interface TrackConversionParams {
   eventName: string;
@@ -10,45 +9,10 @@ interface TrackConversionParams {
 }
 
 export const useMetaConversions = () => {
-  const { user } = useAuth();
+  const { trackEvent } = useUnifiedMetaTracking();
 
-  const trackConversion = async ({
-    eventName,
-    value,
-    currency = 'USD',
-    contentName
-  }: TrackConversionParams) => {
-    try {
-      // Generate unique event ID for deduplication
-      const eventId = `${eventName}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
-      console.log('Tracking Meta conversion:', { eventName, eventId, value });
-
-      const { data, error } = await supabase.functions.invoke('meta-conversions', {
-        body: {
-          eventName,
-          eventId,
-          userEmail: user?.email,
-          userAgent: navigator.userAgent,
-          value,
-          currency,
-          contentName,
-          eventSourceUrl: window.location.href
-        }
-      });
-
-      if (error) {
-        console.error('Meta conversion tracking error:', error);
-        return { success: false, error };
-      }
-
-      console.log('Meta conversion tracked successfully:', data);
-      return { success: true, data };
-
-    } catch (error) {
-      console.error('Meta conversion tracking failed:', error);
-      return { success: false, error };
-    }
+  const trackConversion = async (params: TrackConversionParams) => {
+    return await trackEvent(params);
   };
 
   return { trackConversion };

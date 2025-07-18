@@ -2,6 +2,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { usePageTracking } from '@/hooks/usePageTracking';
+import { useUnifiedMetaTracking } from '@/hooks/useUnifiedMetaTracking';
 
 interface AnalyticsContextType {
   trackButtonClick: (buttonText: string, elementId?: string, elementClass?: string) => void;
@@ -11,6 +12,12 @@ interface AnalyticsContextType {
     element_text?: string;
     element_class?: string;
     page_path: string;
+  }) => void;
+  trackMetaEvent: (params: {
+    eventName: string;
+    value?: number;
+    currency?: string;
+    contentName?: string;
   }) => void;
 }
 
@@ -22,6 +29,7 @@ interface AnalyticsProviderProps {
 
 export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }) => {
   const { trackButtonClick, trackInteraction } = useAnalytics();
+  const { trackEvent } = useUnifiedMetaTracking();
   
   // Enable page tracking with error boundary
   try {
@@ -53,9 +61,23 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
     }
   };
 
+  const safeTrackMetaEvent = (params: {
+    eventName: string;
+    value?: number;
+    currency?: string;
+    contentName?: string;
+  }) => {
+    try {
+      trackEvent(params);
+    } catch (error) {
+      console.error('Meta event tracking failed:', error);
+    }
+  };
+
   const value = {
     trackButtonClick: safeTrackButtonClick,
     trackInteraction: safeTrackInteraction,
+    trackMetaEvent: safeTrackMetaEvent,
   };
 
   return (
