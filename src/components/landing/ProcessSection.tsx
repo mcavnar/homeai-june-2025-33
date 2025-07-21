@@ -26,7 +26,7 @@ const ProcessSection = () => {
       <div className="container mx-auto px-6">
         {/* Upload Call-to-Action Box */}
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
+          <div className="bg-white rounded-2xl p-6 md:p-12 shadow-sm border border-gray-100 text-center">
             <div className="flex items-center justify-center mb-6">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mr-4">
                 <FileText className="h-8 w-8 text-blue-600" />
@@ -45,7 +45,7 @@ const ProcessSection = () => {
               onClick={handleUpload}
               variant="green"
               size="lg"
-              className="px-12 py-6 text-xl font-medium h-auto rounded-lg"
+              className="px-6 md:px-12 py-6 text-lg md:text-xl font-medium h-auto rounded-lg"
               trackingLabel="Process Section Upload Button"
               metaEventName="Lead"
               metaContentName="Upload Report Process Section Button"
