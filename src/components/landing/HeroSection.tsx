@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
 import { useGoogleAnalytics } from '@/hooks/useGoogleAnalytics';
 import { TrackedButton } from '@/components/TrackedButton';
-import { Eye, Upload } from 'lucide-react';
+import { Upload } from 'lucide-react';
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -29,22 +29,6 @@ const HeroSection = () => {
     navigate('/anonymous-upload');
   };
 
-  const handleViewDemo = async () => {
-    // Track Google Analytics event
-    trackEvent('view_demo_report_click', {
-      event_category: 'engagement',
-      event_label: 'homepage',
-      value: 1
-    });
-
-    // Track demo view click as Lead instead of ViewContent
-    await trackConversion({
-      eventName: 'Lead',
-      contentName: 'View Demo Report Button'
-    });
-
-    navigate('/demo-results/synopsis');
-  };
 
   return (
     <div className="bg-blue-50 py-12 md:py-24">
@@ -57,17 +41,7 @@ const HeroSection = () => {
           Upload your inspection report and we'll provide accurate repair estimates, give detailed information on your key systems and their maintenance costs, recommend service providers and offer negotiation advice.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <TrackedButton 
-            onClick={handleViewDemo}
-            variant="outline"
-            size="lg" 
-            className="bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 hover:border-gray-300 px-10 py-4 md:py-6 text-lg font-medium h-auto rounded-lg shadow-none"
-            trackingLabel="Hero View Demo Button"
-          >
-            <Eye className="mr-2 h-5 w-5" />
-            View Demo Report
-          </TrackedButton>
+        <div className="flex justify-center">
           <TrackedButton 
             onClick={handleGetStarted}
             variant="green" 
