@@ -47,13 +47,13 @@ const HeroSection = () => {
   };
 
   return (
-    <div className="bg-blue-50 py-24">
+    <div className="bg-blue-50 py-12 md:py-24">
       <div className="container mx-auto px-6 text-center">
-        <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight max-w-5xl mx-auto">
+        <h1 className="text-4xl md:text-7xl font-bold text-gray-900 mb-6 md:mb-8 leading-tight max-w-5xl mx-auto">
           Get Instant Repair Costs and Negotiation Advice From Your Inspection Report
         </h1>
         
-        <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
+        <p className="text-lg md:text-xl text-gray-600 mb-8 md:mb-12 max-w-3xl mx-auto leading-relaxed font-light">
           Upload your inspection report and we'll provide accurate repair estimates, give detailed information on your key systems and their maintenance costs, recommend service providers and offer negotiation advice.
         </p>
 
@@ -80,7 +80,7 @@ const HeroSection = () => {
           </TrackedButton>
         </div>
 
-        <p className="text-sm text-gray-500 mt-6 max-w-2xl mx-auto">
+        <p className="text-sm text-gray-500 mt-4 md:mt-6 max-w-2xl mx-auto">
           The platform is entirely free to use and you can delete your account and information at any time
         </p>
       </div>
