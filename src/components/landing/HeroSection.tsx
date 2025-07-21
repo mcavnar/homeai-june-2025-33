@@ -53,7 +53,7 @@ const HeroSection = () => {
           Get Instant Repair Costs and Negotiation Advice From Your Inspection Report
         </h1>
         
-        <p className="text-lg md:text-xl text-gray-600 mb-8 md:mb-12 max-w-3xl mx-auto leading-relaxed font-light">
+        <p className="text-base md:text-xl text-gray-600 mb-8 md:mb-12 max-w-3xl mx-auto leading-relaxed font-light">
           Upload your inspection report and we'll provide accurate repair estimates, give detailed information on your key systems and their maintenance costs, recommend service providers and offer negotiation advice.
         </p>
 
@@ -62,7 +62,7 @@ const HeroSection = () => {
             onClick={handleViewDemo}
             variant="outline"
             size="lg" 
-            className="bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 hover:border-gray-300 px-10 py-6 text-lg font-medium h-auto rounded-lg shadow-none"
+            className="bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 hover:border-gray-300 px-10 py-4 md:py-6 text-lg font-medium h-auto rounded-lg shadow-none"
             trackingLabel="Hero View Demo Button"
           >
             <Eye className="mr-2 h-5 w-5" />
@@ -72,7 +72,7 @@ const HeroSection = () => {
             onClick={handleGetStarted}
             variant="green" 
             size="lg"
-            className="px-10 py-6 text-lg font-medium h-auto rounded-lg"
+            className="px-10 py-4 md:py-6 text-lg font-medium h-auto rounded-lg"
             trackingLabel="Hero Upload Report Button"
           >
             <Upload className="mr-2 h-5 w-5" />
