@@ -50,7 +50,7 @@ const HeroSection = () => {
     <div className="bg-blue-50 py-12 md:py-24">
       <div className="container mx-auto px-6 text-center">
         <h1 className="text-4xl md:text-7xl font-bold text-gray-900 mb-6 md:mb-8 leading-tight max-w-5xl mx-auto">
-          Get Instant Repair Costs and Negotiation Advice From Your Inspection Report
+          Get Instant Repair Costs & Negotiation Advice From Your Inspection Report
         </h1>
         
         <p className="text-base md:text-xl text-gray-600 mb-8 md:mb-12 max-w-3xl mx-auto leading-relaxed font-light">
