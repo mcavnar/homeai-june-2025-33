@@ -112,7 +112,7 @@ const AnonymousUpload = () => {
               <div className="p-6 sm:p-8">
                 <div className="flex items-center gap-2 mb-6">
                   <Upload className="h-5 w-5 text-green-600" />
-                  <p className="text-gray-600">Select or drag & drop a PDF file (max 10MB)</p>
+                  <p className="text-gray-600">PDF file (max 10MB)</p>
                 </div>
 
                 {/* File Upload Area */}
@@ -151,7 +151,7 @@ const AnonymousUpload = () => {
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-4">
-                      <Upload className="h-12 w-12 text-gray-400" />
+                      <Upload className="h-8 w-8 sm:h-12 sm:w-12 text-gray-400" />
                       <div>
                         <p className="text-gray-700 font-medium mb-2">
                           Click to select or drag & drop your home inspection PDF
