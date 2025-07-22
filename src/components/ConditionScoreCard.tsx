@@ -56,9 +56,12 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
     return "Below average compared to similar homes";
   };
 
-  // Generate smart bullet points
+  // Generate smart bullet points - always 3 bullets
   const getBulletPoints = () => {
     const bullets = [];
+    
+    // Always include comparison to database
+    bullets.push("Compared against 239,900+ national property records");
     
     // Performance comparison
     if (score >= 8.0) {
@@ -71,22 +74,24 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
       bullets.push("Below average compared to similar homes");
     }
     
-    // Cost context
+    // Cost context or issue context (choose most relevant)
     const nationalAvgCostPerSqft = 4.19;
+    const totalIssues = analysis.issues?.length || 0;
+    const nationalAvgIssues = 20.67;
+    
     if (repairCostPerSqft < nationalAvgCostPerSqft * 0.8) {
       bullets.push(`Low repair costs: $${repairCostPerSqft.toFixed(2)}/sqft vs $${nationalAvgCostPerSqft}/sqft avg`);
     } else if (repairCostPerSqft > nationalAvgCostPerSqft * 1.2) {
       bullets.push(`Higher repair costs: $${repairCostPerSqft.toFixed(2)}/sqft vs $${nationalAvgCostPerSqft}/sqft avg`);
-    }
-    
-    // Issue context
-    const totalIssues = analysis.issues?.length || 0;
-    const nationalAvgIssues = 20.67;
-    if (totalIssues < nationalAvgIssues * 0.8) {
+    } else if (totalIssues < nationalAvgIssues * 0.8) {
       bullets.push(`Fewer issues than typical (${totalIssues} vs ${nationalAvgIssues.toFixed(0)} avg)`);
+    } else if (totalIssues > nationalAvgIssues * 1.2) {
+      bullets.push(`More issues than typical (${totalIssues} vs ${nationalAvgIssues.toFixed(0)} avg)`);
+    } else {
+      bullets.push(`Standard issue count (${totalIssues} vs ${nationalAvgIssues.toFixed(0)} avg)`);
     }
     
-    return bullets.slice(0, 3); // Max 3 bullets
+    return bullets; // Always exactly 3 bullets
   };
 
   const bulletPoints = getBulletPoints();
