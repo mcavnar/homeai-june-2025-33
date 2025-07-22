@@ -182,7 +182,7 @@ const AnonymousUpload = () => {
 
                 {/* Security Trust Indicators */}
                 <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="flex justify-center gap-8">
                     <div className="flex flex-col items-center gap-1">
                       <Shield className="h-4 w-4 text-blue-600" />
                       <span className="text-xs text-gray-600">SSL Encrypted</span>
@@ -190,10 +190,6 @@ const AnonymousUpload = () => {
                     <div className="flex flex-col items-center gap-1">
                       <Shield className="h-4 w-4 text-blue-600" />
                       <span className="text-xs text-gray-600">Private & Secure</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-1">
-                      <CheckCircle className="h-4 w-4 text-blue-600" />
-                      <span className="text-xs text-gray-600">No Data Stored</span>
                     </div>
                   </div>
                 </div>
