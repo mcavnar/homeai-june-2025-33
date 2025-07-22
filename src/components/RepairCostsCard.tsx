@@ -33,10 +33,40 @@ const RepairCostsCard: React.FC<RepairCostsCardProps> = ({
 
   const costBreakdown = getCostBreakdown();
 
+  // Generate smart bullet points
+  const getBulletPoints = () => {
+    if (!costBreakdown) return [];
+    
+    const bullets = [];
+    
+    // High priority cost insight
+    if (costBreakdown.high > 0) {
+      const highPercent = ((costBreakdown.high / totalRepairCost) * 100).toFixed(0);
+      bullets.push(`${highPercent}% are high-priority repairs (${formatCurrency(costBreakdown.high)})`);
+    }
+    
+    // Safety/immediate issues
+    if (analysis?.costSummary?.immediatePriorityTotal?.max && analysis.costSummary.immediatePriorityTotal.max > 0) {
+      bullets.push(`Includes ${formatCurrency(analysis.costSummary.immediatePriorityTotal.max)} in immediate safety repairs`);
+    }
+    
+    // Optional items insight
+    if (costBreakdown.low > 0) {
+      const lowPercent = ((costBreakdown.low / totalRepairCost) * 100).toFixed(0);
+      bullets.push(`${lowPercent}% are optional improvements (${formatCurrency(costBreakdown.low)})`);
+    }
+    
+    return bullets.slice(0, 3); // Max 3 bullets
+  };
+
+  const bulletPoints = getBulletPoints();
+
   return (
     <MetricCard
       title="Estimated Repair Costs"
-      showBullets={false}
+      bulletPoints={bulletPoints}
+      bulletHeadline="Key cost insights:"
+      showBullets={bulletPoints.length > 0}
       backgroundColor="bg-white"
       textColor="text-gray-900"
     >

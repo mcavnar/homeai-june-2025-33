@@ -19,10 +19,46 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
   const mediumPriorityCount = issues.filter(issue => issue.priority === 'medium').length;
   const lowPriorityCount = issues.filter(issue => issue.priority === 'low').length;
 
+  // Generate smart bullet points
+  const getBulletPoints = () => {
+    const bullets = [];
+    
+    // Critical issues insight
+    if (highPriorityCount > 0) {
+      const immediateCount = issues.filter(issue => issue.priority === 'immediate').length;
+      if (immediateCount > 0) {
+        bullets.push(`${immediateCount} immediate safety concern${immediateCount > 1 ? 's' : ''} identified`);
+      }
+      if (highPriorityCount > immediateCount) {
+        const highOnly = highPriorityCount - immediateCount;
+        bullets.push(`${highOnly} high-priority repair${highOnly > 1 ? 's' : ''} need attention`);
+      }
+    }
+    
+    // Comparison to average
+    const nationalAvg = 20.67;
+    if (totalIssues < nationalAvg * 0.8) {
+      bullets.push(`Fewer issues than typical (${nationalAvg.toFixed(0)} average)`);
+    } else if (totalIssues > nationalAvg * 1.2) {
+      bullets.push(`More issues than typical (${nationalAvg.toFixed(0)} average)`);
+    }
+    
+    // Optional improvements insight
+    if (lowPriorityCount > 0 && highPriorityCount === 0) {
+      bullets.push(`Mostly optional improvements, no urgent repairs`);
+    }
+    
+    return bullets.slice(0, 3); // Max 3 bullets
+  };
+
+  const bulletPoints = getBulletPoints();
+
   return (
     <MetricCard
       title="Issues Identified"
-      showBullets={false}
+      bulletPoints={bulletPoints}
+      bulletHeadline="Key findings:"
+      showBullets={bulletPoints.length > 0}
       backgroundColor="bg-white"
       textColor="text-gray-900"
     >

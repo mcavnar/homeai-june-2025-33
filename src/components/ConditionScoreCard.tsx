@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Info } from 'lucide-react';
@@ -41,7 +40,6 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
   // Get detailed scoring breakdown
   const conditionResult = calculateConditionScore(analysis, propertyData);
   const totalRepairCost = analysis.costSummary?.grandTotal?.max || 0;
-  const totalIssues = analysis.issues?.length || 0;
   
   // Calculate repair cost per sq ft
   const repairCostPerSqft = propertyData.squareFeet ? totalRepairCost / propertyData.squareFeet : 0;
@@ -57,10 +55,47 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
     return "Below average compared to similar homes";
   };
 
+  // Generate smart bullet points
+  const getBulletPoints = () => {
+    const bullets = [];
+    
+    // Performance comparison
+    if (score >= 8.0) {
+      bullets.push("Better condition than 75% of comparable homes");
+    } else if (score >= 6.5) {
+      bullets.push("Better condition than 60% of comparable homes");
+    } else if (score >= 5.5) {
+      bullets.push("Better condition than 40% of comparable homes");
+    } else {
+      bullets.push("Below average compared to similar homes");
+    }
+    
+    // Cost context
+    const nationalAvgCostPerSqft = 4.19;
+    if (repairCostPerSqft < nationalAvgCostPerSqft * 0.8) {
+      bullets.push(`Low repair costs: $${repairCostPerSqft.toFixed(2)}/sqft vs $${nationalAvgCostPerSqft}/sqft avg`);
+    } else if (repairCostPerSqft > nationalAvgCostPerSqft * 1.2) {
+      bullets.push(`Higher repair costs: $${repairCostPerSqft.toFixed(2)}/sqft vs $${nationalAvgCostPerSqft}/sqft avg`);
+    }
+    
+    // Issue context
+    const totalIssues = analysis.issues?.length || 0;
+    const nationalAvgIssues = 20.67;
+    if (totalIssues < nationalAvgIssues * 0.8) {
+      bullets.push(`Fewer issues than typical (${totalIssues} vs ${nationalAvgIssues.toFixed(0)} avg)`);
+    }
+    
+    return bullets.slice(0, 3); // Max 3 bullets
+  };
+
+  const bulletPoints = getBulletPoints();
+
   return (
     <MetricCard
       title="Overall Condition"
-      showBullets={false}
+      bulletPoints={bulletPoints}
+      bulletHeadline="Market analysis insights:"
+      showBullets={bulletPoints.length > 0}
       backgroundColor="bg-white"
       textColor="text-gray-900"
     >
