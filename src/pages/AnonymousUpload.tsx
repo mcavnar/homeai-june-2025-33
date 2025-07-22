@@ -77,16 +77,21 @@ const AnonymousUpload = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-8">
+      {/* Header Bar */}
+      <nav className="border-b border-gray-100 bg-white">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">🏠</span>
             </div>
             <div className="text-xl font-bold text-gray-900">HomeAI</div>
           </div>
+        </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Header */}
+        <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Upload Home Inspection Report
           </h1>
