@@ -188,7 +188,7 @@ const AnonymousUpload = () => {
               <Button
                 variant="outline"
                 onClick={() => setIsEmailModalOpen(true)}
-                className="w-full py-4 px-6 rounded-lg text-lg font-medium border-2 border-green-400 text-green-400 hover:bg-green-50 hover:border-green-500 hover:text-green-500 transition-all duration-200 shadow-md hover:shadow-lg"
+                className="w-full py-4 px-6 rounded-lg text-lg font-medium border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-700 hover:text-green-700 transition-all duration-200 shadow-md hover:shadow-lg"
               >
                 Don't Have Your Report?
               </Button>
