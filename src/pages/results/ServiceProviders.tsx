@@ -131,7 +131,7 @@ const ServiceProviders = () => {
       <Card className="border-gray-200">
         <CardContent className="p-6 text-center">
           <h3 className="text-xl font-semibold text-gray-900 mb-4">
-            See Our Recommended Providers
+            Find the Best Service Providers
           </h3>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
             We find the right providers for your area based on our database of millions of service provider transactions. Our algorithm analyzes quality ratings, pricing, availability, and local market conditions to match you with the most qualified professionals in your neighborhood.
