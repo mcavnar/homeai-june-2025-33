@@ -259,10 +259,6 @@ const AnonymousUpload = () => {
                     <Clock className="h-4 w-4 text-gray-500" />
                     <span className="text-sm text-gray-600">Analysis completed in 15-30 seconds</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">Your data is secure and private</span>
-                  </div>
                 </div>
               </CardContent>
             </Card>
