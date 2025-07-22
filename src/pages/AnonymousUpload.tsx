@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
@@ -96,7 +95,8 @@ const AnonymousUpload = () => {
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Upload Your Inspection Report
+            <span className="block sm:inline">Upload Your</span>{' '}
+            <span className="block sm:inline">Inspection Report</span>
           </h1>
           <p className="text-base md:text-xl text-gray-600 max-w-3xl mx-auto">
             We provide clear, expert-backed analysis with prioritized issues, estimated repair costs and smart negotiation tips. The platform is entirely free to use. You can delete your account and data at any time.
