@@ -141,9 +141,9 @@ const ServiceProviders = () => {
             size="lg" 
             className="px-8"
             onClick={handleRecommendedProvidersClick}
-            trackingLabel="See Recommended Providers"
+            trackingLabel="Find Providers"
           >
-            See Our Recommended Providers
+            Find Providers
           </TrackedButton>
         </CardContent>
       </Card>
