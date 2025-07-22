@@ -186,9 +186,9 @@ const AnonymousUpload = () => {
             
             {/* Don't Have Report Button - Moved outside the Card */}
             <Button
-              variant="outline"
+              variant="secondary"
               onClick={() => setIsEmailModalOpen(true)}
-              className="w-full mx-auto py-3 px-6 rounded-lg text-base font-medium"
+              className="w-full py-4 px-6 rounded-lg text-lg font-medium"
             >
               Don't Have Your Report?
             </Button>
