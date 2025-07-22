@@ -80,7 +80,10 @@ const AnonymousUpload = () => {
       {/* Header Bar */}
       <nav className="border-b border-gray-100 bg-white">
         <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center gap-3">
+          <div 
+            className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/')}
+          >
             <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">🏠</span>
             </div>
