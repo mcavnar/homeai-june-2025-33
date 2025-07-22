@@ -109,10 +109,22 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
                 )}
               </div>
               
-              <div className="flex gap-4 text-xs text-gray-500">
-                {highPriorityCount > 0 && <span>High</span>}
-                {mediumPriorityCount > 0 && <span>Medium</span>}
-                {lowPriorityCount > 0 && <span>Low</span>}
+              <div className="flex gap-1 text-xs text-gray-500">
+                {highPriorityCount > 0 && (
+                  <div className="flex items-center justify-center min-w-[24px]">
+                    <span>High</span>
+                  </div>
+                )}
+                {mediumPriorityCount > 0 && (
+                  <div className="flex items-center justify-center min-w-[24px]">
+                    <span>Med</span>
+                  </div>
+                )}
+                {lowPriorityCount > 0 && (
+                  <div className="flex items-center justify-center min-w-[24px]">
+                    <span>Low</span>
+                  </div>
+                )}
               </div>
             </div>
           </HoverCardTrigger>
