@@ -134,7 +134,7 @@ const ServiceProviders = () => {
             Find the Best Service Providers
           </h3>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
-            We find the right providers for your area based on our database of millions of service provider transactions. Our algorithm analyzes quality ratings, pricing, availability, and local market conditions to match you with the most qualified professionals in your neighborhood.
+            We analyze quality ratings, pricing, availability, and local market conditions to match you with the most qualified professionals in your neighborhood.
           </p>
           <TrackedButton 
             variant="green" 
