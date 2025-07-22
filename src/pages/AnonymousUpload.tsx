@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
@@ -166,11 +165,11 @@ const AnonymousUpload = () => {
                   </div>
                 )}
 
-                {/* Process Button */}
+                {/* Process Button - Modified to stay prominent when disabled */}
                 <Button
                   onClick={handleProcessPDF}
                   disabled={!file || isProcessing}
-                  className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-medium py-4 px-6 rounded-lg text-lg"
+                  className="w-full mt-6 bg-green-500 hover:bg-green-600 text-white font-medium py-4 px-6 rounded-lg text-lg disabled:opacity-100 disabled:cursor-not-allowed disabled:hover:bg-green-500"
                 >
                   {isProcessing ? (
                     <>
@@ -184,7 +183,7 @@ const AnonymousUpload = () => {
               </div>
             </Card>
             
-            {/* Don't Have Report Button - Styled as a secondary/skeleton button */}
+            {/* Don't Have Report Button */}
             <div className="px-6 sm:px-8">
               <Button
                 variant="outline"
