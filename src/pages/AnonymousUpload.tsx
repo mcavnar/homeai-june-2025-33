@@ -79,7 +79,7 @@ const AnonymousUpload = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header Bar */}
       <nav className="border-b border-gray-100 bg-white">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-4 sm:px-6 py-4">
           <div 
             className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => navigate('/')}
@@ -92,24 +92,24 @@ const AnonymousUpload = () => {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-12">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             Upload Your Inspection Report
           </h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-base md:text-xl text-gray-600 max-w-3xl mx-auto">
             We provide clear, expert-backed analysis with prioritized issues, estimated repair costs and smart negotiation tips. The platform is entirely free to use. You can delete your account and data at any time.
           </p>
         </div>
 
         {/* Main Content - Two Column Layout */}
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           
           {/* Left Column - Upload Section */}
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             <Card className="bg-white shadow-lg border border-gray-200">
-              <div className="p-8">
+              <div className="p-6 sm:p-8">
                 <div className="flex items-center gap-2 mb-6">
                   <Upload className="h-5 w-5 text-green-600" />
                   <p className="text-gray-600">Select or drag & drop a PDF file (max 10MB)</p>
@@ -117,7 +117,7 @@ const AnonymousUpload = () => {
 
                 {/* File Upload Area */}
                 <div
-                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 cursor-pointer ${
+                  className={`border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-all duration-300 cursor-pointer ${
                     file 
                       ? 'border-green-300 bg-green-50' 
                       : 'border-gray-300 bg-gray-50 hover:border-green-400 hover:bg-green-50'
@@ -198,7 +198,7 @@ const AnonymousUpload = () => {
           {/* Right Column - What You'll Get */}
           <div className="space-y-6">
             <Card className="bg-white shadow-lg border border-gray-200">
-              <CardContent className="p-8">
+              <CardContent className="p-6 sm:p-8">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-6">What You'll Get</h2>
                 
                 <div className="space-y-4 mb-8">
@@ -253,7 +253,7 @@ const AnonymousUpload = () => {
                   </div>
                 </div>
 
-                {/* Analysis Time & Security */}
+                {/* Analysis Time */}
                 <div className="border-t pt-6 space-y-3">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-gray-500" />
@@ -262,21 +262,6 @@ const AnonymousUpload = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </div>
-
-        {/* Privacy Protection Box - Centered at Bottom */}
-        <div className="flex justify-center mt-16 mb-8">
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6 max-w-2xl w-full">
-            <div className="flex items-center gap-3 mb-3 justify-center text-center">
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-green-800">Your Privacy is Protected</h3>
-            </div>
-            <p className="text-gray-700 text-center">
-              We use enterprise-grade encryption to protect your data throughout the analysis process.
-            </p>
           </div>
         </div>
       </div>
