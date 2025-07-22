@@ -12,43 +12,63 @@ interface IssuesFoundCardProps {
 const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
   const totalIssues = issues.length;
   
-  // Count issues by priority
-  const highPriorityCount = issues.filter(issue => 
-    issue.priority === 'immediate' || issue.priority === 'high'
-  ).length;
+  // Count issues by actual priority levels in the data
+  const highPriorityCount = issues.filter(issue => issue.priority === 'high').length;
   const mediumPriorityCount = issues.filter(issue => issue.priority === 'medium').length;
   const lowPriorityCount = issues.filter(issue => issue.priority === 'low').length;
 
-  // Generate smart bullet points
+  // Get most common categories from actual issues
+  const getCategoryInsights = () => {
+    const categoryCounts: { [key: string]: number } = {};
+    issues.forEach(issue => {
+      categoryCounts[issue.category] = (categoryCounts[issue.category] || 0) + 1;
+    });
+    
+    const sortedCategories = Object.entries(categoryCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 2);
+    
+    return sortedCategories;
+  };
+
+  // Generate smart bullet points based on actual data
   const getBulletPoints = () => {
     const bullets = [];
-    
-    // Critical issues insight
-    if (highPriorityCount > 0) {
-      const immediateCount = issues.filter(issue => issue.priority === 'immediate').length;
-      if (immediateCount > 0) {
-        bullets.push(`${immediateCount} immediate safety concern${immediateCount > 1 ? 's' : ''} identified`);
-      }
-      if (highPriorityCount > immediateCount) {
-        const highOnly = highPriorityCount - immediateCount;
-        bullets.push(`${highOnly} high-priority repair${highOnly > 1 ? 's' : ''} need attention`);
-      }
-    }
-    
-    // Comparison to average
     const nationalAvg = 20.67;
+    const topCategories = getCategoryInsights();
+    
+    // Priority breakdown insight
+    if (highPriorityCount > 0) {
+      bullets.push(`${highPriorityCount} high-priority repair${highPriorityCount > 1 ? 's' : ''} need attention`);
+    } else if (mediumPriorityCount > 0 && lowPriorityCount > 0) {
+      bullets.push(`No high-priority issues - mostly medium and low priority items`);
+    } else {
+      bullets.push(`All issues are low priority - no urgent repairs needed`);
+    }
+    
+    // Comparison to national average
     if (totalIssues < nationalAvg * 0.8) {
-      bullets.push(`Fewer issues than typical (${nationalAvg.toFixed(0)} average)`);
+      bullets.push(`Fewer issues than typical (${totalIssues} vs ${nationalAvg.toFixed(0)} average)`);
     } else if (totalIssues > nationalAvg * 1.2) {
-      bullets.push(`More issues than typical (${nationalAvg.toFixed(0)} average)`);
+      bullets.push(`More issues than typical (${totalIssues} vs ${nationalAvg.toFixed(0)} average)`);
+    } else {
+      bullets.push(`Issue count near average (${totalIssues} vs ${nationalAvg.toFixed(0)} average)`);
     }
     
-    // Optional improvements insight
-    if (lowPriorityCount > 0 && highPriorityCount === 0) {
-      bullets.push(`Mostly optional improvements, no urgent repairs`);
+    // Category insights from actual data
+    if (topCategories.length > 0) {
+      const topCategory = topCategories[0];
+      if (topCategories.length > 1 && topCategories[0][1] === topCategories[1][1]) {
+        // Tie for most common
+        bullets.push(`Most common: ${topCategory[0]} and ${topCategories[1][0]} (${topCategory[1]} each)`);
+      } else {
+        bullets.push(`Most common category: ${topCategory[0]} (${topCategory[1]} issue${topCategory[1] > 1 ? 's' : ''})`);
+      }
+    } else {
+      bullets.push(`No major category concentrations identified`);
     }
     
-    return bullets.slice(0, 3); // Max 3 bullets
+    return bullets.slice(0, 3); // Ensure exactly 3 bullets
   };
 
   const bulletPoints = getBulletPoints();

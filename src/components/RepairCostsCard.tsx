@@ -15,12 +15,11 @@ const RepairCostsCard: React.FC<RepairCostsCardProps> = ({
   totalRepairCost,
   analysis 
 }) => {
-  // Calculate costs by priority
+  // Calculate costs by priority from actual cost summary
   const getCostBreakdown = () => {
     if (!analysis?.costSummary) return null;
     
-    const highPriorityCost = (analysis.costSummary.immediatePriorityTotal?.max || 0) + 
-                            (analysis.costSummary.highPriorityTotal?.max || 0);
+    const highPriorityCost = analysis.costSummary.highPriorityTotal?.max || 0;
     const mediumPriorityCost = analysis.costSummary.mediumPriorityTotal?.max || 0;
     const lowPriorityCost = analysis.costSummary.lowPriorityTotal?.max || 0;
     
@@ -33,30 +32,40 @@ const RepairCostsCard: React.FC<RepairCostsCardProps> = ({
 
   const costBreakdown = getCostBreakdown();
 
-  // Generate smart bullet points
+  // Generate smart bullet points based on actual cost data
   const getBulletPoints = () => {
     if (!costBreakdown) return [];
     
     const bullets = [];
     
-    // High priority cost insight
+    // High priority cost insight (only if there are actual high priority costs)
     if (costBreakdown.high > 0) {
       const highPercent = ((costBreakdown.high / totalRepairCost) * 100).toFixed(0);
       bullets.push(`${highPercent}% are high-priority repairs (${formatCurrency(costBreakdown.high)})`);
+    } else {
+      bullets.push(`No high-priority repairs needed - good news for your budget`);
     }
     
-    // Safety/immediate issues
-    if (analysis?.costSummary?.immediatePriorityTotal?.max && analysis.costSummary.immediatePriorityTotal.max > 0) {
-      bullets.push(`Includes ${formatCurrency(analysis.costSummary.immediatePriorityTotal.max)} in immediate safety repairs`);
+    // Cost distribution insight
+    const nonZeroCosts = Object.values(costBreakdown).filter(cost => cost > 0).length;
+    if (nonZeroCosts === 1) {
+      bullets.push(`All costs concentrated in single priority category`);
+    } else {
+      bullets.push(`Costs spread across ${nonZeroCosts} priority categories`);
     }
     
-    // Optional items insight
+    // Optional/low priority items insight
     if (costBreakdown.low > 0) {
       const lowPercent = ((costBreakdown.low / totalRepairCost) * 100).toFixed(0);
       bullets.push(`${lowPercent}% are optional improvements (${formatCurrency(costBreakdown.low)})`);
+    } else if (costBreakdown.medium > 0) {
+      const mediumPercent = ((costBreakdown.medium / totalRepairCost) * 100).toFixed(0);
+      bullets.push(`${mediumPercent}% are medium-priority items (${formatCurrency(costBreakdown.medium)})`);
+    } else {
+      bullets.push(`Minimal optional improvements needed`);
     }
     
-    return bullets.slice(0, 3); // Max 3 bullets
+    return bullets.slice(0, 3); // Ensure exactly 3 bullets
   };
 
   const bulletPoints = getBulletPoints();
