@@ -34,6 +34,9 @@ export const ReminderEmail: React.FC<ReminderEmailProps> = ({ uploadUrl }) => (
           <li style={listItem}>Negotiation leverage for your home purchase</li>
           <li style={listItem}>Safety concerns you should be aware of</li>
         </ul>
+        <Text style={text}>
+          And best of all, the platform is entirely free to use!
+        </Text>
         <Link
           href={uploadUrl}
           target="_blank"
