@@ -179,6 +179,24 @@ const AnonymousUpload = () => {
                     'Analyze Home Inspection Report'
                   )}
                 </Button>
+
+                {/* Security Trust Indicators */}
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="flex flex-col items-center gap-1">
+                      <Shield className="h-4 w-4 text-blue-600" />
+                      <span className="text-xs text-gray-600">SSL Encrypted</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <Shield className="h-4 w-4 text-blue-600" />
+                      <span className="text-xs text-gray-600">Private & Secure</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <CheckCircle className="h-4 w-4 text-blue-600" />
+                      <span className="text-xs text-gray-600">No Data Stored</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </Card>
 
@@ -198,6 +216,16 @@ const AnonymousUpload = () => {
                 <h2 className="text-2xl font-semibold text-gray-900 mb-6">What You'll Get</h2>
                 
                 <div className="space-y-4 mb-8">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-1">Private & Secure Analysis</h3>
+                      <p className="text-gray-600">Your data is protected and you have complete control of it.</p>
+                    </div>
+                  </div>
+
                   <div className="flex items-start gap-3">
                     <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                       <CheckCircle className="h-4 w-4 text-green-600" />
