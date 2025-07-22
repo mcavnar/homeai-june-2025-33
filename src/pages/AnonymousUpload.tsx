@@ -180,19 +180,6 @@ const AnonymousUpload = () => {
                   )}
                 </Button>
 
-                {/* Security Trust Indicators */}
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex justify-center gap-8">
-                    <div className="flex flex-col items-center gap-1">
-                      <Shield className="h-4 w-4 text-blue-600" />
-                      <span className="text-xs text-gray-600">SSL Encrypted</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-1">
-                      <Shield className="h-4 w-4 text-blue-600" />
-                      <span className="text-xs text-gray-600">Private & Secure</span>
-                    </div>
-                  </div>
-                </div>
               </div>
             </Card>
 
@@ -278,6 +265,18 @@ const AnonymousUpload = () => {
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-gray-500" />
                     <span className="text-sm text-gray-600">Analysis completed in 15-30 seconds</span>
+                  </div>
+                  
+                  {/* Security Trust Indicators */}
+                  <div className="flex justify-center gap-8">
+                    <div className="flex flex-col items-center gap-1">
+                      <Shield className="h-4 w-4 text-blue-600" />
+                      <span className="text-xs text-gray-600">SSL Encrypted</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <Shield className="h-4 w-4 text-blue-600" />
+                      <span className="text-xs text-gray-600">Private & Secure</span>
+                    </div>
                   </div>
                 </div>
               </CardContent>
