@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
 import FileUploadSection from '@/components/FileUploadSection';
 import ProcessingStatus from '@/components/ProcessingStatus';
+import EmailCaptureModal from '@/components/EmailCaptureModal';
 import { useAnonymousPDFProcessor } from '@/hooks/useAnonymousPDFProcessor';
 import { Shield, Clock, CheckCircle, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import { Card, CardContent } from '@/components/ui/card';
 const AnonymousUpload = () => {
   const navigate = useNavigate();
   const { trackConversion } = useMetaConversions();
+  const [isEmailModalOpen, setIsEmailModalOpen] = React.useState(false);
   
   const {
     file,
@@ -180,6 +182,15 @@ const AnonymousUpload = () => {
                   )}
                 </Button>
 
+                {/* Don't Have Report Button */}
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEmailModalOpen(true)}
+                  className="w-full mt-3 border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-800 py-4 px-6 rounded-lg text-lg"
+                >
+                  I don't have my report on hand
+                </Button>
+
               </div>
             </Card>
 
@@ -284,6 +295,12 @@ const AnonymousUpload = () => {
           </div>
         </div>
       </div>
+
+      {/* Email Capture Modal */}
+      <EmailCaptureModal
+        isOpen={isEmailModalOpen}
+        onClose={() => setIsEmailModalOpen(false)}
+      />
     </div>
   );
 };
