@@ -53,9 +53,9 @@ const MetricCard: React.FC<MetricCardProps> = ({
         {showBullets && bulletPoints.length > 0 && (
           <div className="mt-4 pt-4 border-t border-gray-200 flex-1">
             <p className={`text-sm ${iconColor || 'text-gray-600'} mb-3 font-medium`}>{bulletHeadline}</p>
-            <ul className={`text-xs ${iconColor || 'text-gray-600'} space-y-2 list-disc list-inside pl-2`}>
+            <ul className={`text-xs ${iconColor || 'text-gray-600'} space-y-2 list-disc list-outside ml-4`}>
               {bulletPoints.map((point, index) => (
-                <li key={index} className="leading-relaxed">{point}</li>
+                <li key={index} className="leading-relaxed pl-1">{point}</li>
               ))}
             </ul>
           </div>
