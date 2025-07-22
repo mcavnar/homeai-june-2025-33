@@ -181,18 +181,17 @@ const AnonymousUpload = () => {
                     'Analyze Home Inspection Report'
                   )}
                 </Button>
-
-                {/* Don't Have Report Button */}
-                <Button
-                  variant="outline"
-                  onClick={() => setIsEmailModalOpen(true)}
-                  className="w-full mt-3 border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-800 py-4 px-6 rounded-lg text-lg"
-                >
-                  I don't have my report right now
-                </Button>
-
               </div>
             </Card>
+            
+            {/* Don't Have Report Button - Moved outside the Card */}
+            <Button
+              variant="outline"
+              onClick={() => setIsEmailModalOpen(true)}
+              className="w-full mx-auto border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-800 py-4 px-6 rounded-lg text-lg"
+            >
+              I don't have my report right now
+            </Button>
 
             {/* Processing Status */}
             <ProcessingStatus
