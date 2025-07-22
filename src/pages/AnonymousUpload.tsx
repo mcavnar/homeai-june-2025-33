@@ -93,7 +93,7 @@ const AnonymousUpload = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Upload Home Inspection Report
+            Upload Your Inspection Report
           </h1>
         </div>
 
