@@ -184,14 +184,16 @@ const AnonymousUpload = () => {
               </div>
             </Card>
             
-            {/* Don't Have Report Button - Moved outside the Card */}
-            <Button
-              variant="secondary"
-              onClick={() => setIsEmailModalOpen(true)}
-              className="w-full py-4 px-6 rounded-lg text-lg font-medium"
-            >
-              Don't Have Your Report?
-            </Button>
+            {/* Don't Have Report Button - Styled as a secondary/skeleton button */}
+            <div className="px-6 sm:px-8">
+              <Button
+                variant="outline"
+                onClick={() => setIsEmailModalOpen(true)}
+                className="w-full py-4 px-6 rounded-lg text-lg font-medium border-2 border-green-400 text-green-700 hover:bg-green-50 hover:border-green-500 transition-all duration-200 shadow-md hover:shadow-lg"
+              >
+                Don't Have Your Report?
+              </Button>
+            </div>
 
             {/* Processing Status */}
             <ProcessingStatus
