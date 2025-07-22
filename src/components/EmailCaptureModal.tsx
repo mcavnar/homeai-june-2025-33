@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Mail } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { getSessionId } from '@/utils/sessionUtils';
 
 interface EmailCaptureModalProps {
   isOpen: boolean;
@@ -40,15 +42,51 @@ const EmailCaptureModal: React.FC<EmailCaptureModalProps> = ({
 
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Insert the email into the upload_reminder_emails table
+      const sessionId = getSessionId();
+      const { error: insertError } = await supabase
+        .from('upload_reminder_emails')
+        .insert({
+          email,
+          session_id: sessionId,
+          user_agent: navigator.userAgent,
+          referrer_url: document.referrer,
+          current_page_url: window.location.href,
+        });
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      // Send the reminder email
+      const { error: emailError } = await supabase.functions.invoke('send-upload-reminder-email', {
+        body: {
+          email,
+          sessionId,
+          currentUrl: window.location.href,
+        },
+      });
+
+      if (emailError) {
+        throw emailError;
+      }
+
       setIsSubmitted(true);
       toast({
         title: "Success!",
         description: "We'll send you a link when you're ready to upload your report.",
       });
-    }, 1000);
+    } catch (error) {
+      console.error('Error sending reminder email:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem sending the email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {
