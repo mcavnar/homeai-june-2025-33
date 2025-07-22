@@ -63,7 +63,7 @@ const EmailCaptureModal: React.FC<EmailCaptureModalProps> = ({
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold flex items-center gap-2">
             <Mail className="h-5 w-5 text-blue-500" />
-            Don't Have Your Report Yet?
+            Don't Have Your Report?
           </DialogTitle>
           <DialogDescription className="text-gray-600 text-base leading-relaxed mt-3">
             {isSubmitted 
