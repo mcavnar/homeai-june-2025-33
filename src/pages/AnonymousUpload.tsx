@@ -98,6 +98,9 @@ const AnonymousUpload = () => {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Upload Your Inspection Report
           </h1>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            We use your home inspection report to provide clear, expert-backed analysis with prioritized issues, estimated repair costs and smart negotiation tips. The platform is entirely free to use and you can delete your account and data at any time.
+          </p>
         </div>
 
         {/* Main Content - Two Column Layout */}
