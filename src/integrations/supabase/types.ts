@@ -407,6 +407,42 @@ export type Database = {
         }
         Relationships: []
       }
+      upload_reminder_emails: {
+        Row: {
+          created_at: string
+          current_page_url: string | null
+          email: string
+          email_sent_at: string | null
+          id: string
+          referrer_url: string | null
+          session_id: string
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_page_url?: string | null
+          email: string
+          email_sent_at?: string | null
+          id?: string
+          referrer_url?: string | null
+          session_id: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_page_url?: string | null
+          email?: string
+          email_sent_at?: string | null
+          id?: string
+          referrer_url?: string | null
+          session_id?: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       user_analytics_summary: {
         Row: {
           created_at: string
