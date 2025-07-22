@@ -43,16 +43,18 @@ const EmailCaptureModal: React.FC<EmailCaptureModalProps> = ({
     setIsLoading(true);
     
     try {
-      // Insert the email into the upload_reminder_emails table using RPC
-      // This avoids TypeScript errors since the types haven't been regenerated yet
+      // Insert the email into the upload_reminder_emails table
+      // Work around TypeScript errors with a more generic approach
       const sessionId = getSessionId();
-      const { error: insertError } = await supabase.rpc('insert_upload_reminder_email', {
-        p_email: email,
-        p_session_id: sessionId,
-        p_user_agent: navigator.userAgent,
-        p_referrer_url: document.referrer,
-        p_current_page_url: window.location.href,
-      });
+      const { error: insertError } = await supabase
+        .from('upload_reminder_emails' as any)
+        .insert({
+          email,
+          session_id: sessionId,
+          user_agent: navigator.userAgent,
+          referrer_url: document.referrer,
+          current_page_url: window.location.href,
+        });
 
       if (insertError) {
         throw insertError;

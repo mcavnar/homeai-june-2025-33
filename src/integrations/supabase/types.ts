@@ -682,6 +682,16 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      insert_upload_reminder_email: {
+        Args: {
+          p_email: string
+          p_session_id: string
+          p_user_agent: string
+          p_referrer_url: string
+          p_current_page_url: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       interaction_type:

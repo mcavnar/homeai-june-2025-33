@@ -1,4 +1,4 @@
-
+import * as React from 'npm:react@18.3.1';
 import {
   Body,
   Container,
@@ -8,97 +8,108 @@ import {
   Link,
   Preview,
   Text,
-  Button,
-} from 'npm:@react-email/components@0.0.22'
-import * as React from 'npm:react@18.3.1'
+} from 'npm:@react-email/components@0.0.22';
 
 interface ReminderEmailProps {
   uploadUrl: string;
 }
 
-export const ReminderEmail = ({ uploadUrl }: ReminderEmailProps) => (
+export const ReminderEmail: React.FC<ReminderEmailProps> = ({ uploadUrl }) => (
   <Html>
     <Head />
-    <Preview>Upload your home inspection report for instant analysis</Preview>
+    <Preview>Your Home Inspection Report Analysis - Upload When Ready</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Ready to analyze your home inspection?</Heading>
+        <Heading style={h1}>Ready to Analyze Your Home Inspection?</Heading>
         <Text style={text}>
-          Get instant insights about your potential home, including:
+          We've saved your spot! When you have your home inspection report ready, simply click the button below to upload and analyze it.
         </Text>
-        <ul style={list}>
-          <li style={listItem}>Prioritized issues and estimated repair costs</li>
-          <li style={listItem}>Expert recommendations for negotiations</li>
-          <li style={listItem}>Detailed property analysis and comparisons</li>
+        <Text style={text}>
+          HomeAI will help you understand:
+        </Text>
+        <ul>
+          <li style={listItem}>Critical issues that need immediate attention</li>
+          <li style={listItem}>Estimated repair costs for budgeting</li>
+          <li style={listItem}>Negotiation leverage for your home purchase</li>
+          <li style={listItem}>Safety concerns you should be aware of</li>
         </ul>
-        <Button style={button} href={uploadUrl}>
-          Upload Your Report
-        </Button>
+        <Link
+          href={uploadUrl}
+          target="_blank"
+          style={button}
+        >
+          Upload Your Inspection Report
+        </Link>
+        <Text style={{...text, marginTop: '24px'}}>
+          If you have any questions, simply reply to this email and we'll be happy to help.
+        </Text>
         <Text style={footer}>
-          If you didn't request this email, you can safely ignore it.
+          © {new Date().getFullYear()} HomeAI - AI-powered home inspection analysis
         </Text>
       </Container>
     </Body>
   </Html>
-)
+);
 
-export default ReminderEmail
-
+// Styles
 const main = {
-  backgroundColor: '#ffffff',
-  fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
-}
+  backgroundColor: '#f5f7fa',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+  padding: '20px 0'
+};
 
 const container = {
+  backgroundColor: '#ffffff',
+  border: '1px solid #e4e8ee',
+  borderRadius: '8px',
   margin: '0 auto',
-  padding: '20px 0 48px',
-  maxWidth: '560px',
-}
+  maxWidth: '600px',
+  padding: '40px'
+};
 
 const h1 = {
-  color: '#333',
+  color: '#1a56db',
   fontSize: '24px',
-  fontWeight: '600',
-  lineHeight: '1.3',
-  margin: '40px 0 20px',
-}
+  fontWeight: 'bold',
+  margin: '0 0 20px',
+  padding: '0',
+  textAlign: 'center' as const
+};
 
 const text = {
-  color: '#444',
+  color: '#374151',
   fontSize: '16px',
-  lineHeight: '1.6',
-  margin: '16px 0',
-}
-
-const list = {
-  color: '#444',
-  fontSize: '16px',
-  lineHeight: '1.6',
-  margin: '16px 0',
-  padding: '0 0 0 20px',
-}
+  lineHeight: '26px',
+  margin: '16px 0'
+};
 
 const listItem = {
-  margin: '8px 0',
-}
+  color: '#374151',
+  fontSize: '16px',
+  lineHeight: '24px',
+  marginBottom: '8px'
+};
 
 const button = {
-  backgroundColor: '#10B981',
-  borderRadius: '8px',
-  color: '#fff',
-  display: 'inline-block',
+  backgroundColor: '#1a56db',
+  borderRadius: '6px',
+  color: '#ffffff',
+  display: 'block',
   fontSize: '16px',
-  fontWeight: '600',
-  lineHeight: '1',
-  padding: '16px 24px',
-  textDecoration: 'none',
+  fontWeight: 'bold',
+  padding: '12px 16px',
   textAlign: 'center' as const,
-  margin: '24px 0',
-}
+  textDecoration: 'none',
+  margin: '30px auto',
+  width: '260px'
+};
 
 const footer = {
-  color: '#898989',
-  fontSize: '12px',
-  lineHeight: '22px',
-  margin: '24px 0',
-}
+  color: '#9ca3af',
+  fontSize: '14px',
+  lineHeight: '24px',
+  marginTop: '32px',
+  textAlign: 'center' as const
+};
+
+export default ReminderEmail;

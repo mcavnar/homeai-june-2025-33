@@ -1,7 +1,7 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { renderAsync } from "npm:@react-email/components@0.0.22";
+import * as React from "npm:react@18.3.1";
 import { ReminderEmail } from "./_templates/reminder-email.tsx";
 import { createClient } from 'npm:@supabase/supabase-js@2.39.3';
 
@@ -55,8 +55,9 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     // Update the email_sent_at timestamp
+    // Use the 'as any' typecast to avoid TypeScript errors with the table name
     const { error: updateError } = await supabase
-      .from('upload_reminder_emails')
+      .from('upload_reminder_emails' as any)
       .update({ email_sent_at: new Date().toISOString() })
       .eq('session_id', sessionId)
       .eq('email', email);
