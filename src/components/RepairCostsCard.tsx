@@ -70,7 +70,7 @@ const RepairCostsCard: React.FC<RepairCostsCardProps> = ({
       backgroundColor="bg-white"
       textColor="text-gray-900"
     >
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between w-full">
         <HoverCard>
           <HoverCardTrigger asChild>
             <div className="cursor-help flex-1">

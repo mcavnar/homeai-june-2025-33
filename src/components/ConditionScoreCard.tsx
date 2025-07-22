@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Info } from 'lucide-react';
@@ -99,7 +100,7 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
       backgroundColor="bg-white"
       textColor="text-gray-900"
     >
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between w-full">
         <HoverCard>
           <HoverCardTrigger asChild>
             <div className="cursor-help flex-1">
