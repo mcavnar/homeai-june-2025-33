@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMetaConversions } from '@/hooks/useMetaConversions';
@@ -110,11 +111,6 @@ const AnonymousUpload = () => {
           <div className="space-y-6 sm:space-y-8">
             <Card className="bg-white shadow-lg border border-gray-200">
               <div className="p-6 sm:p-8">
-                <div className="flex items-center gap-2 mb-6">
-                  <Upload className="h-5 w-5 text-green-600" />
-                  <p className="text-gray-600">PDF file (max 10MB)</p>
-                </div>
-
                 {/* File Upload Area */}
                 <div
                   className={`border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-all duration-300 cursor-pointer ${
