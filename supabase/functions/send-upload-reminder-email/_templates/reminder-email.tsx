@@ -1,3 +1,4 @@
+
 import * as React from 'npm:react@18.3.1';
 import {
   Body,
@@ -40,9 +41,6 @@ export const ReminderEmail: React.FC<ReminderEmailProps> = ({ uploadUrl }) => (
         >
           Upload Your Inspection Report
         </Link>
-        <Text style={{...text, marginTop: '24px'}}>
-          If you have any questions, simply reply to this email and we'll be happy to help.
-        </Text>
         <Text style={footer}>
           © {new Date().getFullYear()} HomeAI - AI-powered home inspection analysis
         </Text>
@@ -68,7 +66,7 @@ const container = {
 };
 
 const h1 = {
-  color: '#1a56db',
+  color: '#000000', // Changed from blue to black
   fontSize: '24px',
   fontWeight: 'bold',
   margin: '0 0 20px',
@@ -91,8 +89,9 @@ const listItem = {
 };
 
 const button = {
-  backgroundColor: '#1a56db',
-  borderRadius: '6px',
+  backgroundColor: '#4ade80', // Changed to green-400 to match site
+  borderRadius: '4px', // Updated border-radius to match site
+  border: '2px solid #22c55e', // Added border to match site (green-500)
   color: '#ffffff',
   display: 'block',
   fontSize: '16px',

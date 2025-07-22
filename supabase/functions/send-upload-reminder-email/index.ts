@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { renderAsync } from "npm:@react-email/components@0.0.22";
@@ -36,10 +37,10 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Email and sessionId are required");
     }
 
-    // Generate the upload URL (preserve the origin but change the path)
-    const url = new URL(currentUrl);
-    url.pathname = '/anonymous-upload';
-    const uploadUrl = url.toString();
+    // Generate the upload URL with tracking parameters
+    const encodedEmail = encodeURIComponent(email);
+    const encodedSessionId = encodeURIComponent(sessionId);
+    const uploadUrl = `https://gethomeai.com/anonymous-upload?source=email&medium=reminder&em=${encodedEmail}&sid=${encodedSessionId}`;
 
     // Render the email template
     const html = await renderAsync(
@@ -55,9 +56,8 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     // Update the email_sent_at timestamp
-    // Use the 'as any' typecast to avoid TypeScript errors with the table name
     const { error: updateError } = await supabase
-      .from('upload_reminder_emails' as any)
+      .from('upload_reminder_emails')
       .update({ email_sent_at: new Date().toISOString() })
       .eq('session_id', sessionId)
       .eq('email', email);
