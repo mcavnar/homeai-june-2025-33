@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getSessionId } from '@/utils/sessionUtils';
@@ -15,7 +14,6 @@ interface HomepageEmailPopupProps {
 export const HomepageEmailPopup: React.FC<HomepageEmailPopupProps> = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
 
   const validateEmail = (email: string): boolean => {
@@ -71,11 +69,13 @@ export const HomepageEmailPopup: React.FC<HomepageEmailPopupProps> = ({ isOpen, 
         // Don't throw error here - email capture is still successful
       }
 
-      setIsSuccess(true);
       toast({
         title: "Success!",
         description: "Thanks for signing up! Check your email for a welcome message.",
       });
+
+      // Close popup immediately after success
+      handleClose();
 
     } catch (error) {
       console.error('Error in email capture:', error);
@@ -91,86 +91,45 @@ export const HomepageEmailPopup: React.FC<HomepageEmailPopupProps> = ({ isOpen, 
 
   const handleClose = () => {
     setEmail('');
-    setIsSuccess(false);
     onClose();
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md w-full mx-4 sm:mx-auto max-h-[80vh] p-0 overflow-hidden border-0 bg-background shadow-2xl">
-        <div className="relative p-8">
-          {/* Close button */}
-          <button
-            onClick={handleClose}
-            className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted transition-colors"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4 text-muted-foreground" />
-          </button>
+        <div className="p-8">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-semibold text-foreground mb-2">
+              Stay in the loop.
+            </h2>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Get product updates and home buying insights — straight to your inbox.
+            </p>
+          </div>
 
-          {!isSuccess ? (
-            <>
-              {/* Header */}
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-semibold text-foreground mb-2">
-                  Stay in the loop.
-                </h2>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Get product updates and home buying insights — straight to your inbox.
-                </p>
-              </div>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                type="email"
+                placeholder="Your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                className="h-12 text-base border-border focus:border-primary"
+                required
+              />
+            </div>
 
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Input
-                    type="email"
-                    placeholder="Your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isLoading}
-                    className="h-12 text-base border-border focus:border-primary"
-                    required
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={isLoading || !email}
-                  className="w-full h-12 text-base font-medium"
-                >
-                  {isLoading ? "Signing you up..." : "Keep Me Posted"}
-                </Button>
-              </form>
-            </>
-          ) : (
-            <>
-              {/* Success state */}
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                    <svg className="w-4 h-4 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                </div>
-                
-                <h2 className="text-2xl font-semibold text-foreground mb-2">
-                  You're all set!
-                </h2>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-                  Check your email for a welcome message with everything you need to get started.
-                </p>
-
-                <Button
-                  onClick={handleClose}
-                  className="w-full h-12 text-base font-medium"
-                >
-                  Got It
-                </Button>
-              </div>
-            </>
-          )}
+            <Button
+              type="submit"
+              disabled={isLoading || !email}
+              className="w-full h-12 text-base font-medium"
+            >
+              {isLoading ? "Signing you up..." : "Keep Me Posted"}
+            </Button>
+          </form>
         </div>
       </DialogContent>
     </Dialog>
