@@ -62,83 +62,84 @@ export const HomepageWelcomeEmail = ({ uploadUrl }: HomepageWelcomeEmailProps) =
 export default HomepageWelcomeEmail;
 
 const main = {
-  backgroundColor: '#ffffff',
-  fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
-  padding: '40px 20px',
+  backgroundColor: '#f5f7fa',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+  padding: '20px 0'
 };
 
 const container = {
-  margin: '0 auto',
-  padding: '40px',
-  maxWidth: '560px',
   backgroundColor: '#ffffff',
+  border: '1px solid #e4e8ee',
+  borderRadius: '8px',
+  margin: '0 auto',
+  maxWidth: '600px',
+  padding: '40px'
 };
 
 const h1 = {
   color: '#000000',
-  fontSize: '20px',
+  fontSize: '24px',
   fontWeight: 'bold',
-  margin: '0 0 32px 0',
+  margin: '0 0 20px',
   padding: '0',
-  lineHeight: '1.2',
+  textAlign: 'center' as const
 };
 
 const text = {
-  color: '#000000',
+  color: '#374151',
   fontSize: '16px',
-  lineHeight: '1.6',
-  margin: '0 0 32px 0',
+  lineHeight: '26px',
+  margin: '16px 0'
 };
 
 const buttonContainer = {
   textAlign: 'center' as const,
-  margin: '32px 0',
+  margin: '30px 0',
 };
 
 const button = {
-  backgroundColor: '#22C55E',
-  borderRadius: '6px',
+  backgroundColor: '#4ade80',
+  borderRadius: '4px',
+  border: '2px solid #22c55e',
   color: '#ffffff',
+  display: 'block',
   fontSize: '16px',
-  fontWeight: '500',
-  textDecoration: 'none',
+  fontWeight: 'bold',
+  padding: '12px 16px',
   textAlign: 'center' as const,
-  display: 'inline-block',
-  padding: '12px 24px',
-  margin: '0',
-  lineHeight: '1.4',
+  textDecoration: 'none',
+  margin: '0 auto',
+  width: '260px'
 };
 
 const list = {
-  color: '#000000',
+  color: '#374151',
   fontSize: '16px',
-  lineHeight: '1.6',
-  margin: '0 0 32px 0',
-  paddingLeft: '20px',
-  listStyle: 'none',
+  lineHeight: '24px',
+  margin: '16px 0',
+  paddingLeft: '20px'
 };
 
 const listItem = {
-  margin: '8px 0',
-  paddingLeft: '0',
+  marginBottom: '8px'
 };
 
 const freeText = {
-  color: '#000000',
+  color: '#374151',
   fontSize: '16px',
-  margin: '0 0 40px 0',
+  margin: '16px 0',
   fontWeight: '500',
 };
 
 const footer = {
-  color: '#666666',
-  fontSize: '12px',
-  lineHeight: '1.6',
-  margin: '0',
-  textAlign: 'center' as const,
+  color: '#9ca3af',
+  fontSize: '14px',
+  lineHeight: '24px',
+  marginTop: '32px',
+  textAlign: 'center' as const
 };
 
 const unsubscribeLink = {
-  color: '#666666',
+  color: '#9ca3af',
   textDecoration: 'underline',
 };
