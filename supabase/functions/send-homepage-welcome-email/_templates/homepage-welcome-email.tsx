@@ -18,23 +18,23 @@ interface HomepageWelcomeEmailProps {
 export const HomepageWelcomeEmail = ({ uploadUrl }: HomepageWelcomeEmailProps) => (
   <Html>
     <Head />
-    <Preview>Welcome to HomeAI — Your Smart Home Analysis Tool</Preview>
+    <Preview>Welcome to HomeIQ — Your Smart Home Analysis Tool</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Thanks for checking out HomeAI!</Heading>
+        <Heading style={h1}>Thanks for checking out HomeIQ!</Heading>
         
         <Text style={text}>
-          HomeAI is a smarter way to understand the condition of any home using your inspection report.
+          Thanks for checking out HomeIQ — a smarter way to understand the condition of any home using your inspection report.
         </Text>
 
         <div style={buttonContainer}>
           <Button href={uploadUrl} style={button}>
-            Get Started Now
+            You can get started here
           </Button>
         </div>
 
         <Text style={text}>
-          HomeAI will help you understand:
+          HomeIQ will help you understand:
         </Text>
 
         <ul style={list}>
@@ -50,7 +50,7 @@ export const HomepageWelcomeEmail = ({ uploadUrl }: HomepageWelcomeEmailProps) =
 
         <Text style={footer}>
           Happy analyzing,<br />
-          The HomeAI Team
+          The HomeIQ Team
         </Text>
       </Container>
     </Body>
