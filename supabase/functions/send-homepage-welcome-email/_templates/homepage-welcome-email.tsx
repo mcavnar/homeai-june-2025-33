@@ -46,7 +46,7 @@ export const HomepageWelcomeEmail = ({ uploadUrl }: HomepageWelcomeEmailProps) =
 
         {/* Free to use text */}
         <Text style={freeText}>
-          Free to use.
+          And best of all, the platform is entirely free to use!
         </Text>
 
       </Container>
@@ -129,7 +129,6 @@ const freeText = {
   color: '#374151',
   fontSize: '16px',
   margin: '16px 0',
-  fontWeight: '500',
 };
 
 const footer = {
