@@ -18,30 +18,30 @@ interface HomepageWelcomeEmailProps {
 export const HomepageWelcomeEmail = ({ uploadUrl }: HomepageWelcomeEmailProps) => (
   <Html>
     <Head />
-    <Preview>Welcome to HomeAI — Smarter insights from your inspection report</Preview>
+    <Preview>Welcome to HomeIQ — Smarter insights from your inspection report</Preview>
     <Body style={main}>
       <Container style={container}>
         {/* Header */}
-        <Heading style={h1}>Welcome to HomeAI</Heading>
+        <Heading style={h1}>Welcome to HomeIQ</Heading>
         
         {/* Body paragraph */}
         <Text style={text}>
-          Thanks for checking out HomeAI — a smarter way to understand the condition of any home using your inspection report.
+          Thanks for checking out HomeIQ — a smarter way to understand the condition of any home using your inspection report.
         </Text>
 
         {/* CTA Button */}
         <div style={buttonContainer}>
           <Button href="https://gethomeai.com/anonymous-upload" style={button}>
-            Explore HomeAI →
+            Explore HomeIQ →
           </Button>
         </div>
 
         {/* Benefits list */}
         <ul style={list}>
-          <li style={listItem}>• Clear summaries of critical issues</li>
-          <li style={listItem}>• Estimated repair costs for budgeting</li>
-          <li style={listItem}>• Insights to guide your home purchase</li>
-          <li style={listItem}>• Awareness of safety concerns</li>
+          <li style={listItem}>Clear summaries of critical issues</li>
+          <li style={listItem}>Estimated repair costs for budgeting</li>
+          <li style={listItem}>Insights to guide your home purchase</li>
+          <li style={listItem}>Awareness of safety concerns</li>
         </ul>
 
         {/* Free to use text */}
@@ -49,12 +49,13 @@ export const HomepageWelcomeEmail = ({ uploadUrl }: HomepageWelcomeEmailProps) =
           Free to use.
         </Text>
 
-        {/* Footer */}
-        <Text style={footer}>
-          You're receiving this email because you asked to learn more about HomeAI at gethomeai.com.{' '}
-          <Link href="#" style={unsubscribeLink}>Unsubscribe</Link>
-        </Text>
       </Container>
+      
+      {/* Footer */}
+      <Text style={footer}>
+        You're receiving this email because you asked to learn more about HomeIQ at gethomeai.com.{' '}
+        <Link href="#" style={unsubscribeLink}>Unsubscribe</Link>
+      </Text>
     </Body>
   </Html>
 );
