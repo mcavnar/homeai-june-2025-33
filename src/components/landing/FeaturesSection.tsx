@@ -25,7 +25,7 @@ const FeaturesSection = () => {
     {
       name: "Sarah Johnson",
       location: "Austin, TX",
-      quote: "HomeAI transformed my 47-page inspection report into clear, actionable insights.",
+      quote: "HomeIQ transformed my 47-page inspection report into clear, actionable insights.",
       rating: 5
     },
     {
@@ -37,7 +37,7 @@ const FeaturesSection = () => {
     {
       name: "Amanda Rodriguez",
       location: "Phoenix, AZ",
-      quote: "HomeAI's negotiation advice was invaluable. They showed me comparable repair costs.",
+      quote: "HomeIQ's negotiation advice was invaluable. They showed me comparable repair costs.",
       rating: 5
     },
     {
@@ -76,8 +76,8 @@ const FeaturesSection = () => {
             </div>
             <div className="order-1 lg:order-2">
               <img 
-                src="https://znohkixqcmwifqnqwdoc.supabase.co/storage/v1/object/public/site-images/HomeAI_dashboard_jul172025.png" 
-                alt="HomeAI dashboard showing repair costs, issues identified, and overall condition"
+                src="https://znohkixqcmwifqnqwdoc.supabase.co/storage/v1/object/public/site-images/HomeIQ_dashboard_jul242025.png" 
+                alt="HomeIQ dashboard showing repair costs, issues identified, and overall condition"
                 className="w-full"
               />
             </div>
