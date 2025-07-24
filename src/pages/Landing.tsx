@@ -7,8 +7,12 @@ import WhyWeBuildSection from '@/components/landing/WhyWeBuildSection';
 // import BenefitsSection from '@/components/landing/BenefitsSection';
 import ProcessSection from '@/components/landing/ProcessSection';
 import LandingFooter from '@/components/landing/LandingFooter';
+import { HomepageEmailPopup } from '@/components/HomepageEmailPopup';
+import { useHomepageEmailPopup } from '@/hooks/useHomepageEmailPopup';
 
 const Landing = () => {
+  const { showPopup, closePopup } = useHomepageEmailPopup();
+
   return (
     <div className="min-h-screen bg-white">
       <LandingNavigation />
@@ -18,6 +22,11 @@ const Landing = () => {
       {/* <BenefitsSection /> */}
       <ProcessSection />
       <LandingFooter />
+      
+      <HomepageEmailPopup 
+        isOpen={showPopup} 
+        onClose={closePopup}
+      />
     </div>
   );
 };

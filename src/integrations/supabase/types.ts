@@ -128,6 +128,42 @@ export type Database = {
         }
         Relationships: []
       }
+      popup_email_capture: {
+        Row: {
+          created_at: string
+          current_page_url: string | null
+          email: string
+          id: string
+          referrer_url: string | null
+          session_id: string
+          source: string
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_page_url?: string | null
+          email: string
+          id?: string
+          referrer_url?: string | null
+          session_id: string
+          source?: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_page_url?: string | null
+          email?: string
+          id?: string
+          referrer_url?: string | null
+          session_id?: string
+          source?: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
