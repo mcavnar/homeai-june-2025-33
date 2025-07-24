@@ -91,7 +91,7 @@ const ResultsSidebar = () => {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-xl font-bold text-gray-900 px-3 py-4 mb-2">
-            HomeAI
+            HomeIQ
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
