@@ -5,6 +5,8 @@ import FileUploadSection from '@/components/FileUploadSection';
 import ProcessingStatus from '@/components/ProcessingStatus';
 import EmailCaptureModal from '@/components/EmailCaptureModal';
 import { useAnonymousPDFProcessor } from '@/hooks/useAnonymousPDFProcessor';
+import { useAnonymousUploadPopup } from '@/hooks/useAnonymousUploadPopup';
+import { AnonymousUploadPopup } from '@/components/AnonymousUploadPopup';
 import { Shield, Clock, CheckCircle, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,6 +15,9 @@ const AnonymousUpload = () => {
   const navigate = useNavigate();
   const { trackConversion } = useMetaConversions();
   const [isEmailModalOpen, setIsEmailModalOpen] = React.useState(false);
+  
+  // Anonymous upload popup
+  const { showPopup, closePopup, handleUploadInteraction } = useAnonymousUploadPopup();
   
   const {
     file,
@@ -27,6 +32,9 @@ const AnonymousUpload = () => {
   } = useAnonymousPDFProcessor();
 
   const handleFileSelectWithTracking = (selectedFile: File) => {
+    // Mark that user interacted with upload module
+    handleUploadInteraction();
+    
     trackConversion({
       eventName: 'Lead',
       contentName: 'Anonymous PDF Upload Started'
@@ -36,6 +44,9 @@ const AnonymousUpload = () => {
   };
 
   const handleProcessPDF = async () => {
+    // Mark that user interacted with upload module
+    handleUploadInteraction();
+    
     console.log('=== STARTING PDF PROCESSING FROM ANONYMOUS UPLOAD ===');
     
     const result = await processPDF();
@@ -119,7 +130,10 @@ const AnonymousUpload = () => {
                       ? 'border-green-300 bg-green-50' 
                       : 'border-gray-300 bg-gray-50 hover:border-green-400 hover:bg-green-50'
                   }`}
-                  onClick={() => document.getElementById('file-input')?.click()}
+                  onClick={() => {
+                    handleUploadInteraction();
+                    document.getElementById('file-input')?.click();
+                  }}
                 >
                   <input
                     id="file-input"
@@ -187,7 +201,10 @@ const AnonymousUpload = () => {
             <div className="px-6 sm:px-8">
               <Button
                 variant="outline"
-                onClick={() => setIsEmailModalOpen(true)}
+                onClick={() => {
+                  handleUploadInteraction();
+                  setIsEmailModalOpen(true);
+                }}
                 className="w-full py-4 px-6 rounded-lg text-lg font-medium border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-700 hover:text-green-700 transition-all duration-200 shadow-md hover:shadow-lg"
               >
                 Don't Have Your Report?
@@ -300,6 +317,12 @@ const AnonymousUpload = () => {
       <EmailCaptureModal
         isOpen={isEmailModalOpen}
         onClose={() => setIsEmailModalOpen(false)}
+      />
+
+      {/* Anonymous Upload Popup */}
+      <AnonymousUploadPopup
+        isOpen={showPopup}
+        onClose={closePopup}
       />
     </div>
   );
