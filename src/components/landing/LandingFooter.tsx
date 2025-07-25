@@ -10,7 +10,7 @@ const LandingFooter = () => {
           <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">🏠</span>
           </div>
-          <div className="text-xl font-bold text-gray-900">HomeIQ</div>
+          <div className="text-xl font-bold text-gray-900">HomeAI</div>
         </div>
         <p className="text-gray-500 font-light mb-6">
           Transform your home inspection reports with AI-powered insights.

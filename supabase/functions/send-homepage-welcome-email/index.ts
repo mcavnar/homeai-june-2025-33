@@ -39,9 +39,9 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     const emailResponse = await resend.emails.send({
-      from: "HomeIQ <onboarding@resend.dev>",
+      from: "HomeAI <onboarding@resend.dev>",
       to: [email],
-      subject: "Welcome to HomeIQ — Your Smart Home Analysis Tool",
+      subject: "Welcome to HomeAI — Your Smart Home Analysis Tool",
       html: emailHtml,
     });
 

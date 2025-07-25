@@ -68,7 +68,7 @@ const DemoResultsSidebar = () => {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-xl font-bold text-gray-900 px-3 py-4 mb-2">
-            HomeIQ Demo
+            HomeAI Demo
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
