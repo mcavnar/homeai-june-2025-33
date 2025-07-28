@@ -26,7 +26,7 @@ export const HomepageWelcomeEmail = ({ uploadUrl }: HomepageWelcomeEmailProps) =
         
         {/* Body paragraph */}
         <Text style={text}>
-          Thanks for checking out HomeAI — a smarter way to understand the condition of any home using your inspection report.
+          Thanks for checking out HomeAI -- a smarter way to understand your home condition using your inspection report.
         </Text>
 
         {/* CTA Button */}
