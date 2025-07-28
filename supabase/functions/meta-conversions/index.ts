@@ -21,6 +21,13 @@ interface ConversionData {
     value?: number;
     currency?: string;
     content_name?: string;
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+    utm_term?: string;
+    utm_content?: string;
+    fbclid?: string;
+    gclid?: string;
   };
   event_source_url?: string;
   action_source: string;
@@ -84,7 +91,8 @@ serve(async (req) => {
       value,
       currency = 'USD',
       contentName,
-      eventSourceUrl
+      eventSourceUrl,
+      attributionData = {}
     } = await req.json();
 
     // Extract client IP from request headers
@@ -123,10 +131,18 @@ serve(async (req) => {
     };
 
     // Add custom data if provided
-    if (value || contentName) {
+    if (value || contentName || Object.keys(attributionData).length > 0) {
       conversionData.custom_data = {
         ...(value && { value, currency }),
-        ...(contentName && { content_name: contentName })
+        ...(contentName && { content_name: contentName }),
+        // Include attribution data in custom_data
+        ...(attributionData.utm_source && { utm_source: attributionData.utm_source }),
+        ...(attributionData.utm_medium && { utm_medium: attributionData.utm_medium }),
+        ...(attributionData.utm_campaign && { utm_campaign: attributionData.utm_campaign }),
+        ...(attributionData.utm_term && { utm_term: attributionData.utm_term }),
+        ...(attributionData.utm_content && { utm_content: attributionData.utm_content }),
+        ...(attributionData.fbclid && { fbclid: attributionData.fbclid }),
+        ...(attributionData.gclid && { gclid: attributionData.gclid }),
       };
     }
 

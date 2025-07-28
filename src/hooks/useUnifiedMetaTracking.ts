@@ -1,6 +1,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { initializeAttribution, type AttributionData } from '@/utils/attributionUtils';
 
 interface TrackEventParams {
   eventName: string;
@@ -19,10 +20,13 @@ export const useUnifiedMetaTracking = () => {
     contentName
   }: TrackEventParams) => {
     try {
+      // Get attribution data for this event
+      const attributionData = initializeAttribution();
+      
       // Generate unique event ID for deduplication
       const eventId = `${eventName}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      console.log('Tracking unified Meta event:', { eventName, eventId, value });
+      console.log('Tracking unified Meta event:', { eventName, eventId, value, attributionData });
 
       // 1. Fire client-side Meta Pixel event (if fbq is available)
       if (typeof window !== 'undefined' && window.fbq) {
@@ -54,7 +58,8 @@ export const useUnifiedMetaTracking = () => {
           value,
           currency,
           contentName,
-          eventSourceUrl: window.location.href
+          eventSourceUrl: window.location.href,
+          attributionData
         }
       });
 

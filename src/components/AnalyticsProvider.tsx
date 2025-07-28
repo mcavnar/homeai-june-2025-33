@@ -3,6 +3,7 @@ import React, { createContext, useContext, ReactNode } from 'react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { usePageTracking } from '@/hooks/usePageTracking';
 import { useUnifiedMetaTracking } from '@/hooks/useUnifiedMetaTracking';
+import { useAttributionTracking } from '@/hooks/useAttributionTracking';
 
 interface AnalyticsContextType {
   trackButtonClick: (buttonText: string, elementId?: string, elementClass?: string) => void;
@@ -31,11 +32,12 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
   const { trackButtonClick, trackInteraction } = useAnalytics();
   const { trackEvent } = useUnifiedMetaTracking();
   
-  // Enable page tracking with error boundary
+  // Enable page tracking and attribution tracking with error boundary
   try {
     usePageTracking();
+    useAttributionTracking();
   } catch (error) {
-    console.error('Page tracking failed:', error);
+    console.error('Analytics tracking failed:', error);
   }
 
   // Wrap analytics functions with error handling
