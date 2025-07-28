@@ -29,16 +29,16 @@ interface AnalyticsProviderProps {
 }
 
 export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }) => {
-  const { trackButtonClick, trackInteraction } = useAnalytics();
-  const { trackEvent } = useUnifiedMetaTracking();
+  // Always call hooks at the top level
+  const analytics = useAnalytics();
+  const metaTracking = useUnifiedMetaTracking();
   
-  // Enable page tracking and attribution tracking with error boundary
-  try {
-    usePageTracking();
-    useAttributionTracking();
-  } catch (error) {
-    console.error('Analytics tracking failed:', error);
-  }
+  // Enable page tracking and attribution tracking
+  usePageTracking();
+  useAttributionTracking();
+
+  const { trackButtonClick, trackInteraction } = analytics;
+  const { trackEvent } = metaTracking;
 
   // Wrap analytics functions with error handling
   const safeTrackButtonClick = (buttonText: string, elementId?: string, elementClass?: string) => {
