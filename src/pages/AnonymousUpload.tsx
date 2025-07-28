@@ -47,6 +47,12 @@ const AnonymousUpload = () => {
     // Mark that user interacted with upload module
     handleUploadInteraction();
     
+    // Track the analyze button click
+    await trackConversion({
+      eventName: 'ClickedAnalyzeReport',
+      contentName: 'Anonymous Upload - Analyze Report Button'
+    });
+    
     console.log('=== STARTING PDF PROCESSING FROM ANONYMOUS UPLOAD ===');
     
     const result = await processPDF();
