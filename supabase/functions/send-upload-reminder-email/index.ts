@@ -49,7 +49,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send the email
     const emailResponse = await resend.emails.send({
-      from: "HomeAI <onboarding@resend.dev>",
+      from: "HomeAI <onboarding@gethomeai.com>",
       to: [email],
       subject: "Your Home Inspection Report Analysis",
       html,
