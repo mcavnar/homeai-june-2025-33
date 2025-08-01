@@ -8,7 +8,7 @@ const LandingFooter = () => {
       <div className="container mx-auto px-6 text-center">
         <div className="flex items-center justify-center gap-3 mb-6">
           <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">🏠</span>
+            <span className="text-white font-bold text-sm">👵</span>
           </div>
           <div className="text-xl font-bold text-gray-900">Aunt Sally</div>
         </div>

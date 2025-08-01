@@ -103,9 +103,9 @@ const AnonymousUpload = () => {
             onClick={() => navigate('/')}
           >
             <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">🏠</span>
+              <span className="text-white font-bold text-sm">👵</span>
             </div>
-            <div className="text-xl font-bold text-gray-900">HomeAI</div>
+            <div className="text-xl font-bold text-gray-900">Aunt Sally</div>
           </div>
         </div>
       </nav>
