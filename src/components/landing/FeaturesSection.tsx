@@ -25,7 +25,7 @@ const FeaturesSection = () => {
     {
       name: "Sarah Johnson",
       location: "Austin, TX",
-      quote: "HomeAI transformed my 47-page inspection report into clear, actionable insights.",
+      quote: "Aunt Sally transformed my 47-page inspection report into clear, actionable insights.",
       rating: 5
     },
     {
@@ -37,7 +37,7 @@ const FeaturesSection = () => {
     {
       name: "Amanda Rodriguez",
       location: "Phoenix, AZ",
-      quote: "HomeAI's negotiation advice was invaluable. They showed me comparable repair costs.",
+      quote: "Aunt Sally's negotiation advice was invaluable. They showed me comparable repair costs.",
       rating: 5
     },
     {
@@ -76,8 +76,8 @@ const FeaturesSection = () => {
             </div>
             <div className="order-1 lg:order-2">
               <img 
-                src="https://znohkixqcmwifqnqwdoc.supabase.co/storage/v1/object/public/site-images/HomeAI_dashboard_jul172025.png" 
-                alt="HomeAI dashboard showing repair costs, issues identified, and overall condition"
+                src="https://znohkixqcmwifqnqwdoc.supabase.co/storage/v1/object/public/site-images/AuntSally_dashboard_aug12025.png" 
+                alt="Aunt Sally dashboard showing repair costs, issues identified, and overall condition"
                 className="w-full"
               />
             </div>
@@ -92,7 +92,7 @@ const FeaturesSection = () => {
             <div>
               <img 
                 src="https://znohkixqcmwifqnqwdoc.supabase.co/storage/v1/object/public/site-images/HomeAI_issues_jul172025.png" 
-                alt="HomeAI issues list with severity ratings and repair estimates"
+                alt="Aunt Sally issues list with severity ratings and repair estimates"
                 className="w-full"
               />
             </div>
@@ -147,7 +147,7 @@ const FeaturesSection = () => {
             <div className="order-1 lg:order-2">
               <img 
                 src="https://znohkixqcmwifqnqwdoc.supabase.co/storage/v1/object/public/site-images/HomeAI_keysystems_jul172025.png" 
-                alt="HomeAI key systems overview showing HVAC, roof, plumbing, and electrical health"
+                alt="Aunt Sally key systems overview showing HVAC, roof, plumbing, and electrical health"
                 className="w-full"
               />
             </div>
@@ -162,7 +162,7 @@ const FeaturesSection = () => {
             <div>
               <img 
                 src="https://znohkixqcmwifqnqwdoc.supabase.co/storage/v1/object/public/site-images/HomeAI_momonphone_jul172025.png" 
-                alt="HomeAI mobile app interface showing home inspection results"
+                alt="Aunt Sally mobile app interface showing home inspection results"
                 className="w-full"
               />
             </div>
