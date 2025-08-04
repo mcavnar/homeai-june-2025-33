@@ -7,7 +7,7 @@ const ProblemsSection = () => {
     {
       name: "Sarah Johnson",
       location: "Austin, TX",
-      quote: "Aunt Sally transformed my 47-page inspection report into clear, actionable insights. I finally understood what needed immediate attention vs. what could wait. The repair cost estimates helped me negotiate $8,000 off the purchase price.",
+      quote: "HomeAI transformed my 47-page inspection report into clear, actionable insights. I finally understood what needed immediate attention vs. what could wait. The repair cost estimates helped me negotiate $8,000 off the purchase price.",
       rating: 5
     },
     {
@@ -19,7 +19,7 @@ const ProblemsSection = () => {
     {
       name: "Amanda Rodriguez",
       location: "Phoenix, AZ",
-      quote: "Aunt Sally's negotiation advice was invaluable. They showed me comparable repair costs in my area and helped me create a compelling case for the seller to cover major electrical issues. The seller agreed to $12,000 in credits.",
+      quote: "HomeAI's negotiation advice was invaluable. They showed me comparable repair costs in my area and helped me create a compelling case for the seller to cover major electrical issues. The seller agreed to $12,000 in credits.",
       rating: 5
     }
   ];
@@ -34,7 +34,7 @@ const ProblemsSection = () => {
           <div className="max-w-4xl mx-auto mt-12">
             <img 
               src="/lovable-uploads/e9006c0e-8a2f-4a16-a27e-1a5df07794fb.png" 
-              alt="Aunt Sally inspection dashboard showing repair costs, issues identified, and overall condition"
+              alt="HomeAI inspection dashboard showing repair costs, issues identified, and overall condition"
               className="w-full rounded-2xl shadow-lg border border-gray-200"
             />
           </div>
@@ -47,7 +47,7 @@ const ProblemsSection = () => {
               What Our Users Say
             </h3>
             <p className="text-xl text-gray-600 font-light mb-12">
-              See how Aunt Sally has helped homebuyers make confident decisions
+              See how HomeAI has helped homebuyers make confident decisions
             </p>
             <div className="max-w-2xl mx-auto mb-16">
               <img 
