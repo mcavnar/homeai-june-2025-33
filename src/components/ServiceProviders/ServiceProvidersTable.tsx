@@ -234,7 +234,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
             <div>
               <CardTitle className="text-2xl font-bold">Service Provider Overview</CardTitle>
               <p className="text-gray-600 mt-2">
-                We've analyzed your property and recommend the following service types. We've pre-populated the list with estimated costs for your area. You can add your own service providers or request information about existing providers from the seller.
+                We've analyzed your property and recommend the following service types. We've pre-populated the list with estimated costs for your area. <strong>Hit Get Provider to be connected to a vetted local service provider.</strong>
               </p>
             </div>
           </div>
@@ -296,7 +296,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
                             Loading...
                           </div>
                         ) : (
-                          'Get Providers'
+                          'Get Provider'
                         )}
                       </Button>
                     </TableCell>

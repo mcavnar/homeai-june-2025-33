@@ -93,7 +93,7 @@ const ProvidersModal: React.FC<ProvidersModalProps> = ({
           {!isLoading && !error && providers.length > 0 && (
             <div className="space-y-4">
               <p className="text-gray-600 mb-4">
-                Found {providers.length} {serviceType.toLowerCase()} providers in your area
+                We recommend these {providers.length} {serviceType.toLowerCase()} providers for your property.
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
