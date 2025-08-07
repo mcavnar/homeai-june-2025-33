@@ -39,14 +39,14 @@ serve(async (req) => {
 
     console.log('Searching Thumbtack for:', { category, zip });
 
-    // Use staging environment only
-    const clientId = Deno.env.get('THUMBTACK_DEV_CLIENT_ID');
-    const clientSecret = Deno.env.get('THUMBTACK_DEV_CLIENT_SECRET');
-    const oauthUrl = 'https://staging-auth.thumbtack.com/oauth/token';
-    const apiUrl = 'https://staging-api.thumbtack.com';
+    // Use production environment
+    const clientId = Deno.env.get('THUMBTACK_PROD_CLIENT_ID');
+    const clientSecret = Deno.env.get('THUMBTACK_PROD_CLIENT_SECRET');
+    const oauthUrl = 'https://auth.thumbtack.com/oauth/token';
+    const apiUrl = 'https://api.thumbtack.com';
 
     if (!clientId || !clientSecret) {
-      console.log('No staging Thumbtack credentials found, returning mock data');
+      console.log('No production Thumbtack credentials found, returning mock data');
       const mockProviders: ThumbTackProvider[] = [
         {
           name: "Demo Lawn Care Pro",
@@ -71,7 +71,7 @@ serve(async (req) => {
           success: true,
           providers: mockProviders,
           total: mockProviders.length,
-          note: "Demo data - Thumbtack staging credentials not configured"
+          note: "Demo data - Thumbtack production credentials not configured"
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -79,7 +79,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Using staging environment with clientId:', clientId?.substring(0, 8) + '...');
+    console.log('Using production environment with clientId:', clientId?.substring(0, 8) + '...');
     console.log('OAuth URL:', oauthUrl);
     console.log('API URL:', apiUrl);
 
