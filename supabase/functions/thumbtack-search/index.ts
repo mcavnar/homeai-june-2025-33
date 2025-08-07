@@ -123,7 +123,8 @@ serve(async (req) => {
         'Authorization': `Basic ${encodedAuth}`
       },
       body: new URLSearchParams({
-        'grant_type': 'client_credentials'
+        'grant_type': 'client_credentials',
+        'audience': 'urn:partner-api'
       })
     });
 
