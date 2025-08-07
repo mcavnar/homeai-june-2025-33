@@ -24,7 +24,7 @@ const LandingNavigation = () => {
         <div className="flex items-center gap-4">
           {user ? (
             <TrackedButton 
-              onClick={() => navigate('/upload')} 
+              onClick={() => navigate('/results/synopsis')} 
               variant="outline" 
               className="border-gray-200 text-gray-700 hover:bg-gray-50"
               trackingLabel="Header Dashboard Button"
