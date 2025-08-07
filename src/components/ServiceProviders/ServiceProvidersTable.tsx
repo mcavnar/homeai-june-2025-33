@@ -160,7 +160,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
       const { data, error } = await supabase.functions.invoke('thumbtack-search', {
         body: {
           searchQuery: serviceType,
-          zip: zipCode
+          zipCode: zipCode
         }
       });
 

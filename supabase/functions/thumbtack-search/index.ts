@@ -26,18 +26,18 @@ serve(async (req) => {
 
   // Declare variables at function scope so they're available in catch block
   let searchQuery: string;
-  let zip: string;
+  let zipCode: string;
 
   try {
     const requestBody = await req.json();
     searchQuery = requestBody.searchQuery;
-    zip = requestBody.zip;
+    zipCode = requestBody.zipCode;
     
-    if (!searchQuery || !zip) {
+    if (!searchQuery || !zipCode) {
       throw new Error('Search query and zip code are required');
     }
 
-    console.log('Searching Thumbtack for:', { searchQuery, zip });
+    console.log('Searching Thumbtack for:', { searchQuery, zipCode });
 
     // Use development environment for testing
     const clientId = Deno.env.get('THUMBTACK_DEV_CLIENT_ID');
@@ -137,7 +137,7 @@ serve(async (req) => {
     // Step 2: Create a business search
     const searchRequestBody = {
       searchQuery: searchQuery,
-      zipCode: zip,
+      zipCode: zipCode,
       utmData: {
         utm_source: 'cma-fivefourventures'
       },
@@ -200,14 +200,14 @@ serve(async (req) => {
     
     // Add null checks for variables that might be undefined
     const safeSearchQuery = searchQuery || 'Service';
-    const safeZip = zip || '00000';
+    const safeZipCode = zipCode || '00000';
     
     const mockProviders: ThumbTackProvider[] = [
       {
         name: `Professional ${safeSearchQuery} Service`,
         rating: 4.7,
         reviewCount: 95,
-        location: safeZip,
+        location: safeZipCode,
         profileUrl: "https://www.thumbtack.com",
         requestFlowUrl: "https://www.thumbtack.com/quote",
         description: `Reliable ${safeSearchQuery.toLowerCase()} services in your area`
@@ -216,7 +216,7 @@ serve(async (req) => {
         name: `Expert ${safeSearchQuery} Solutions`,
         rating: 4.9,
         reviewCount: 143,
-        location: safeZip,
+        location: safeZipCode,
         profileUrl: "https://www.thumbtack.com", 
         requestFlowUrl: "https://www.thumbtack.com/quote",
         description: `Professional ${safeSearchQuery.toLowerCase()} with excellent customer reviews`
@@ -225,7 +225,7 @@ serve(async (req) => {
         name: `Local ${safeSearchQuery} Specialists`,
         rating: 4.6,
         reviewCount: 78,
-        location: safeZip,
+        location: safeZipCode,
         profileUrl: "https://www.thumbtack.com",
         requestFlowUrl: "https://www.thumbtack.com/quote",
         description: `Trusted ${safeSearchQuery.toLowerCase()} providers serving your neighborhood`
