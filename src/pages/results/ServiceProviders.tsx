@@ -127,7 +127,7 @@ const ServiceProviders = () => {
 
       <CostSummaryCards costSummary={costSummary} estimate={estimate} />
       
-      <ServiceProvidersTable providers={serviceProviders} />
+      <ServiceProvidersTable providers={serviceProviders} propertyAddress={propertyAddress} />
 
       {config && currentService && (
         <ServiceOptInModal
