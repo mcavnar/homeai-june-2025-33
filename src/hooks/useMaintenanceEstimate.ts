@@ -77,8 +77,14 @@ export const useMaintenanceEstimate = (): UseMaintenanceEstimateReturn => {
     }
 
     // Prevent duplicate calls for the same address
-    if (estimate && lastFetchedAddress.current === address) {
+    if (lastFetchedAddress.current === address) {
       console.log('Maintenance estimate already fetched for this address');
+      // Generate service providers if we have an estimate but no providers
+      if (estimate && serviceProviders.length === 0) {
+        console.log('Generating service providers for cached estimate');
+        const providers = generateServiceProviders(estimate);
+        setServiceProviders(providers);
+      }
       return;
     }
 
