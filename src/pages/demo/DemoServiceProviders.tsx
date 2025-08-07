@@ -3,7 +3,7 @@ import React from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import CostSummaryCards from '@/components/ServiceProviders/CostSummaryCards';
-import ActionCards from '@/components/ServiceProviders/ActionCards';
+
 import ServiceProvidersTable from '@/components/ServiceProviders/ServiceProvidersTable';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -82,27 +82,6 @@ const DemoServiceProviders = () => {
 
       <CostSummaryCards costSummary={costSummary} />
       
-      {/* Upload Report CTA Section */}
-      <Card className="border-gray-200">
-        <CardContent className="p-6 text-center">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">
-            Get Real Provider Recommendations
-          </h3>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
-            Upload your actual inspection report to get personalized provider recommendations based on your specific property needs, location, and the issues identified in your inspection.
-          </p>
-          <Button 
-            variant="green" 
-            size="lg" 
-            className="px-8 py-3 text-lg font-medium shadow-lg"
-            onClick={handleUploadReport}
-          >
-            Upload Your Report For Free
-          </Button>
-        </CardContent>
-      </Card>
-
-      <ActionCards />
       <ServiceProvidersTable providers={serviceProviders} />
     </div>
   );
