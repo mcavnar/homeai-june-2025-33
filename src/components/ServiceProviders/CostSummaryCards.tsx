@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Calculator, TrendingUp } from 'lucide-react';
+import { Calendar, Calculator } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatters';
 
 interface MaintenanceEstimate {
@@ -21,33 +21,8 @@ interface CostSummaryCardsProps {
 }
 
 const CostSummaryCards: React.FC<CostSummaryCardsProps> = ({ costSummary, estimate }) => {
-  // Parse regional comparison to determine if it's above or below average
-  const getMarketComparisonText = () => {
-    if (!estimate?.regionalComparison) {
-      return "Based on service providers in your area";
-    }
-    
-    const isAbove = estimate.regionalComparison.startsWith('+');
-    const isBelow = estimate.regionalComparison.startsWith('-');
-    
-    if (isAbove) {
-      return `${estimate.regionalComparison} above regional average`;
-    } else if (isBelow) {
-      return `${estimate.regionalComparison.replace('-', '')} below regional average`;
-    }
-    
-    return estimate.regionalComparison;
-  };
-
-  const getMarketComparisonColor = () => {
-    if (!estimate?.regionalComparison) return "text-gray-600";
-    
-    const isAbove = estimate.regionalComparison.startsWith('+');
-    return isAbove ? "text-red-600" : "text-green-600";
-  };
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
       <Card className="bg-white border border-gray-200 shadow-sm">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
@@ -76,24 +51,6 @@ const CostSummaryCards: React.FC<CostSummaryCardsProps> = ({ costSummary, estima
             <h3 className="text-lg font-semibold text-gray-600">Estimated Annual Total</h3>
             <p className="text-3xl font-bold text-gray-900">{formatCurrency(costSummary.annualTotal)}</p>
             <p className="text-sm text-gray-600">Excludes as-needed services</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-white border border-gray-200 shadow-sm">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <TrendingUp className="h-8 w-8 text-green-500" />
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-gray-600">Market Comparison</h3>
-            <p className="text-3xl font-bold text-gray-900">
-              {estimate?.regionalComparison?.startsWith('-') ? '' : '+'}
-              {formatCurrency(costSummary.marketDifference)}
-            </p>
-            <p className={`text-sm ${getMarketComparisonColor()}`}>
-              {getMarketComparisonText()}
-            </p>
           </div>
         </CardContent>
       </Card>
