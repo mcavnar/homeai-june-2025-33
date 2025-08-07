@@ -133,6 +133,11 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
     return <span className="text-gray-900 font-bold">{formattedCost}</span>;
   };
 
+  const handleGetProviders = (serviceType: string) => {
+    console.log('Get providers clicked for:', serviceType);
+    // Placeholder for future functionality
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -153,6 +158,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
               <TableHead className="text-gray-500 font-medium">Frequency</TableHead>
               <TableHead className="text-gray-500 font-medium text-right">Monthly Cost</TableHead>
               <TableHead className="text-gray-500 font-medium text-right">Annual Cost</TableHead>
+              <TableHead className="text-gray-500 font-medium text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -189,11 +195,19 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({ providers
                   <TableCell className="text-right">
                     {formatProviderCost(provider.annualCost, isPlaceholderProvider(provider))}
                   </TableCell>
+                  <TableCell className="text-center">
+                    <Button 
+                      onClick={() => handleGetProviders(provider.serviceType)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      Get Providers
+                    </Button>
+                  </TableCell>
                 </TableRow>
                 
                 {!isPlaceholderProvider(provider) && (
                   <TableRow>
-                    <TableCell colSpan={4} className="p-0">
+                    <TableCell colSpan={5} className="p-0">
                       <Collapsible open={openDetails === provider.id}>
                         <CollapsibleContent className="bg-gray-50 border-t">
                           <div className="p-6 space-y-4">
