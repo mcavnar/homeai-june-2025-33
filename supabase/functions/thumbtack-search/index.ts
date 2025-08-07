@@ -41,15 +41,14 @@ serve(async (req) => {
     }
 
     // Step 1: Get access token using OAuth2 client credentials flow
-    const tokenResponse = await fetch('https://api.thumbtack.com/v2/oauth/token', {
+    const tokenResponse = await fetch('https://pro-api.thumbtack.com/oauth/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization': `Basic ${btoa(`${clientId}:${clientSecret}`)}`
       },
       body: new URLSearchParams({
-        'grant_type': 'client_credentials',
-        'scope': 'business_search'
+        'grant_type': 'client_credentials'
       })
     });
 
@@ -68,41 +67,47 @@ serve(async (req) => {
 
     console.log('Successfully obtained access token');
 
-    // Step 2: Search for businesses
-    const searchResponse = await fetch('https://api.thumbtack.com/v2/businesses/search', {
+    // Step 2: Create a business search
+    const searchRequestBody = {
+      zipCode: zip,
+      utmData: {
+        utm_source: 'cma-integration'
+      },
+      searchQuery: category,
+      limit: 10
+    };
+
+    console.log('Creating business search with:', searchRequestBody);
+
+    const searchResponse = await fetch('https://api.thumbtack.com/api/v4/businesses/search', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`
       },
-      body: JSON.stringify({
-        categoryId: category,
-        location: {
-          zipCode: zip
-        },
-        limit: 10
-      })
+      body: JSON.stringify(searchRequestBody)
     });
 
     if (!searchResponse.ok) {
       const errorText = await searchResponse.text();
       console.error('Search request failed:', errorText);
-      throw new Error(`Search request failed: ${searchResponse.status}`);
+      throw new Error(`Search request failed: ${searchResponse.status} - ${errorText}`);
     }
 
     const searchData = await searchResponse.json();
-    console.log('Search response:', searchData);
+    console.log('Search response:', JSON.stringify(searchData, null, 2));
 
     // Transform the response to match our interface
-    const providers: ThumbTackProvider[] = (searchData.businesses || []).map((business: any) => ({
-      name: business.name || 'Unknown Provider',
+    const businesses = searchData.data || [];
+    const providers: ThumbTackProvider[] = businesses.map((business: any) => ({
+      name: business.businessName || 'Unknown Provider',
       rating: business.rating || 0,
-      reviewCount: business.reviewCount || 0,
-      location: business.location?.city ? `${business.location.city}, ${business.location.state}` : zip,
-      image: business.profileImage?.url || null,
-      profileUrl: business.profileUrl || `https://www.thumbtack.com/profile/${business.id}`,
-      phone: business.phone,
-      description: business.description
+      reviewCount: business.numberOfReviews || 0,
+      location: business.businessLocation || `${zip}`,
+      image: business.businessImageURL || null,
+      profileUrl: business.servicePageURL || `https://www.thumbtack.com/profile/${business.businessID}`,
+      phone: business.phone || null,
+      description: business.businessIntroduction || business.featuredReview || null
     }));
 
     return new Response(
