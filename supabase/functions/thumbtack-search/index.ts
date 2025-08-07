@@ -39,21 +39,21 @@ serve(async (req) => {
 
     console.log('Searching Thumbtack for:', { searchQuery, zipCode });
 
-    // TEMPORARILY: Try development environment first for testing
-    let clientId = Deno.env.get('THUMBTACK_DEV_CLIENT_ID');
-    let clientSecret = Deno.env.get('THUMBTACK_DEV_CLIENT_SECRET');
-    let oauthUrl = 'https://staging-auth.thumbtack.com/oauth2/token';
-    let apiUrl = 'https://staging-api.thumbtack.com';
+    // Use production environment as primary
+    let clientId = Deno.env.get('THUMBTACK_PROD_CLIENT_ID');
+    let clientSecret = Deno.env.get('THUMBTACK_PROD_CLIENT_SECRET');
+    let oauthUrl = 'https://auth.thumbtack.com/oauth2/token';
+    let apiUrl = 'https://api.thumbtack.com';
     
     if (!clientId || !clientSecret) {
-      // Fallback to production environment
-      clientId = Deno.env.get('THUMBTACK_PROD_CLIENT_ID');
-      clientSecret = Deno.env.get('THUMBTACK_PROD_CLIENT_SECRET');
-      oauthUrl = 'https://auth.thumbtack.com/oauth2/token';
-      apiUrl = 'https://api.thumbtack.com';
-      console.log('Using production environment with clientId:', clientId?.substring(0, 8) + '...');
-    } else {
+      // Fallback to development environment
+      clientId = Deno.env.get('THUMBTACK_DEV_CLIENT_ID');
+      clientSecret = Deno.env.get('THUMBTACK_DEV_CLIENT_SECRET');
+      oauthUrl = 'https://staging-auth.thumbtack.com/oauth2/token';
+      apiUrl = 'https://staging-api.thumbtack.com';
       console.log('Using development environment with clientId:', clientId?.substring(0, 8) + '...');
+    } else {
+      console.log('Using production environment with clientId:', clientId?.substring(0, 8) + '...');
     }
 
     console.log('Environment check:', {
