@@ -25,19 +25,19 @@ serve(async (req) => {
   }
 
   // Declare variables at function scope so they're available in catch block
-  let category: string;
+  let searchQuery: string;
   let zip: string;
 
   try {
     const requestBody = await req.json();
-    category = requestBody.category;
+    searchQuery = requestBody.searchQuery;
     zip = requestBody.zip;
     
-    if (!category || !zip) {
-      throw new Error('Category and zip code are required');
+    if (!searchQuery || !zip) {
+      throw new Error('Search query and zip code are required');
     }
 
-    console.log('Searching Thumbtack for:', { category, zip });
+    console.log('Searching Thumbtack for:', { searchQuery, zip });
 
     // Use development environment for testing
     const clientId = Deno.env.get('THUMBTACK_DEV_CLIENT_ID');
@@ -136,11 +136,11 @@ serve(async (req) => {
 
     // Step 2: Create a business search
     const searchRequestBody = {
+      searchQuery: searchQuery,
       zipCode: zip,
       utmData: {
         utm_source: 'cma-fivefourventures'
       },
-      searchQuery: category,
       limit: 10
     };
 
@@ -199,36 +199,36 @@ serve(async (req) => {
     console.log('API failed, returning mock data as fallback');
     
     // Add null checks for variables that might be undefined
-    const safeCategory = category || 'Service';
+    const safeSearchQuery = searchQuery || 'Service';
     const safeZip = zip || '00000';
     
     const mockProviders: ThumbTackProvider[] = [
       {
-        name: `Professional ${safeCategory} Service`,
+        name: `Professional ${safeSearchQuery} Service`,
         rating: 4.7,
         reviewCount: 95,
         location: safeZip,
         profileUrl: "https://www.thumbtack.com",
         requestFlowUrl: "https://www.thumbtack.com/quote",
-        description: `Reliable ${safeCategory.toLowerCase()} services in your area`
+        description: `Reliable ${safeSearchQuery.toLowerCase()} services in your area`
       },
       {
-        name: `Expert ${safeCategory} Solutions`,
+        name: `Expert ${safeSearchQuery} Solutions`,
         rating: 4.9,
         reviewCount: 143,
         location: safeZip,
         profileUrl: "https://www.thumbtack.com", 
         requestFlowUrl: "https://www.thumbtack.com/quote",
-        description: `Professional ${safeCategory.toLowerCase()} with excellent customer reviews`
+        description: `Professional ${safeSearchQuery.toLowerCase()} with excellent customer reviews`
       },
       {
-        name: `Local ${safeCategory} Specialists`,
+        name: `Local ${safeSearchQuery} Specialists`,
         rating: 4.6,
         reviewCount: 78,
         location: safeZip,
         profileUrl: "https://www.thumbtack.com",
         requestFlowUrl: "https://www.thumbtack.com/quote",
-        description: `Trusted ${safeCategory.toLowerCase()} providers serving your neighborhood`
+        description: `Trusted ${safeSearchQuery.toLowerCase()} providers serving your neighborhood`
       }
     ];
 

@@ -155,12 +155,11 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
     setCurrentServiceType(serviceType);
 
     try {
-      const categoryId = getThumbTackCategoryId(serviceType);
-      console.log('Searching for providers:', { serviceType, categoryId, zipCode });
+      console.log('Searching for providers:', { serviceType, zipCode });
 
       const { data, error } = await supabase.functions.invoke('thumbtack-search', {
         body: {
-          category: categoryId,
+          searchQuery: serviceType,
           zip: zipCode
         }
       });
