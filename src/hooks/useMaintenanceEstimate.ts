@@ -1,8 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useUserReport } from '@/hooks/useUserReport';
 
 interface MaintenanceEstimate {
   monthlyRangeLow: number;
@@ -36,8 +34,8 @@ export const useMaintenanceEstimate = (): UseMaintenanceEstimateReturn => {
   const [serviceProviders, setServiceProviders] = useState<ServiceProvider[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastFetchedAddress, setLastFetchedAddress] = useState<string>('');
   const { toast } = useToast();
-  const { userReport, updateUserReport } = useUserReport();
 
   const generateServiceProviders = useCallback((estimate: MaintenanceEstimate): ServiceProvider[] => {
     // Calculate average monthly cost from the estimate
@@ -71,53 +69,6 @@ export const useMaintenanceEstimate = (): UseMaintenanceEstimateReturn => {
     });
   }, []);
 
-  const getCachedEstimate = useCallback((address: string): MaintenanceEstimate | null => {
-    if (!userReport?.property_data) return null;
-
-    const propertyData = userReport.property_data as any;
-    const maintenanceCache = propertyData.maintenanceEstimate;
-
-    if (!maintenanceCache || maintenanceCache.address !== address) {
-      return null;
-    }
-
-    // Check if cache is still valid (within CACHE_DURATION)
-    const cacheTime = new Date(maintenanceCache.cachedAt).getTime();
-    const now = new Date().getTime();
-    
-    if (now - cacheTime > CACHE_DURATION) {
-      console.log('Maintenance estimate cache expired');
-      return null;
-    }
-
-    console.log('Using cached maintenance estimate');
-    return maintenanceCache.estimate;
-  }, [userReport?.property_data]);
-
-  const saveCachedEstimate = useCallback(async (address: string, estimate: MaintenanceEstimate) => {
-    if (!userReport) return;
-
-    try {
-      const currentPropertyData = (userReport.property_data as any) || {};
-      const updatedPropertyData = {
-        ...currentPropertyData,
-        maintenanceEstimate: {
-          address,
-          estimate,
-          cachedAt: new Date().toISOString()
-        }
-      };
-
-      await updateUserReport({
-        property_data: updatedPropertyData
-      });
-
-      console.log('Maintenance estimate cached successfully');
-    } catch (error) {
-      console.error('Failed to cache maintenance estimate:', error);
-      // Don't throw error - caching failure shouldn't block the user
-    }
-  }, [userReport, updateUserReport]);
 
   const fetchEstimate = useCallback(async (address: string) => {
     if (!address) {
@@ -125,20 +76,16 @@ export const useMaintenanceEstimate = (): UseMaintenanceEstimateReturn => {
       return;
     }
 
+    // Prevent duplicate calls for the same address
+    if (estimate && lastFetchedAddress === address) {
+      console.log('Maintenance estimate already fetched for this address');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
-      // First, check if we have cached data
-      const cachedEstimate = getCachedEstimate(address);
-      if (cachedEstimate) {
-        setEstimate(cachedEstimate);
-        const providers = generateServiceProviders(cachedEstimate);
-        setServiceProviders(providers);
-        setIsLoading(false);
-        return;
-      }
-
       // Generate a default estimate based on property location
       const defaultEstimate: MaintenanceEstimate = {
         monthlyRangeLow: 200,
@@ -148,13 +95,11 @@ export const useMaintenanceEstimate = (): UseMaintenanceEstimateReturn => {
       };
       
       setEstimate(defaultEstimate);
+      setLastFetchedAddress(address);
       
       // Generate service providers based on the estimate
       const providers = generateServiceProviders(defaultEstimate);
       setServiceProviders(providers);
-
-      // Cache the estimate for future use
-      await saveCachedEstimate(address, defaultEstimate);
 
       toast({
         title: "Maintenance estimate loaded",
@@ -178,7 +123,7 @@ export const useMaintenanceEstimate = (): UseMaintenanceEstimateReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [generateServiceProviders, toast, getCachedEstimate, saveCachedEstimate]);
+  }, [generateServiceProviders, toast, estimate, lastFetchedAddress]);
 
   return {
     estimate,
