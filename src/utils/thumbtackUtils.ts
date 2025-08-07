@@ -6,17 +6,24 @@
  * Supports both 5-digit and 5+4 format zip codes
  */
 export const extractZipFromAddress = (address: string): string | null => {
-  if (!address) return null;
+  if (!address) {
+    console.log('extractZipFromAddress: No address provided');
+    return null;
+  }
+  
+  console.log('extractZipFromAddress: Processing address:', address);
   
   // Match 5-digit or 5+4 digit zip codes at the end of the address
   const zipRegex = /\b(\d{5}(?:-\d{4})?)\b(?:\s*$)/;
   const match = address.match(zipRegex);
   
   if (match) {
-    // Return just the 5-digit portion for API compatibility
-    return match[1].substring(0, 5);
+    const zip = match[1].substring(0, 5);
+    console.log('extractZipFromAddress: Extracted zip:', zip);
+    return zip;
   }
   
+  console.log('extractZipFromAddress: No zip code found in address');
   return null;
 };
 

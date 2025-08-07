@@ -82,7 +82,10 @@ const DemoServiceProviders = () => {
 
       <CostSummaryCards costSummary={costSummary} />
       
-      <ServiceProvidersTable providers={serviceProviders} />
+      <ServiceProvidersTable 
+        providers={serviceProviders} 
+        propertyAddress={analysis?.propertyInfo?.address} 
+      />
     </div>
   );
 };
