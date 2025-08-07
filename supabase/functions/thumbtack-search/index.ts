@@ -14,6 +14,7 @@ interface ThumbTackProvider {
   location: string;
   image?: string;
   profileUrl: string;
+  requestFlowUrl?: string;
   phone?: string;
   description?: string;
 }
@@ -155,6 +156,7 @@ serve(async (req) => {
       location: business.businessLocation || `${zip}`,
       image: business.businessImageURL || null,
       profileUrl: business.servicePageURL || `https://www.thumbtack.com/profile/${business.businessID}`,
+      requestFlowUrl: business.requestFlowURL,
       phone: business.phone || null,
       description: business.businessIntroduction || business.featuredReview || null
     }));
@@ -187,6 +189,7 @@ serve(async (req) => {
         reviewCount: 95,
         location: safeZip,
         profileUrl: "https://www.thumbtack.com",
+        requestFlowUrl: "https://www.thumbtack.com/quote",
         description: `Reliable ${safeCategory.toLowerCase()} services in your area`
       },
       {
@@ -195,6 +198,7 @@ serve(async (req) => {
         reviewCount: 143,
         location: safeZip,
         profileUrl: "https://www.thumbtack.com", 
+        requestFlowUrl: "https://www.thumbtack.com/quote",
         description: `Professional ${safeCategory.toLowerCase()} with excellent customer reviews`
       },
       {
@@ -203,6 +207,7 @@ serve(async (req) => {
         reviewCount: 78,
         location: safeZip,
         profileUrl: "https://www.thumbtack.com",
+        requestFlowUrl: "https://www.thumbtack.com/quote",
         description: `Trusted ${safeCategory.toLowerCase()} providers serving your neighborhood`
       }
     ];

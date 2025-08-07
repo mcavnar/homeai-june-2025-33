@@ -13,6 +13,7 @@ interface ThumbTackProvider {
   location: string;
   image?: string;
   profileUrl: string;
+  requestFlowUrl?: string;
   phone?: string;
   description?: string;
 }
@@ -50,8 +51,8 @@ const ProvidersModal: React.FC<ProvidersModalProps> = ({
     );
   };
 
-  const handleViewOnThumbtack = (profileUrl: string) => {
-    window.open(profileUrl, '_blank', 'noopener,noreferrer');
+  const handleGetQuote = (requestFlowUrl: string) => {
+    window.open(requestFlowUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -141,12 +142,12 @@ const ProvidersModal: React.FC<ProvidersModalProps> = ({
                         </Badge>
                         
                         <Button
-                          onClick={() => handleViewOnThumbtack(provider.profileUrl)}
+                          onClick={() => handleGetQuote(provider.requestFlowUrl || provider.profileUrl)}
                           className="bg-orange-500 hover:bg-orange-600 text-white"
                           size="sm"
                         >
                           <ExternalLink className="h-4 w-4 mr-2" />
-                          View on Thumbtack
+                          Get a Quote
                         </Button>
                       </div>
                     </CardContent>
