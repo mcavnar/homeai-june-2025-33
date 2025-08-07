@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -54,6 +54,15 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
 }) => {
   const [providers, setProviders] = useState<ServiceProvider[]>(initialProviders);
   const [openDetails, setOpenDetails] = useState<number | null>(null);
+
+  // Update providers when initialProviders prop changes
+  useEffect(() => {
+    console.log('ServiceProvidersTable: Updating providers from props', { 
+      newLength: initialProviders.length,
+      currentLength: providers.length 
+    });
+    setProviders(initialProviders);
+  }, [initialProviders]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isProvidersModalOpen, setIsProvidersModalOpen] = useState(false);
   const [thumbtackProviders, setThumbTackProviders] = useState<ThumbTackProvider[]>([]);

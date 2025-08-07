@@ -120,7 +120,7 @@ export const useNegotiationStrategy = (
     };
 
     generateNegotiationStrategy();
-  }, [analysis, propertyData, negotiationStrategy, isGeneratingStrategy, hasLoadedFromDatabase, userReport, updateUserReport, toast]);
+  }, [analysis, propertyData, negotiationStrategy, isGeneratingStrategy, hasLoadedFromDatabase, toast]);
 
   const resetStrategy = () => {
     setNegotiationStrategy(null);
