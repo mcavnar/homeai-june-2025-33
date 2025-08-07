@@ -127,29 +127,7 @@ const ServiceProviders = () => {
 
       <CostSummaryCards costSummary={costSummary} estimate={estimate} />
       
-      {/* See Our Recommended Providers Section */}
-      <Card className="border-gray-200">
-        <CardContent className="p-6 text-center">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">
-            Find the Best Service Providers
-          </h3>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
-            We analyze quality ratings, pricing, availability, and local market conditions to match you with the most qualified professionals in your neighborhood.
-          </p>
-          <TrackedButton 
-            variant="green" 
-            size="lg" 
-            className="px-8"
-            onClick={handleRecommendedProvidersClick}
-            trackingLabel="Find Providers"
-          >
-            Find Providers
-          </TrackedButton>
-        </CardContent>
-      </Card>
-
       <ServiceProvidersTable providers={serviceProviders} />
-      <ActionCards />
 
       {config && currentService && (
         <ServiceOptInModal
