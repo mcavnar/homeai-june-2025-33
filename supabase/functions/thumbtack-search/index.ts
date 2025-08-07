@@ -32,19 +32,38 @@ serve(async (req) => {
 
     console.log('Searching Thumbtack for:', { category, zip });
 
-    // Get OAuth2 credentials - using PROD credentials now
-    const clientId = Deno.env.get('THUMBTACK_PROD_CLIENT_ID');
-    const clientSecret = Deno.env.get('THUMBTACK_PROD_CLIENT_SECRET');
+    // Determine environment and get appropriate credentials
+    let clientId, clientSecret, oauthUrl, apiUrl, environment;
+    
+    // Try staging first (recommended for integration), then production
+    const stagingClientId = Deno.env.get('THUMBTACK_DEV_CLIENT_ID');
+    const stagingClientSecret = Deno.env.get('THUMBTACK_DEV_CLIENT_SECRET');
+    const prodClientId = Deno.env.get('THUMBTACK_PROD_CLIENT_ID');
+    const prodClientSecret = Deno.env.get('THUMBTACK_PROD_CLIENT_SECRET');
 
-    if (!clientId || !clientSecret) {
+    if (stagingClientId && stagingClientSecret) {
+      clientId = stagingClientId;
+      clientSecret = stagingClientSecret;
+      oauthUrl = 'https://staging-auth.thumbtack.com/oauth/token';
+      apiUrl = 'https://staging-api.thumbtack.com';
+      environment = 'staging';
+    } else if (prodClientId && prodClientSecret) {
+      clientId = prodClientId;
+      clientSecret = prodClientSecret;
+      oauthUrl = 'https://auth.thumbtack.com/oauth/token';
+      apiUrl = 'https://api.thumbtack.com';
+      environment = 'production';
+    } else {
       console.error('Missing credentials. Available env vars:', Object.keys(Deno.env.toObject()));
-      throw new Error('Thumbtack production credentials not configured');
+      throw new Error('Thumbtack credentials not configured. Need either staging or production credentials.');
     }
 
-    console.log('Using production credentials with clientId:', clientId?.substring(0, 8) + '...');
+    console.log(`Using ${environment} environment with clientId:`, clientId?.substring(0, 8) + '...');
+    console.log(`OAuth URL: ${oauthUrl}`);
+    console.log(`API URL: ${apiUrl}`);
 
     // Step 1: Get access token using OAuth2 client credentials flow
-    const tokenResponse = await fetch('https://pro-api.thumbtack.com/oauth/token', {
+    const tokenResponse = await fetch(oauthUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -86,7 +105,7 @@ serve(async (req) => {
 
     console.log('Creating business search with:', searchRequestBody);
 
-    const searchResponse = await fetch('https://api.thumbtack.com/api/v4/businesses/search', {
+    const searchResponse = await fetch(`${apiUrl}/api/v4/businesses/search`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
