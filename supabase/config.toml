@@ -1,4 +1,8 @@
+
 project_id = "znohkixqcmwifqnqwdoc"
 
 [functions.send-homepage-welcome-email]
+verify_jwt = false
+
+[functions.thumbtack-search]
 verify_jwt = false
