@@ -155,7 +155,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
     setCurrentServiceType(serviceType);
 
     try {
-      console.log('Searching for providers:', { serviceType, zipCode });
+      console.log('Sending to Thumbtack API:', { searchQuery: serviceType, zipCode });
 
       const { data, error } = await supabase.functions.invoke('thumbtack-search', {
         body: {

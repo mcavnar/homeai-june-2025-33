@@ -39,27 +39,40 @@ serve(async (req) => {
 
     console.log('Searching Thumbtack for:', { searchQuery, zipCode });
 
-    // Use development environment for testing
-    const clientId = Deno.env.get('THUMBTACK_DEV_CLIENT_ID');
-    const clientSecret = Deno.env.get('THUMBTACK_DEV_CLIENT_SECRET');
-    const oauthUrl = 'https://staging-auth.thumbtack.com/oauth/token';
-    const apiUrl = 'https://staging-api.thumbtack.com';
+    // Try production environment first, then fallback to development
+    let clientId = Deno.env.get('THUMBTACK_PROD_CLIENT_ID');
+    let clientSecret = Deno.env.get('THUMBTACK_PROD_CLIENT_SECRET');
+    let oauthUrl = 'https://auth.thumbtack.com/oauth/token';
+    let apiUrl = 'https://api.thumbtack.com';
+    
+    if (!clientId || !clientSecret) {
+      // Fallback to development environment
+      clientId = Deno.env.get('THUMBTACK_DEV_CLIENT_ID');
+      clientSecret = Deno.env.get('THUMBTACK_DEV_CLIENT_SECRET');
+      oauthUrl = 'https://staging-auth.thumbtack.com/oauth/token';
+      apiUrl = 'https://staging-api.thumbtack.com';
+      console.log('Using development environment with clientId:', clientId?.substring(0, 8) + '...');
+    } else {
+      console.log('Using production environment with clientId:', clientId?.substring(0, 8) + '...');
+    }
 
     console.log('Environment check:', {
       hasClientId: !!clientId,
       hasClientSecret: !!clientSecret,
       clientIdLength: clientId?.length || 0,
-      clientSecretLength: clientSecret?.length || 0
+      clientSecretLength: clientSecret?.length || 0,
+      oauthUrl,
+      apiUrl
     });
 
     if (!clientId || !clientSecret) {
-      console.log('No development Thumbtack credentials found, returning mock data');
+      console.log('No Thumbtack credentials found, returning mock data');
       const mockProviders: ThumbTackProvider[] = [
         {
           name: "Demo Lawn Care Pro",
           rating: 4.8,
           reviewCount: 127,
-          location: `${zip}`,
+          location: `${zipCode}`,
           profileUrl: "https://www.thumbtack.com",
           description: "Professional lawn care services with 10+ years experience"
         },
@@ -67,7 +80,7 @@ serve(async (req) => {
           name: "Green Thumb Services",
           rating: 4.9,
           reviewCount: 89,
-          location: `${zip}`,
+          location: `${zipCode}`,
           profileUrl: "https://www.thumbtack.com",
           description: "Eco-friendly lawn maintenance and landscaping"
         }
@@ -86,7 +99,6 @@ serve(async (req) => {
       );
     }
 
-    console.log('Using development environment with clientId:', clientId?.substring(0, 8) + '...');
     console.log('OAuth URL:', oauthUrl);
     console.log('API URL:', apiUrl);
 
@@ -117,10 +129,17 @@ serve(async (req) => {
 
     console.log('Token response status:', tokenResponse.status);
     console.log('Token response headers:', Object.fromEntries(tokenResponse.headers.entries()));
+    console.log('Token response URL attempted:', oauthUrl);
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
       console.error('Token request failed:', tokenResponse.status, errorText);
+      console.error('Full response details:', {
+        status: tokenResponse.status,
+        statusText: tokenResponse.statusText,
+        url: tokenResponse.url,
+        headers: Object.fromEntries(tokenResponse.headers.entries())
+      });
       throw new Error(`Failed to get access token: ${tokenResponse.status} - ${errorText}`);
     }
 
@@ -173,7 +192,7 @@ serve(async (req) => {
       name: business.businessName || 'Unknown Provider',
       rating: business.rating || 0,
       reviewCount: business.numberOfReviews || 0,
-      location: business.businessLocation || `${zip}`,
+      location: business.businessLocation || `${zipCode}`,
       image: business.businessImageURL || null,
       profileUrl: business.servicePageURL || `https://www.thumbtack.com/profile/${business.businessID}`,
       requestFlowUrl: business.requestFlowURL,
