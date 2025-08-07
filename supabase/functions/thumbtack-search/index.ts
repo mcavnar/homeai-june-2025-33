@@ -23,8 +23,14 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Declare variables at function scope so they're available in catch block
+  let category: string;
+  let zip: string;
+
   try {
-    const { category, zip } = await req.json();
+    const requestBody = await req.json();
+    category = requestBody.category;
+    zip = requestBody.zip;
     
     if (!category || !zip) {
       throw new Error('Category and zip code are required');
@@ -111,7 +117,7 @@ serve(async (req) => {
     const searchRequestBody = {
       zipCode: zip,
       utmData: {
-        utm_source: 'cma-integration'
+        utm_source: 'cma-fivefourventures'
       },
       searchQuery: category,
       limit: 10
@@ -169,30 +175,35 @@ serve(async (req) => {
     
     // Return mock data as fallback when API fails
     console.log('API failed, returning mock data as fallback');
+    
+    // Add null checks for variables that might be undefined
+    const safeCategory = category || 'Service';
+    const safeZip = zip || '00000';
+    
     const mockProviders: ThumbTackProvider[] = [
       {
-        name: `Professional ${category} Service`,
+        name: `Professional ${safeCategory} Service`,
         rating: 4.7,
         reviewCount: 95,
-        location: `${zip}`,
+        location: safeZip,
         profileUrl: "https://www.thumbtack.com",
-        description: `Reliable ${category.toLowerCase()} services in your area`
+        description: `Reliable ${safeCategory.toLowerCase()} services in your area`
       },
       {
-        name: `Expert ${category} Solutions`,
+        name: `Expert ${safeCategory} Solutions`,
         rating: 4.9,
         reviewCount: 143,
-        location: `${zip}`,
+        location: safeZip,
         profileUrl: "https://www.thumbtack.com", 
-        description: `Professional ${category.toLowerCase()} with excellent customer reviews`
+        description: `Professional ${safeCategory.toLowerCase()} with excellent customer reviews`
       },
       {
-        name: `Local ${category} Specialists`,
+        name: `Local ${safeCategory} Specialists`,
         rating: 4.6,
         reviewCount: 78,
-        location: `${zip}`,
+        location: safeZip,
         profileUrl: "https://www.thumbtack.com",
-        description: `Trusted ${category.toLowerCase()} providers serving your neighborhood`
+        description: `Trusted ${safeCategory.toLowerCase()} providers serving your neighborhood`
       }
     ];
 
