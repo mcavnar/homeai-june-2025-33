@@ -39,14 +39,21 @@ serve(async (req) => {
 
     console.log('Searching Thumbtack for:', { category, zip });
 
-    // Use production environment
-    const clientId = Deno.env.get('THUMBTACK_PROD_CLIENT_ID');
-    const clientSecret = Deno.env.get('THUMBTACK_PROD_CLIENT_SECRET');
-    const oauthUrl = 'https://auth.thumbtack.com/oauth/token';
-    const apiUrl = 'https://api.thumbtack.com';
+    // Use development environment for testing
+    const clientId = Deno.env.get('THUMBTACK_DEV_CLIENT_ID');
+    const clientSecret = Deno.env.get('THUMBTACK_DEV_CLIENT_SECRET');
+    const oauthUrl = 'https://staging-auth.thumbtack.com/oauth/token';
+    const apiUrl = 'https://staging-api.thumbtack.com';
+
+    console.log('Environment check:', {
+      hasClientId: !!clientId,
+      hasClientSecret: !!clientSecret,
+      clientIdLength: clientId?.length || 0,
+      clientSecretLength: clientSecret?.length || 0
+    });
 
     if (!clientId || !clientSecret) {
-      console.log('No production Thumbtack credentials found, returning mock data');
+      console.log('No development Thumbtack credentials found, returning mock data');
       const mockProviders: ThumbTackProvider[] = [
         {
           name: "Demo Lawn Care Pro",
@@ -71,7 +78,7 @@ serve(async (req) => {
           success: true,
           providers: mockProviders,
           total: mockProviders.length,
-          note: "Demo data - Thumbtack production credentials not configured"
+          note: "Demo data - Thumbtack development credentials not configured"
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -79,16 +86,29 @@ serve(async (req) => {
       );
     }
 
-    console.log('Using production environment with clientId:', clientId?.substring(0, 8) + '...');
+    console.log('Using development environment with clientId:', clientId?.substring(0, 8) + '...');
     console.log('OAuth URL:', oauthUrl);
     console.log('API URL:', apiUrl);
 
     // Step 1: Get access token using OAuth2 client credentials flow
+    const authString = `${clientId}:${clientSecret}`;
+    const encodedAuth = btoa(authString);
+    
+    console.log('OAuth request details:', {
+      method: 'POST',
+      url: oauthUrl,
+      authStringLength: authString.length,
+      encodedAuthLength: encodedAuth.length,
+      encodedAuthPreview: encodedAuth.substring(0, 20) + '...',
+      contentType: 'application/x-www-form-urlencoded',
+      grantType: 'client_credentials'
+    });
+
     const tokenResponse = await fetch(oauthUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${btoa(`${clientId}:${clientSecret}`)}`
+        'Authorization': `Basic ${encodedAuth}`
       },
       body: new URLSearchParams({
         'grant_type': 'client_credentials'
