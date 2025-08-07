@@ -42,14 +42,14 @@ serve(async (req) => {
     // Try production environment first, then fallback to development
     let clientId = Deno.env.get('THUMBTACK_PROD_CLIENT_ID');
     let clientSecret = Deno.env.get('THUMBTACK_PROD_CLIENT_SECRET');
-    let oauthUrl = 'https://auth.thumbtack.com/oauth/token';
+    let oauthUrl = 'https://auth.thumbtack.com/oauth2/token';
     let apiUrl = 'https://api.thumbtack.com';
     
     if (!clientId || !clientSecret) {
       // Fallback to development environment
       clientId = Deno.env.get('THUMBTACK_DEV_CLIENT_ID');
       clientSecret = Deno.env.get('THUMBTACK_DEV_CLIENT_SECRET');
-      oauthUrl = 'https://staging-auth.thumbtack.com/oauth/token';
+      oauthUrl = 'https://staging-auth.thumbtack.com/oauth2/token';
       apiUrl = 'https://staging-api.thumbtack.com';
       console.log('Using development environment with clientId:', clientId?.substring(0, 8) + '...');
     } else {
