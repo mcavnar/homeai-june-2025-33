@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 interface MaintenanceEstimate {
@@ -34,7 +34,7 @@ export const useMaintenanceEstimate = (): UseMaintenanceEstimateReturn => {
   const [serviceProviders, setServiceProviders] = useState<ServiceProvider[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastFetchedAddress, setLastFetchedAddress] = useState<string>('');
+  const lastFetchedAddress = useRef<string>('');
   const { toast } = useToast();
 
   const generateServiceProviders = useCallback((estimate: MaintenanceEstimate): ServiceProvider[] => {
@@ -77,7 +77,7 @@ export const useMaintenanceEstimate = (): UseMaintenanceEstimateReturn => {
     }
 
     // Prevent duplicate calls for the same address
-    if (estimate && lastFetchedAddress === address) {
+    if (estimate && lastFetchedAddress.current === address) {
       console.log('Maintenance estimate already fetched for this address');
       return;
     }
@@ -95,7 +95,7 @@ export const useMaintenanceEstimate = (): UseMaintenanceEstimateReturn => {
       };
       
       setEstimate(defaultEstimate);
-      setLastFetchedAddress(address);
+      lastFetchedAddress.current = address;
       
       // Generate service providers based on the estimate
       const providers = generateServiceProviders(defaultEstimate);
@@ -123,7 +123,7 @@ export const useMaintenanceEstimate = (): UseMaintenanceEstimateReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [generateServiceProviders, toast, estimate, lastFetchedAddress]);
+  }, [generateServiceProviders, toast]);
 
   return {
     estimate,
