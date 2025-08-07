@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { TrackedButton } from '@/components/TrackedButton';
+import { useGoogleAnalytics } from '@/hooks/useGoogleAnalytics';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -87,6 +89,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const isDemoModeActive = isDemoMode(location.pathname);
+  const { trackEvent } = useGoogleAnalytics();
 
   const handleAddProviderClick = () => {
     if (isDemoModeActive) {
@@ -139,6 +142,16 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
 
   const handleGetProviders = async (serviceType: string) => {
     console.log('Get providers clicked for:', serviceType);
+    
+    // Track Google Analytics event
+    trackEvent('get_provider_click', {
+      event_category: 'engagement',
+      event_label: serviceType,
+      value: 1,
+      service_type: serviceType,
+      is_demo: isDemoModeActive,
+      has_property_address: !!propertyAddress
+    });
     
     // Determine zip code based on mode
     let zipCode: string | null = null;
@@ -293,10 +306,11 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
                       {formatProviderCost(provider.annualCost, isPlaceholderProvider(provider))}
                     </TableCell>
                     <TableCell className="text-center">
-                      <Button 
+                      <TrackedButton 
                         onClick={() => handleGetProviders(provider.serviceType)}
                         className="bg-blue-600 hover:bg-blue-700 text-white"
                         disabled={loadingServiceType === provider.serviceType}
+                        trackingLabel={`Get ${provider.serviceType} Provider`}
                       >
                         {loadingServiceType === provider.serviceType ? (
                           <div className="flex items-center">
@@ -306,7 +320,7 @@ const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
                         ) : (
                           'Get Provider'
                         )}
-                      </Button>
+                      </TrackedButton>
                     </TableCell>
                   </TableRow>
                   
