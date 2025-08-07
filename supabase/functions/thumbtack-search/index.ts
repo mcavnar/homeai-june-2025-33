@@ -32,32 +32,14 @@ serve(async (req) => {
 
     console.log('Searching Thumbtack for:', { category, zip });
 
-    // Determine environment and get appropriate credentials - prioritize production
-    let clientId, clientSecret, oauthUrl, apiUrl, environment;
-    
-    // Try production first (more stable), then staging as fallback
-    const prodClientId = Deno.env.get('THUMBTACK_PROD_CLIENT_ID');
-    const prodClientSecret = Deno.env.get('THUMBTACK_PROD_CLIENT_SECRET');
-    const stagingClientId = Deno.env.get('THUMBTACK_DEV_CLIENT_ID');
-    const stagingClientSecret = Deno.env.get('THUMBTACK_DEV_CLIENT_SECRET');
+    // Use staging environment only
+    const clientId = Deno.env.get('THUMBTACK_DEV_CLIENT_ID');
+    const clientSecret = Deno.env.get('THUMBTACK_DEV_CLIENT_SECRET');
+    const oauthUrl = 'https://staging-auth.thumbtack.com/oauth/token';
+    const apiUrl = 'https://staging-api.thumbtack.com';
 
-    if (prodClientId && prodClientSecret) {
-      clientId = prodClientId;
-      clientSecret = prodClientSecret;
-      oauthUrl = 'https://auth.thumbtack.com/oauth/token';
-      apiUrl = 'https://api.thumbtack.com';
-      environment = 'production';
-    } else if (stagingClientId && stagingClientSecret) {
-      clientId = stagingClientId;
-      clientSecret = stagingClientSecret;
-      oauthUrl = 'https://staging-auth.thumbtack.com/oauth/token';
-      apiUrl = 'https://staging-api.thumbtack.com';
-      environment = 'staging';
-    } else {
-      console.error('Missing credentials. Available env vars:', Object.keys(Deno.env.toObject()));
-      
-      // Return mock data if no credentials available
-      console.log('No Thumbtack credentials found, returning mock data');
+    if (!clientId || !clientSecret) {
+      console.log('No staging Thumbtack credentials found, returning mock data');
       const mockProviders: ThumbTackProvider[] = [
         {
           name: "Demo Lawn Care Pro",
@@ -82,7 +64,7 @@ serve(async (req) => {
           success: true,
           providers: mockProviders,
           total: mockProviders.length,
-          note: "Demo data - Thumbtack credentials not configured"
+          note: "Demo data - Thumbtack staging credentials not configured"
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -90,9 +72,9 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Using ${environment} environment with clientId:`, clientId?.substring(0, 8) + '...');
-    console.log(`OAuth URL: ${oauthUrl}`);
-    console.log(`API URL: ${apiUrl}`);
+    console.log('Using staging environment with clientId:', clientId?.substring(0, 8) + '...');
+    console.log('OAuth URL:', oauthUrl);
+    console.log('API URL:', apiUrl);
 
     // Step 1: Get access token using OAuth2 client credentials flow
     const tokenResponse = await fetch(oauthUrl, {
