@@ -32,13 +32,16 @@ serve(async (req) => {
 
     console.log('Searching Thumbtack for:', { category, zip });
 
-    // Get OAuth2 credentials
-    const clientId = Deno.env.get('THUMBTACK_DEV_CLIENT_ID');
-    const clientSecret = Deno.env.get('THUMBTACK_DEV_CLIENT_SECRET');
+    // Get OAuth2 credentials - using PROD credentials now
+    const clientId = Deno.env.get('THUMBTACK_PROD_CLIENT_ID');
+    const clientSecret = Deno.env.get('THUMBTACK_PROD_CLIENT_SECRET');
 
     if (!clientId || !clientSecret) {
-      throw new Error('Thumbtack credentials not configured');
+      console.error('Missing credentials. Available env vars:', Object.keys(Deno.env.toObject()));
+      throw new Error('Thumbtack production credentials not configured');
     }
+
+    console.log('Using production credentials with clientId:', clientId?.substring(0, 8) + '...');
 
     // Step 1: Get access token using OAuth2 client credentials flow
     const tokenResponse = await fetch('https://pro-api.thumbtack.com/oauth/token', {
@@ -52,16 +55,20 @@ serve(async (req) => {
       })
     });
 
+    console.log('Token response status:', tokenResponse.status);
+    console.log('Token response headers:', Object.fromEntries(tokenResponse.headers.entries()));
+
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
-      console.error('Token request failed:', errorText);
-      throw new Error(`Failed to get access token: ${tokenResponse.status}`);
+      console.error('Token request failed:', tokenResponse.status, errorText);
+      throw new Error(`Failed to get access token: ${tokenResponse.status} - ${errorText}`);
     }
 
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
 
     if (!accessToken) {
+      console.error('Token response data:', tokenData);
       throw new Error('No access token received from Thumbtack');
     }
 
@@ -88,9 +95,12 @@ serve(async (req) => {
       body: JSON.stringify(searchRequestBody)
     });
 
+    console.log('Search response status:', searchResponse.status);
+    console.log('Search response headers:', Object.fromEntries(searchResponse.headers.entries()));
+
     if (!searchResponse.ok) {
       const errorText = await searchResponse.text();
-      console.error('Search request failed:', errorText);
+      console.error('Search request failed:', searchResponse.status, errorText);
       throw new Error(`Search request failed: ${searchResponse.status} - ${errorText}`);
     }
 
