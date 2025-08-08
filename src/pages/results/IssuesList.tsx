@@ -6,7 +6,7 @@ import { formatCurrency } from '@/utils/formatters';
 import DetailedFindings from '@/components/DetailedFindings';
 import ProvidersModal from '@/components/ServiceProviders/ProvidersModal';
 import { supabase } from '@/integrations/supabase/client';
-import { extractZipFromAddress, getDemoZipCode, isDemoMode } from '@/utils/thumbtackUtils';
+import { extractZipFromAddress, getDemoZipCode, isDemoMode, generateThumbTackSearchQuery } from '@/utils/thumbtackUtils';
 import { useGoogleAnalytics } from '@/hooks/useGoogleAnalytics';
 import { useToast } from '@/hooks/use-toast';
 
@@ -141,15 +141,19 @@ const IssuesList = () => {
       setProvidersError('');
       setProviders([]);
 
+      // Generate optimized search query
+      const searchQuery = generateThumbTackSearchQuery(issue);
+      
       // Call thumbtack-search edge function
       console.log('Calling thumbtack-search with:', {
-        searchQuery: issue.description,
+        originalDescription: issue.description,
+        processedSearchQuery: searchQuery,
         zipCode: zipCode
       });
 
       const { data, error } = await supabase.functions.invoke('thumbtack-search', {
         body: {
-          searchQuery: issue.description,
+          searchQuery: searchQuery,
           zipCode: zipCode,
         },
       });

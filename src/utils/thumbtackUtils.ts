@@ -60,3 +60,29 @@ export const getThumbTackCategoryId = (serviceType: string): string => {
 export const isDemoMode = (pathname: string): boolean => {
   return pathname.includes('/demo/');
 };
+
+/**
+ * Generate Thumbtack search query from issue category and description
+ * Maps generic categories to Handyman services and truncates to 64 character limit
+ */
+export const generateThumbTackSearchQuery = (issue: { category: string; description: string }): string => {
+  // Map generic categories to Handyman services
+  const categoryMap: Record<string, string> = {
+    "Interior": "Interior Handyman",
+    "Exterior": "Exterior Handyman", 
+    "Safety": "Safety Handyman"
+  };
+
+  // Use mapped category or original category
+  const category = categoryMap[issue.category] || issue.category;
+  
+  // Format as "{Category}. {description}"
+  const fullQuery = `${category}. ${issue.description}`;
+  
+  // Truncate to exactly 64 characters if needed
+  if (fullQuery.length <= 64) {
+    return fullQuery;
+  }
+  
+  return fullQuery.substring(0, 64);
+};

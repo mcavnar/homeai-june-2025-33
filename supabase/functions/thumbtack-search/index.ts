@@ -37,7 +37,12 @@ serve(async (req) => {
       throw new Error('Search query and zip code are required');
     }
 
-    console.log('Searching Thumbtack for:', { searchQuery, zipCode });
+    console.log('Searching Thumbtack for:', { 
+      searchQuery, 
+      zipCode,
+      queryLength: searchQuery.length,
+      withinLimit: searchQuery.length <= 64
+    });
 
     // Use production environment as primary
     let clientId = Deno.env.get('THUMBTACK_PROD_CLIENT_ID');
