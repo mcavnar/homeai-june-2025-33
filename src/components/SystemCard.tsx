@@ -91,12 +91,12 @@ const SystemCard: React.FC<SystemCardProps> = ({
 
   const getSearchQuery = (type: string): string => {
     switch (type) {
-      case 'hvac': return 'HVAC experts';
-      case 'roofing': return 'Roof experts';
-      case 'plumbing': return 'Plumbing experts';
-      case 'electrical': return 'Electrical experts';
-      case 'recommended_providers': return 'Foundation experts';
-      default: return 'Home experts';
+      case 'hvac': return 'HVAC Experts';
+      case 'roofing': return 'Roof Experts';
+      case 'plumbing': return 'Plumbing Experts';
+      case 'electrical': return 'Electrical Experts';
+      case 'recommended_providers': return 'Foundation Experts';
+      default: return 'Home Experts';
     }
   };
 
