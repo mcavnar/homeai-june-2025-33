@@ -143,9 +143,11 @@ const ProvidersModal: React.FC<ProvidersModalProps> = ({
                       )}
 
                       <div className="flex items-center justify-between">
-                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                          {serviceType}
-                        </Badge>
+                        {variant !== 'issues-table' && (
+                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                            {serviceType}
+                          </Badge>
+                        )}
                         
                         <Button
                           onClick={() => handleGetQuote(provider.requestFlowUrl || provider.profileUrl)}
