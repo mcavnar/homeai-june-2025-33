@@ -152,6 +152,15 @@ const IssuesList: React.FC<IssuesListProps> = ({ issues }) => {
     document.body.removeChild(link);
   };
 
+  const handleGetExpertOpinion = (issue: InspectionIssue) => {
+    // Placeholder handler - user will provide functionality later
+    console.log('Get Expert Opinion clicked for issue:', issue);
+    toast({
+      title: "Expert Opinion Requested",
+      description: `Request submitted for ${issue.description.substring(0, 50)}...`,
+    });
+  };
+
   const handleClearFilters = () => {
     setSeverityFilter('all');
     setTypeFilter('all');
@@ -194,6 +203,7 @@ const IssuesList: React.FC<IssuesListProps> = ({ issues }) => {
               isQuoteExpanded={expandedQuotes.has(index)}
               onToggleQuote={toggleQuoteExpansion}
               onSeeInReport={handleSeeInReport}
+              onGetExpertOpinion={handleGetExpertOpinion}
             />
           ))}
         </div>

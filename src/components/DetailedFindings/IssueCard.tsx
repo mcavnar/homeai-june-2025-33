@@ -16,6 +16,7 @@ interface IssueCardProps {
   isQuoteExpanded: boolean;
   onToggleQuote: (index: number) => void;
   onSeeInReport: (issue: InspectionIssue) => void;
+  onGetExpertOpinion: (issue: InspectionIssue) => void;
 }
 
 const IssueCard: React.FC<IssueCardProps> = ({
@@ -24,6 +25,7 @@ const IssueCard: React.FC<IssueCardProps> = ({
   isQuoteExpanded,
   onToggleQuote,
   onSeeInReport,
+  onGetExpertOpinion,
 }) => {
   // Debug logging to trace sourceQuote data
   console.log(`IssueCard ${index} - Full issue object:`, issue);
@@ -67,6 +69,49 @@ const IssueCard: React.FC<IssueCardProps> = ({
             </p>
           </div>
           <TrackedButton
+            onClick={() => onGetExpertOpinion(issue)}
+            variant="green"
+            size="sm"
+            trackingLabel={`Get Expert Opinion - ${issue.category}: ${issue.description.slice(0, 30)}...`}
+          >
+            Get Expert Opinion
+          </TrackedButton>
+        </div>
+      </div>
+      <h4 className="font-semibold text-gray-900 mb-1">{issue.description}</h4>
+      <p className="text-sm text-gray-600 flex items-center gap-1 mb-3">
+        <MapPin className="h-3 w-3" />
+        {issue.location}
+      </p>
+
+      {/* Bottom Section - Inspector's Notes and See in Report */}
+      <div className="flex justify-between items-start">
+        {/* Source Quote Section */}
+        {issue.sourceQuote && (
+          <div className="flex-1">
+            <Collapsible 
+              open={isQuoteExpanded} 
+              onOpenChange={() => onToggleQuote(index)}
+            >
+              <CollapsibleTrigger className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                <span>View Inspector's Notes</span>
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isQuoteExpanded ? 'transform rotate-180' : ''}`} />
+              </CollapsibleTrigger>
+              
+              <CollapsibleContent className="mt-3">
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <p className="text-sm text-blue-800 italic leading-relaxed">
+                    "{issue.sourceQuote}"
+                  </p>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+        )}
+        
+        {/* See in Report Button */}
+        <div className="flex-shrink-0 ml-4">
+          <TrackedButton
             onClick={() => onSeeInReport(issue)}
             variant="outline"
             size="sm"
@@ -78,32 +123,6 @@ const IssueCard: React.FC<IssueCardProps> = ({
           </TrackedButton>
         </div>
       </div>
-      <h4 className="font-semibold text-gray-900 mb-1">{issue.description}</h4>
-      <p className="text-sm text-gray-600 flex items-center gap-1 mb-3">
-        <MapPin className="h-3 w-3" />
-        {issue.location}
-      </p>
-
-      {/* Source Quote Section */}
-      {issue.sourceQuote && (
-        <Collapsible 
-          open={isQuoteExpanded} 
-          onOpenChange={() => onToggleQuote(index)}
-        >
-          <CollapsibleTrigger className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 transition-colors">
-            <span>View Inspector's Notes</span>
-            <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isQuoteExpanded ? 'transform rotate-180' : ''}`} />
-          </CollapsibleTrigger>
-          
-          <CollapsibleContent className="mt-3">
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
-              <p className="text-sm text-blue-800 italic leading-relaxed">
-                "{issue.sourceQuote}"
-              </p>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-      )}
     </div>
   );
 };
