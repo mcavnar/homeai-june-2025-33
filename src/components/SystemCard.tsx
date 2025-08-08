@@ -241,6 +241,7 @@ const SystemCard: React.FC<SystemCardProps> = ({
         serviceType={getSearchQuery(ctaType)}
         isLoading={isLoadingProviders}
         error={providersError}
+        variant="system-card"
       />
     </>
   );

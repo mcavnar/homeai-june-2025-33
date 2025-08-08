@@ -25,6 +25,7 @@ interface ProvidersModalProps {
   serviceType: string;
   isLoading: boolean;
   error?: string;
+  variant?: 'service-table' | 'system-card';
 }
 
 const ProvidersModal: React.FC<ProvidersModalProps> = ({
@@ -33,7 +34,8 @@ const ProvidersModal: React.FC<ProvidersModalProps> = ({
   providers,
   serviceType,
   isLoading,
-  error
+  error,
+  variant = 'service-table'
 }) => {
   const renderRating = (rating: number, reviewCount: number) => {
     if (!rating || rating === 0) {
@@ -60,7 +62,7 @@ const ProvidersModal: React.FC<ProvidersModalProps> = ({
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
-            {serviceType} Providers Near You
+            {variant === 'system-card' ? `${serviceType} Near You` : `${serviceType} Providers Near You`}
           </DialogTitle>
         </DialogHeader>
 
@@ -93,7 +95,7 @@ const ProvidersModal: React.FC<ProvidersModalProps> = ({
           {!isLoading && !error && providers.length > 0 && (
             <div className="space-y-4">
               <p className="text-gray-600 mb-4">
-                We recommend these {providers.length} {serviceType.toLowerCase()} providers for your property.
+                We recommend these {providers.length} {serviceType.toLowerCase()}{variant === 'service-table' ? ' providers' : ''} for your property.
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
