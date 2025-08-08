@@ -12,6 +12,9 @@ const DemoKeySystems = () => {
   const { analysis } = useOutletContext<DemoKeySystemsContextType>();
   const navigate = useNavigate();
 
+  // Use demo property address for consistency
+  const demoPropertyAddress = "123 Demo Street, Springfield, IL 62704";
+
   const handleUploadReport = () => {
     navigate('/anonymous-upload');
   };
@@ -26,7 +29,7 @@ const DemoKeySystems = () => {
         </div>
       </div>
 
-      <MajorSystems systems={analysis.majorSystems} />
+      <MajorSystems systems={analysis.majorSystems} propertyAddress={demoPropertyAddress} />
 
       {/* Upload Report Button */}
       <div className="flex justify-center">

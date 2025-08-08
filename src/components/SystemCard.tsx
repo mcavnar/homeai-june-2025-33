@@ -1,15 +1,29 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { useServiceOptIn } from '@/hooks/useServiceOptIn';
-import ServiceOptInModal from '@/components/ServiceOptInModal';
-import { ServiceType } from '@/hooks/useServiceOptIn';
+import { useGoogleAnalytics } from '@/hooks/useGoogleAnalytics';
+import { useToast } from '@/hooks/use-toast';
+import ProvidersModal from '@/components/ServiceProviders/ProvidersModal';
+import { extractZipFromAddress, getDemoZipCode, isDemoMode } from '@/utils/thumbtackUtils';
+import { supabase } from '@/integrations/supabase/client';
 import SystemHeader from './SystemCard/SystemHeader';
 import SystemSpecs from './SystemCard/SystemSpecs';
 import SystemDetails from './SystemCard/SystemDetails';
 import SystemCTA from './SystemCard/SystemCTA';
+
+interface ThumbTackProvider {
+  name: string;
+  rating: number;
+  reviewCount: number;
+  location: string;
+  image?: string;
+  profileUrl: string;
+  requestFlowUrl?: string;
+  phone?: string;
+  description?: string;
+}
 
 interface SystemCardProps {
   title: string;
@@ -22,6 +36,7 @@ interface SystemCardProps {
   maintenanceTips?: string[];
   ctaText: string;
   ctaType: 'hvac' | 'roofing' | 'plumbing' | 'electrical' | 'recommended_providers';
+  propertyAddress?: string;
   // Additional props for detailed information
   age?: string;
   yearsLeft?: string;
@@ -54,6 +69,7 @@ const SystemCard: React.FC<SystemCardProps> = ({
   maintenanceTips,
   ctaText,
   ctaType,
+  propertyAddress,
   age,
   yearsLeft,
   type,
@@ -63,45 +79,109 @@ const SystemCard: React.FC<SystemCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isDemoMode = location.pathname.includes('/demo/');
+  const isDemoModeActive = isDemoMode(location.pathname);
+  const { trackEvent } = useGoogleAnalytics();
+  const { toast } = useToast();
 
-  const {
-    isModalOpen,
-    openOptInModal,
-    closeModal,
-    confirmOptIn,
-    currentService,
-    getCurrentServiceConfig
-  } = useServiceOptIn();
+  // Provider search state
+  const [isProvidersModalOpen, setIsProvidersModalOpen] = useState(false);
+  const [thumbtackProviders, setThumbTackProviders] = useState<ThumbTackProvider[]>([]);
+  const [isLoadingProviders, setIsLoadingProviders] = useState(false);
+  const [providersError, setProvidersError] = useState<string>('');
 
-  const getServiceType = (type: string): ServiceType => {
+  const getSearchQuery = (type: string): string => {
     switch (type) {
-      case 'hvac':
-        return 'hvac_technicians';
-      case 'roofing':
-        return 'roofing_experts';
-      case 'plumbing':
-        return 'plumbers';
-      case 'electrical':
-        return 'electricians';
-      case 'recommended_providers':
-        return 'recommended_providers';
-      default:
-        return 'recommended_providers';
+      case 'hvac': return 'HVAC experts';
+      case 'roofing': return 'Roof experts';
+      case 'plumbing': return 'Plumbing experts';
+      case 'electrical': return 'Electrical experts';
+      case 'recommended_providers': return 'Foundation experts';
+      default: return 'Home experts';
+    }
+  };
+
+  const handleGetProviders = async () => {
+    console.log('Get providers clicked for:', ctaType);
+    
+    // Track Google Analytics event
+    trackEvent('system_cta_click', {
+      event_category: 'engagement',
+      event_label: ctaType,
+      value: 1,
+      service_type: ctaType,
+      is_demo: isDemoModeActive,
+      has_property_address: !!propertyAddress
+    });
+    
+    // Determine zip code based on mode
+    let zipCode: string | null = null;
+    
+    if (isDemoModeActive) {
+      zipCode = getDemoZipCode();
+      console.log('Demo mode: Using demo zip code:', zipCode);
+    } else if (propertyAddress) {
+      zipCode = extractZipFromAddress(propertyAddress);
+      console.log('Extracted zip code from property address:', zipCode);
+    }
+
+    if (!zipCode) {
+      toast({
+        title: "Location required",
+        description: "We need your property address to find local providers.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const searchQuery = getSearchQuery(ctaType);
+    console.log('Searching for providers:', { searchQuery, zipCode });
+
+    setIsLoadingProviders(true);
+    setProvidersError('');
+    setIsProvidersModalOpen(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('thumbtack-search', {
+        body: { searchQuery, zipCode }
+      });
+
+      if (error) {
+        console.error('Thumbtack search error:', error);
+        throw new Error(error.message || 'Failed to search for providers');
+      }
+
+      console.log('Thumbtack search results:', data);
+      setThumbTackProviders(data.providers || []);
+      
+      if (data.providers && data.providers.length > 0) {
+        toast({
+          title: "Providers found!",
+          description: `Found ${data.providers.length} ${searchQuery.toLowerCase()} in your area.`,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching providers:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to find providers';
+      setProvidersError(errorMessage);
+      
+      toast({
+        title: "Search failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingProviders(false);
     }
   };
 
   const handleCTAClick = () => {
-    if (isDemoMode) {
+    if (isDemoModeActive) {
       navigate('/auth');
       return;
     }
 
-    const serviceType = getServiceType(ctaType);
-    openOptInModal(serviceType);
+    handleGetProviders();
   };
-
-  const config = getCurrentServiceConfig();
 
   // Check if we have detailed information to show
   const hasDetailedInfo = description || repairCost || maintenanceTips || maintenanceCosts || anticipatedRepairs;
@@ -154,16 +234,14 @@ const SystemCard: React.FC<SystemCardProps> = ({
         </CardContent>
       </Card>
 
-      {config && currentService && !isDemoMode && (
-        <ServiceOptInModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          serviceType={currentService}
-          title={config.title}
-          description={config.description}
-          onConfirm={confirmOptIn}
-        />
-      )}
+      <ProvidersModal
+        isOpen={isProvidersModalOpen}
+        onClose={() => setIsProvidersModalOpen(false)}
+        providers={thumbtackProviders}
+        serviceType={getSearchQuery(ctaType)}
+        isLoading={isLoadingProviders}
+        error={providersError}
+      />
     </>
   );
 };

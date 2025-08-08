@@ -7,9 +7,10 @@ import { type MajorSystems } from '@/types/inspection';
 
 interface MajorSystemsProps {
   systems: MajorSystems;
+  propertyAddress?: string;
 }
 
-const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
+const MajorSystems: React.FC<MajorSystemsProps> = ({ systems, propertyAddress }) => {
   // Calculate total costs from all systems
   const calculateTotalCosts = () => {
     let fiveYear = { min: 0, max: 0 };
@@ -43,6 +44,7 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
       maintenanceTips: system.maintenanceTips,
       ctaText: `See Local ${key.charAt(0).toUpperCase() + key.slice(1)} Experts`,
       ctaType: key.toLowerCase() as 'hvac' | 'roofing' | 'plumbing' | 'electrical',
+      propertyAddress,
       // Pass detailed system information
       age: system.age,
       yearsLeft: system.yearsLeft,
@@ -99,6 +101,7 @@ const MajorSystems: React.FC<MajorSystemsProps> = ({ systems }) => {
               {...mapSystemToCardProps('foundation', systems.foundation)}
               ctaType="recommended_providers"
               ctaText="See Local Foundation Experts"
+              propertyAddress={propertyAddress}
             />
           )}
         </div>

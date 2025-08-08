@@ -5,10 +5,35 @@ import MajorSystems from '@/components/MajorSystems';
 
 interface KeySystemsContextType {
   analysis: any;
+  propertyData?: any;
 }
 
 const KeySystems = () => {
-  const { analysis } = useOutletContext<KeySystemsContextType>();
+  const { analysis, propertyData } = useOutletContext<KeySystemsContextType>();
+  
+  // Extract property address from various sources
+  const extractPropertyAddress = (): string | undefined => {
+    // Try property data first
+    if (propertyData?.address) return propertyData.address;
+    
+    // Try analysis data
+    const addressFields = [
+      analysis?.propertyInfo?.address,
+      analysis?.address,
+      analysis?.property?.address,
+      analysis?.propertyDetails?.address,
+      analysis?.location?.address,
+    ];
+
+    for (const address of addressFields) {
+      if (address && typeof address === 'string') {
+        return address;
+      }
+    }
+    return undefined;
+  };
+
+  const propertyAddress = extractPropertyAddress();
 
   if (!analysis.majorSystems) {
     return (
@@ -38,7 +63,7 @@ const KeySystems = () => {
         </div>
       </div>
 
-      <MajorSystems systems={analysis.majorSystems} />
+      <MajorSystems systems={analysis.majorSystems} propertyAddress={propertyAddress} />
     </div>
   );
 };
