@@ -7,9 +7,10 @@ import IssuesList from './DetailedFindings/IssuesList';
 
 interface DetailedFindingsProps {
   issues: InspectionIssue[];
+  onGetExpertOpinion?: (issue: InspectionIssue) => void;
 }
 
-const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
+const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues, onGetExpertOpinion }) => {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
 
   return (
@@ -21,7 +22,7 @@ const DetailedFindings: React.FC<DetailedFindingsProps> = ({ issues }) => {
         />
         
         <div className="mt-6">
-          <IssuesList issues={issues} />
+          <IssuesList issues={issues} onGetExpertOpinion={onGetExpertOpinion} />
         </div>
       </CardContent>
     </Card>

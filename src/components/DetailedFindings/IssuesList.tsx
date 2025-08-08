@@ -8,9 +8,13 @@ import IssueCard from './IssueCard';
 
 interface IssuesListProps {
   issues: InspectionIssue[];
+  onGetExpertOpinion?: (issue: InspectionIssue) => void;
 }
 
-const IssuesList: React.FC<IssuesListProps> = ({ issues }) => {
+const IssuesList: React.FC<IssuesListProps> = ({ 
+  issues,
+  onGetExpertOpinion,
+}) => {
   // Debug logging to trace issues data
   console.log('IssuesList - Raw issues array:', issues);
   console.log('IssuesList - Issues count:', issues?.length || 0);
@@ -153,12 +157,15 @@ const IssuesList: React.FC<IssuesListProps> = ({ issues }) => {
   };
 
   const handleGetExpertOpinion = (issue: InspectionIssue) => {
-    // Placeholder handler - user will provide functionality later
-    console.log('Get Expert Opinion clicked for issue:', issue);
-    toast({
-      title: "Expert Opinion Requested",
-      description: `Request submitted for ${issue.description.substring(0, 50)}...`,
-    });
+    if (onGetExpertOpinion) {
+      onGetExpertOpinion(issue);
+    } else {
+      // Fallback toast if no handler provided
+      toast({
+        title: "Expert Opinion Requested",
+        description: `Request submitted for ${issue.description.substring(0, 50)}...`,
+      });
+    }
   };
 
   const handleClearFilters = () => {

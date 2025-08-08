@@ -1,16 +1,44 @@
 
-import React from 'react';
-import { useOutletContext } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useOutletContext, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatCurrency } from '@/utils/formatters';
 import DetailedFindings from '@/components/DetailedFindings';
+import ProvidersModal from '@/components/ServiceProviders/ProvidersModal';
+import { supabase } from '@/integrations/supabase/client';
+import { extractZipFromAddress, getDemoZipCode, isDemoMode } from '@/utils/thumbtackUtils';
+import { useGoogleAnalytics } from '@/hooks/useGoogleAnalytics';
+import { useToast } from '@/hooks/use-toast';
+
+interface ThumbTackProvider {
+  name: string;
+  rating: number;
+  reviewCount: number;
+  location: string;
+  image?: string;
+  profileUrl: string;
+  requestFlowUrl?: string;
+  phone?: string;
+  description?: string;
+}
 
 interface IssuesListContextType {
   analysis: any;
+  propertyData: any;
 }
 
 const IssuesList = () => {
-  const { analysis } = useOutletContext<IssuesListContextType>();
+  const { analysis, propertyData } = useOutletContext<IssuesListContextType>();
+  const location = useLocation();
+  const { trackEvent } = useGoogleAnalytics();
+  const { toast } = useToast();
+
+  // Modal state for expert opinion providers
+  const [isProvidersModalOpen, setIsProvidersModalOpen] = useState(false);
+  const [providers, setProviders] = useState<ThumbTackProvider[]>([]);
+  const [isLoadingProviders, setIsLoadingProviders] = useState(false);
+  const [providersError, setProvidersError] = useState<string>('');
+  const [currentIssueDescription, setCurrentIssueDescription] = useState<string>('');
 
   // Debug logging to trace analysis data at page level
   console.log('IssuesList Page - Full analysis object:', analysis);
@@ -62,6 +90,105 @@ const IssuesList = () => {
   };
 
   const priorityStats = getPriorityStats();
+
+  // Handle Get Expert Opinion functionality
+  const handleGetExpertOpinion = async (issue: any) => {
+    console.log('Get Expert Opinion clicked for issue:', issue);
+    
+    try {
+      // Track analytics event
+      trackEvent('expert_opinion_requested', {
+        event_category: 'engagement',
+        event_label: `${issue.category}: ${issue.description.slice(0, 50)}...`,
+        issue_category: issue.category,
+        issue_priority: issue.priority
+      });
+
+      // Extract property address and zip code
+      const propertyAddress = propertyData?.address || analysis?.propertyInfo?.address;
+      console.log('Property address for zip extraction:', propertyAddress);
+      
+      let zipCode = '';
+      if (isDemoMode(location.pathname)) {
+        zipCode = getDemoZipCode();
+        console.log('Using demo zip code:', zipCode);
+      } else if (propertyAddress) {
+        const extractedZip = extractZipFromAddress(propertyAddress);
+        if (extractedZip) {
+          zipCode = extractedZip;
+          console.log('Extracted zip code:', zipCode);
+        } else {
+          toast({
+            title: "Address Error",
+            description: "Could not determine location for provider search.",
+            variant: "destructive",
+          });
+          return;
+        }
+      } else {
+        toast({
+          title: "Address Error", 
+          description: "Property address not available for provider search.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Set up modal state
+      setCurrentIssueDescription(issue.description);
+      setIsProvidersModalOpen(true);
+      setIsLoadingProviders(true);
+      setProvidersError('');
+      setProviders([]);
+
+      // Call thumbtack-search edge function
+      console.log('Calling thumbtack-search with:', {
+        searchQuery: issue.description,
+        zipCode: zipCode
+      });
+
+      const { data, error } = await supabase.functions.invoke('thumbtack-search', {
+        body: {
+          searchQuery: issue.description,
+          zipCode: zipCode,
+        },
+      });
+
+      if (error) {
+        console.error('Thumbtack search error:', error);
+        setProvidersError('Failed to find providers. Please try again later.');
+        toast({
+          title: "Search Failed",
+          description: "Could not find providers at this time.",
+          variant: "destructive",
+        });
+      } else if (data?.providers) {
+        console.log('Thumbtack search successful:', data.providers);
+        setProviders(data.providers);
+        toast({
+          title: "Providers Found",
+          description: `Found ${data.providers.length} providers for your issue.`,
+        });
+      } else {
+        console.log('No providers found in response:', data);
+        setProviders([]);
+        toast({
+          title: "No Providers Found",
+          description: "No providers available for this service in your area.",
+        });
+      }
+    } catch (error) {
+      console.error('Error getting expert opinion:', error);
+      setProvidersError('An unexpected error occurred. Please try again.');
+      toast({
+        title: "Error",
+        description: "Failed to search for providers. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingProviders(false);
+    }
+  };
 
   if (!analysis.issues || analysis.issues.length === 0) {
     return (
@@ -157,7 +284,21 @@ const IssuesList = () => {
         </Card>
       </div>
 
-      <DetailedFindings issues={analysis.issues} />
+      <DetailedFindings 
+        issues={analysis.issues} 
+        onGetExpertOpinion={handleGetExpertOpinion}
+      />
+
+      {/* Providers Modal for Expert Opinion */}
+      <ProvidersModal
+        isOpen={isProvidersModalOpen}
+        onClose={() => setIsProvidersModalOpen(false)}
+        providers={providers}
+        serviceType={currentIssueDescription}
+        isLoading={isLoadingProviders}
+        error={providersError}
+        variant="issues-table"
+      />
     </div>
   );
 };
