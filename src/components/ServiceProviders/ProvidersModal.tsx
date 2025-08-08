@@ -98,7 +98,7 @@ const ProvidersModal: React.FC<ProvidersModalProps> = ({
             <div className="space-y-4">
               <p className="text-gray-600 mb-4">
                 {variant === 'issues-table' 
-                  ? `We recommend these ${providers.length} providers for your property.`
+                  ? `We recommend these ${providers.length} providers to assess this issue.`
                   : `We recommend these ${providers.length} ${serviceType.toLowerCase()}${variant === 'service-table' ? ' providers' : ''} for your property.`}
               </p>
               
