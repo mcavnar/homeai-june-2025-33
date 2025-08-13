@@ -129,42 +129,16 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
             </div>
           </HoverCardTrigger>
           <HoverCardContent className="w-96">
-            <div className="space-y-3">
-              <h4 className="font-semibold text-gray-900">Issues Breakdown</h4>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between items-center p-2 bg-red-50 rounded">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <span className="font-medium text-red-700">High Priority</span>
-                  </div>
-                  <span className="font-bold text-red-700">{highPriorityCount}</span>
-                </div>
-                <div className="flex justify-between items-center p-2 bg-yellow-50 rounded">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                    <span className="font-medium text-yellow-700">Medium Priority</span>
-                  </div>
-                  <span className="font-bold text-yellow-700">{mediumPriorityCount}</span>
-                </div>
-                <div className="flex justify-between items-center p-2 bg-green-50 rounded">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="font-medium text-green-700">Low Priority</span>
-                  </div>
-                  <span className="font-bold text-green-700">{lowPriorityCount}</span>
-                </div>
-                <div className="pt-2 border-t text-xs text-gray-600 space-y-2">
-                  <p className="font-medium">How We Categorize Issues:</p>
-                  <p>Our AI analyzes inspection reports to identify and categorize issues across 8 main areas: Electrical, Plumbing, HVAC, Roofing, Structural, Exterior, Interior, and Safety.</p>
-                  <div className="space-y-1">
-                    <p><span className="font-medium text-red-600">• Immediate:</span> Safety hazards, code violations, and urgent repairs</p>
-                    <p><span className="font-medium text-orange-600">• High:</span> Major system problems and structural concerns</p>
-                    <p><span className="font-medium text-yellow-600">• Medium:</span> Issues that could worsen if ignored and efficiency improvements</p>
-                    <p><span className="font-medium text-green-600">• Low:</span> Routine maintenance and preventive care recommendations</p>
-                  </div>
-                  <p>The analysis targets 15-25+ findings across all systems to provide comprehensive coverage from critical repairs to long-term maintenance planning.</p>
-                </div>
+            <div className="text-xs text-gray-600 space-y-2">
+              <p className="font-medium">How We Categorize Issues:</p>
+              <p>Our AI analyzes inspection reports to identify and categorize issues across 8 main areas: Electrical, Plumbing, HVAC, Roofing, Structural, Exterior, Interior, and Safety.</p>
+              <div className="space-y-1">
+                <p><span className="font-medium text-red-600">• Immediate:</span> Safety hazards, code violations, and urgent repairs</p>
+                <p><span className="font-medium text-orange-600">• High:</span> Major system problems and structural concerns</p>
+                <p><span className="font-medium text-yellow-600">• Medium:</span> Issues that could worsen if ignored and efficiency improvements</p>
+                <p><span className="font-medium text-green-600">• Low:</span> Routine maintenance and preventive care recommendations</p>
               </div>
+              <p>The analysis targets 15-25+ findings across all systems to provide comprehensive coverage from critical repairs to long-term maintenance planning.</p>
             </div>
           </HoverCardContent>
         </HoverCard>
