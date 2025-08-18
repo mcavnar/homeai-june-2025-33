@@ -128,28 +128,45 @@ const calculateDaysOnMarket = (soldDate: string | null, listedDate: string | nul
 
 export const calculateConditionScore = (
   analysis: HomeInspectionAnalysis,
-  propertyData: RedfinPropertyData
+  propertyData: RedfinPropertyData | null
 ): ConditionScoreResult => {
-  // Calculate total repair cost
-  const totalRepairCost = analysis.costSummary?.grandTotal?.max || 0;
+  console.log('🧮 Calculating condition score with:', { 
+    hasPropertyData: !!propertyData, 
+    costSummary: analysis.costSummary,
+    issuesCount: analysis.issues?.length 
+  });
+
+  // Calculate total repair cost - try grandTotal first, then fallback to sum of individual issues
+  let totalRepairCost = analysis.costSummary?.grandTotal?.max || 0;
+  
+  if (totalRepairCost === 0 && analysis.issues?.length) {
+    console.log('🧮 GrandTotal is 0, calculating from individual issues');
+    totalRepairCost = analysis.issues.reduce((sum, issue) => {
+      const maxCost = issue.estimatedCost?.max || 0;
+      return sum + maxCost;
+    }, 0);
+    console.log('🧮 Calculated total from issues:', totalRepairCost);
+  }
   
   // Count total issues (safety issues are now included in the main issues array)
   const totalIssues = analysis.issues?.length || 0;
   
-  // Calculate days on market
-  const daysOnMarket = calculateDaysOnMarket(propertyData.soldDate, propertyData.listedDate);
+  // Calculate days on market (only if property data exists)
+  const daysOnMarket = propertyData ? calculateDaysOnMarket(propertyData.soldDate, propertyData.listedDate) : null;
 
   // Calculate penalties
-  const repairPenalty = calculateRepairSeverityPenalty(
+  const repairPenalty = propertyData ? calculateRepairSeverityPenalty(
     totalRepairCost,
     propertyData.squareFeet,
     propertyData.soldPrice,
     propertyData.bedrooms
-  );
+  ) : Math.min(30, (totalRepairCost / 10000) * 15); // Fallback: $10k = 15 penalty points
 
   const issuePenalty = calculateIssueCountPenalty(totalIssues);
   
-  const marketPenalty = calculateMarketMisalignmentPenalty(propertyData, daysOnMarket);
+  const marketPenalty = propertyData ? calculateMarketMisalignmentPenalty(propertyData, daysOnMarket) : 0;
+  
+  console.log('🧮 Calculated penalties:', { repairPenalty, issuePenalty, marketPenalty, totalRepairCost });
 
   // Calculate raw score (0-100)
   const rawScore = Math.max(0, 100 - repairPenalty - issuePenalty - marketPenalty);

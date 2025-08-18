@@ -9,11 +9,13 @@ import { calculateConditionScore } from '@/utils/conditionScore';
 
 interface ConditionScoreProps {
   analysis: HomeInspectionAnalysis;
-  propertyData: RedfinPropertyData;
+  propertyData: RedfinPropertyData | null;
 }
 
 const ConditionScore: React.FC<ConditionScoreProps> = ({ analysis, propertyData }) => {
   const result = calculateConditionScore(analysis, propertyData);
+  
+  console.log('🏠 ConditionScore rendering with:', { hasPropertyData: !!propertyData, result });
 
   const getRatingColor = (rating: string) => {
     switch (rating) {

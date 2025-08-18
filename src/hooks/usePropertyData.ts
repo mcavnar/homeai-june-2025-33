@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { fetchPropertyData } from '@/services/redfinApi';
+import { fetchPropertyData } from '@/utils/propertyDataService';
 import { RedfinPropertyData } from '@/types/redfin';
 import { useToast } from '@/hooks/use-toast';
 import { useUserReport } from '@/hooks/useUserReport';
@@ -24,7 +24,7 @@ export const usePropertyData = () => {
     setPropertyError('');
 
     try {
-      console.log('Fetching property details for address:', address);
+      console.log('🏠 Fetching property details for address:', address);
       
       toast({
         title: "Fetching property details...",
@@ -32,6 +32,13 @@ export const usePropertyData = () => {
       });
 
       const data = await fetchPropertyData(address);
+      console.log('🏠 Property data received:', data);
+      
+      if (!data) {
+        console.warn('🏠 Property data is null, check API response');
+        throw new Error('No property data returned from API');
+      }
+      
       setPropertyData(data);
       setLastFetchedAddress(address);
 
