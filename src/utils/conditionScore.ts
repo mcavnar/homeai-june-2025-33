@@ -31,30 +31,88 @@ const calculateRepairSeverityPenalty = (
 ): number => {
   if (totalRepairCost === 0) return 0;
 
+  console.log('🔧 Repair penalty calculation:', { 
+    totalRepairCost, 
+    squareFeet, 
+    soldPrice, 
+    bedrooms 
+  });
+
   const penalties: number[] = [];
+  let estimatedFields = 0;
+
+  // Smart estimations for missing values
+  let effectiveSquareFeet = squareFeet;
+  let effectiveSoldPrice = soldPrice;
+  let effectiveBedrooms = bedrooms;
+
+  // Estimate squareFeet if missing
+  if (!effectiveSquareFeet && effectiveBedrooms) {
+    effectiveSquareFeet = effectiveBedrooms * 800; // 800 sqft per bedroom
+    estimatedFields++;
+    console.log('🔧 Estimated squareFeet from bedrooms:', effectiveSquareFeet);
+  } else if (!effectiveSquareFeet) {
+    effectiveSquareFeet = 2386; // National average
+    estimatedFields++;
+    console.log('🔧 Using national avg squareFeet:', effectiveSquareFeet);
+  }
+
+  // Estimate soldPrice if missing
+  if (!effectiveSoldPrice && effectiveSquareFeet) {
+    effectiveSoldPrice = effectiveSquareFeet * 150; // $150 per sqft estimate
+    estimatedFields++;
+    console.log('🔧 Estimated soldPrice from squareFeet:', effectiveSoldPrice);
+  } else if (!effectiveSoldPrice) {
+    effectiveSoldPrice = 239900; // National average
+    estimatedFields++;
+    console.log('🔧 Using national avg soldPrice:', effectiveSoldPrice);
+  }
+
+  // Estimate bedrooms if missing
+  if (!effectiveBedrooms && effectiveSquareFeet) {
+    effectiveBedrooms = Math.max(1, Math.round(effectiveSquareFeet / 800)); // 800 sqft per bedroom
+    estimatedFields++;
+    console.log('🔧 Estimated bedrooms from squareFeet:', effectiveBedrooms);
+  } else if (!effectiveBedrooms) {
+    effectiveBedrooms = 2.8; // National average
+    estimatedFields++;
+    console.log('🔧 Using national avg bedrooms:', effectiveBedrooms);
+  }
+
+  // Calculate penalties with confidence weighting (reduce penalty when using estimates)
+  const confidenceMultiplier = Math.max(0.5, 1 - (estimatedFields * 0.15));
+  console.log('🔧 Confidence multiplier:', confidenceMultiplier, 'estimated fields:', estimatedFields);
 
   // Penalty A - Cost per SqFt
-  if (squareFeet) {
-    const repairCostPerSqft = totalRepairCost / squareFeet;
-    const penaltyA = (repairCostPerSqft / NATIONAL_AVG_COST_PER_SQFT) * 30;
+  if (effectiveSquareFeet) {
+    const repairCostPerSqft = totalRepairCost / effectiveSquareFeet;
+    const penaltyA = (repairCostPerSqft / NATIONAL_AVG_COST_PER_SQFT) * 30 * confidenceMultiplier;
     penalties.push(penaltyA);
+    console.log('🔧 Penalty A (cost per sqft):', penaltyA, `($${repairCostPerSqft.toFixed(2)}/sqft)`);
   }
 
   // Penalty B - % of Price
-  if (soldPrice) {
-    const repairPct = totalRepairCost / soldPrice;
-    const penaltyB = (repairPct / NATIONAL_AVG_REPAIR_PCT) * 30;
+  if (effectiveSoldPrice) {
+    const repairPct = totalRepairCost / effectiveSoldPrice;
+    const penaltyB = (repairPct / NATIONAL_AVG_REPAIR_PCT) * 30 * confidenceMultiplier;
     penalties.push(penaltyB);
+    console.log('🔧 Penalty B (% of price):', penaltyB, `(${(repairPct * 100).toFixed(2)}%)`);
   }
 
   // Penalty C - Cost per Bedroom
-  if (bedrooms && bedrooms > 0) {
-    const repairCostPerBedroom = totalRepairCost / bedrooms;
-    const penaltyC = (repairCostPerBedroom / NATIONAL_AVG_COST_PER_BEDROOM) * 30;
+  if (effectiveBedrooms && effectiveBedrooms > 0) {
+    const repairCostPerBedroom = totalRepairCost / effectiveBedrooms;
+    const penaltyC = (repairCostPerBedroom / NATIONAL_AVG_COST_PER_BEDROOM) * 30 * confidenceMultiplier;
     penalties.push(penaltyC);
+    console.log('🔧 Penalty C (cost per bedroom):', penaltyC, `($${repairCostPerBedroom.toFixed(0)}/bedroom)`);
   }
 
-  if (penalties.length === 0) return 0;
+  // Minimum penalty logic - ensure high repair costs get meaningful penalties
+  if (penalties.length === 0 || totalRepairCost > 50000) {
+    const minimumPenalty = Math.min(25, (totalRepairCost / 10000) * 12);
+    penalties.push(minimumPenalty);
+    console.log('🔧 Added minimum penalty for high repair cost:', minimumPenalty);
+  }
 
   // Average the penalties
   const avgPenalty = penalties.reduce((sum, penalty) => sum + penalty, 0) / penalties.length;
@@ -62,10 +120,12 @@ const calculateRepairSeverityPenalty = (
 
   // Add inconsistency penalty if we have multiple penalties
   if (penalties.length > 1) {
-    const inconsistencyPenalty = standardDeviation(penalties);
+    const inconsistencyPenalty = standardDeviation(penalties) * confidenceMultiplier;
     repairPenalty += Math.min(5, inconsistencyPenalty);
+    console.log('🔧 Added inconsistency penalty:', inconsistencyPenalty);
   }
 
+  console.log('🔧 Final repair penalty:', repairPenalty);
   return repairPenalty;
 };
 
