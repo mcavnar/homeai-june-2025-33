@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { fetchPropertyData } from '@/utils/propertyDataService';
+import { fetchPropertyData } from '@/services/redfinApi';
 import { RedfinPropertyData } from '@/types/redfin';
 import { useToast } from '@/hooks/use-toast';
 import { useUserReport } from '@/hooks/useUserReport';
