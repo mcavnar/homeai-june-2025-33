@@ -9,8 +9,17 @@ const extractUrlFromResponse = (data: AutoCompleteResponse): string | null => {
     return null;
   }
   
-  if (data.data?.[0]?.rows?.[0]?.url) {
-    return data.data[0].rows[0].url;
+  // Handle new API response format with didYouMean
+  if (Array.isArray(data.data)) {
+    // Old format: data is an array
+    if (data.data?.[0]?.rows?.[0]?.url) {
+      return data.data[0].rows[0].url;
+    }
+  } else {
+    // New format: data is an object with didYouMean property
+    if (data.data?.didYouMean?.[0]?.rows?.[0]?.url) {
+      return data.data.didYouMean[0].rows[0].url;
+    }
   }
   
   return null;

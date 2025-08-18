@@ -15,7 +15,14 @@ export interface RedfinPropertyData {
 export interface AutoCompleteResponse {
   status: boolean;
   message?: string;
-  data: Array<{
+  data: {
+    didYouMean?: Array<{
+      rows: Array<{
+        url: string;
+      }>;
+      name: string;
+    }>;
+  } | Array<{
     rows: Array<{
       url: string;
     }>;
