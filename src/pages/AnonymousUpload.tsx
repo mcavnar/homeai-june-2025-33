@@ -297,7 +297,7 @@ const AnonymousUpload = () => {
                 <div className="border-t pt-6 space-y-3">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">Your analysis may take a minute or more to render. We understand this may seem prolonged but we need to make sure your information is as accurate as possible.</span>
+                    <span className="text-sm text-gray-600">Processing may take up to a minute. This ensures we provide you with the most accurate information.</span>
                   </div>
                   
                   {/* Security Trust Indicators */}
