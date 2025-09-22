@@ -105,10 +105,10 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
       backgroundColor="bg-white"
       textColor="text-gray-900"
     >
-      <div className="flex items-start justify-between w-full">
-        <HoverCard>
-          <HoverCardTrigger asChild>
-            <div className="cursor-help flex-1">
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <div className="flex items-start justify-between w-full cursor-help">
+            <div className="flex-1">
               <div className={`text-4xl font-bold mb-1 ${getRatingColor(rating)}`}>
                 {rating}
               </div>
@@ -116,44 +116,44 @@ const ConditionScoreCard: React.FC<ConditionScoreCardProps> = ({
                 {score} / 10
               </div>
             </div>
-          </HoverCardTrigger>
-          <HoverCardContent className="w-96">
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Advanced Market Analysis:</h4>
-                <p className="text-sm text-gray-700">
-                  This score analyzes your home against <strong>239,900+ national property records</strong>, 
-                  comparing repair costs per sq ft (${repairCostPerSqft.toFixed(2)} vs $4.19 avg), 
-                  percentage of home value ({repairCostPercentage.toFixed(2)}% vs 4.17% avg), 
-                  and 20+ issue categories from thousands of inspection reports.
-                </p>
+            <Info className="h-4 w-4 text-gray-400 ml-2 flex-shrink-0" />
+          </div>
+        </HoverCardTrigger>
+        <HoverCardContent className="w-96">
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-2">Advanced Market Analysis:</h4>
+              <p className="text-sm text-gray-700">
+                This score analyzes your home against <strong>239,900+ national property records</strong>, 
+                comparing repair costs per sq ft (${repairCostPerSqft.toFixed(2)} vs $4.19 avg), 
+                percentage of home value ({repairCostPercentage.toFixed(2)}% vs 4.17% avg), 
+                and 20+ issue categories from thousands of inspection reports.
+              </p>
+            </div>
+            
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>• Repair severity:</span>
+                <span className="font-medium">-{conditionResult.repairPenalty.toFixed(1)} pts vs national baselines</span>
               </div>
-              
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>• Repair severity:</span>
-                  <span className="font-medium">-{conditionResult.repairPenalty.toFixed(1)} pts vs national baselines</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>• Issue frequency:</span>
-                  <span className="font-medium">-{conditionResult.issuePenalty.toFixed(1)} pts vs 20.67 avg issues</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>• Market performance:</span>
-                  <span className="font-medium">-{conditionResult.marketPenalty.toFixed(1)} pts vs local comps</span>
-                </div>
+              <div className="flex justify-between">
+                <span>• Issue frequency:</span>
+                <span className="font-medium">-{conditionResult.issuePenalty.toFixed(1)} pts vs 20.67 avg issues</span>
               </div>
-
-              <div className="pt-3 border-t">
-                <div className="text-sm font-medium text-green-700">
-                  Result: {getPerformanceText()}
-                </div>
+              <div className="flex justify-between">
+                <span>• Market performance:</span>
+                <span className="font-medium">-{conditionResult.marketPenalty.toFixed(1)} pts vs local comps</span>
               </div>
             </div>
-          </HoverCardContent>
-        </HoverCard>
-        <Info className="h-4 w-4 text-gray-400 ml-2 flex-shrink-0" />
-      </div>
+
+            <div className="pt-3 border-t">
+              <div className="text-sm font-medium text-green-700">
+                Result: {getPerformanceText()}
+              </div>
+            </div>
+          </div>
+        </HoverCardContent>
+      </HoverCard>
     </MetricCard>
   );
 };

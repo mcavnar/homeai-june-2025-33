@@ -82,10 +82,10 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
       backgroundColor="bg-white"
       textColor="text-gray-900"
     >
-      <div className="flex items-start justify-between w-full">
-        <HoverCard>
-          <HoverCardTrigger asChild>
-            <div className="cursor-help flex-1">
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <div className="flex items-start justify-between w-full cursor-help">
+            <div className="flex-1">
               <div className="text-4xl font-bold mb-2 text-blue-600">
                 {totalIssues}
               </div>
@@ -127,23 +127,23 @@ const IssuesFoundCard: React.FC<IssuesFoundCardProps> = ({ issues }) => {
                 )}
               </div>
             </div>
-          </HoverCardTrigger>
-          <HoverCardContent className="w-96">
-            <div className="text-xs text-gray-600 space-y-2">
-              <p className="font-medium">How We Categorize Issues:</p>
-              <p>Our AI analyzes inspection reports to identify and categorize issues across 8 main areas: Electrical, Plumbing, HVAC, Roofing, Structural, Exterior, Interior, and Safety.</p>
-              <div className="space-y-1">
-                <p><span className="font-medium text-red-600">• Immediate:</span> Safety hazards, code violations, and urgent repairs</p>
-                <p><span className="font-medium text-orange-600">• High:</span> Major system problems and structural concerns</p>
-                <p><span className="font-medium text-yellow-600">• Medium:</span> Issues that could worsen if ignored and efficiency improvements</p>
-                <p><span className="font-medium text-green-600">• Low:</span> Routine maintenance and preventive care recommendations</p>
-              </div>
-              <p>The analysis targets 15-25+ findings across all systems to provide comprehensive coverage from critical repairs to long-term maintenance planning.</p>
+            <Info className="h-4 w-4 text-gray-400 ml-2 flex-shrink-0" />
+          </div>
+        </HoverCardTrigger>
+        <HoverCardContent className="w-96">
+          <div className="text-xs text-gray-600 space-y-2">
+            <p className="font-medium">How We Categorize Issues:</p>
+            <p>Our AI analyzes inspection reports to identify and categorize issues across 8 main areas: Electrical, Plumbing, HVAC, Roofing, Structural, Exterior, Interior, and Safety.</p>
+            <div className="space-y-1">
+              <p><span className="font-medium text-red-600">• Immediate:</span> Safety hazards, code violations, and urgent repairs</p>
+              <p><span className="font-medium text-orange-600">• High:</span> Major system problems and structural concerns</p>
+              <p><span className="font-medium text-yellow-600">• Medium:</span> Issues that could worsen if ignored and efficiency improvements</p>
+              <p><span className="font-medium text-green-600">• Low:</span> Routine maintenance and preventive care recommendations</p>
             </div>
-          </HoverCardContent>
-        </HoverCard>
-        <Info className="h-4 w-4 text-gray-400 ml-2 flex-shrink-0" />
-      </div>
+            <p>The analysis targets 15-25+ findings across all systems to provide comprehensive coverage from critical repairs to long-term maintenance planning.</p>
+          </div>
+        </HoverCardContent>
+      </HoverCard>
     </MetricCard>
   );
 };
