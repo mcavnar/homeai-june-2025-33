@@ -459,9 +459,9 @@ const Results = () => {
                 <div className="max-w-7xl mx-auto">
                   <div className="flex items-center justify-between">
                      <div className="space-y-1">
-                       <h1 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                         <FileText className="h-5 w-5 text-blue-600" />
-                         {currentReport.name}
+                        <h1 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                          <FileText className="h-5 w-5 text-blue-600" />
+                          {currentReport.address}
                          {currentReport.isPrimary && (
                            <span className="text-yellow-500 text-sm">★ Primary</span>
                          )}
